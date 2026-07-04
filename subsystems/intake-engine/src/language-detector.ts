@@ -7,13 +7,18 @@
  * Subsystem : Intake Engine
  * Module    : Language Detector
  *
- * Build     : BUILD-000022
+ * Build     : BUILD-000032
  * Sprint    : Sprint 02
- * Version   : 0.0.1
+ * Version   : 0.0.2
  *
  * Status    : Active
  * ==========================================================
  */
+
+import {
+    PipelineContext,
+    PipelineStep
+} from "./pipeline-step";
 
 export enum LanguageCode {
 
@@ -27,37 +32,54 @@ export enum LanguageCode {
 
 }
 
-export class LanguageDetector {
+export class LanguageDetector implements PipelineStep {
 
-    public detect(text: string): LanguageCode {
+    public execute(
+        context: PipelineContext
+    ): PipelineContext {
 
-        if (!text || text.trim().length === 0) {
+        console.log("STEP 03 : Language Detection");
 
-            return LanguageCode.UNKNOWN;
+        const value = context.sourcePath;
+
+        if (!value || value.trim().length === 0) {
+
+            context.language = LanguageCode.UNKNOWN;
+
+            return context;
 
         }
-
-        const value = text;
 
         if (/[آ-ی]/.test(value)) {
 
-            return LanguageCode.FA;
+            context.language = LanguageCode.FA;
 
         }
 
-        if (/[A-Za-z]/.test(value)) {
+        else if (/[A-Za-z]/.test(value)) {
 
-            return LanguageCode.EN;
-
-        }
-
-        if (/[\u0600-\u06FF]/.test(value)) {
-
-            return LanguageCode.AR;
+            context.language = LanguageCode.EN;
 
         }
 
-        return LanguageCode.UNKNOWN;
+        else if (/[\u0600-\u06FF]/.test(value)) {
+
+            context.language = LanguageCode.AR;
+
+        }
+
+        else {
+
+            context.language = LanguageCode.UNKNOWN;
+
+        }
+
+        console.log(
+            "Detected Language:",
+            context.language
+        );
+
+        return context;
 
     }
 
