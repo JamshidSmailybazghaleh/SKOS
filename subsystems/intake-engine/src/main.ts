@@ -1,23 +1,45 @@
 /**
+ * ==========================================================
  * SKOS
- * Intake Engine
+ * Smaily Knowledge Operating System
+ * ==========================================================
  *
- * BUILD-000015
- * Generation Zero
+ * Subsystem : Intake Engine
+ * Module    : Main Engine
+ *
+ * Build     : BUILD-000024
+ * Sprint    : Sprint 02
+ * Version   : 0.0.1
+ *
+ * Status    : Active
+ *
+ * Copyright © Smaily Knowledge Foundation
+ * ==========================================================
  */
 
+import { DocumentParser } from "./document-parser";
+
 export interface IntakeRequest {
+
     sourceType: string;
+
     sourcePath: string;
+
     language?: string;
+
 }
 
 export interface IntakeResult {
+
     accepted: boolean;
+
     message: string;
+
 }
 
 export class IntakeEngine {
+
+    private parser = new DocumentParser();
 
     public start(): void {
 
@@ -31,22 +53,22 @@ export class IntakeEngine {
 
     public receive(request: IntakeRequest): IntakeResult {
 
-    console.log("Receiving source...");
+        console.log("Receiving source...");
 
-    // TODO: File Type Detection
+        const parsed = this.parser.parse(request.sourcePath);
 
-    // TODO: Language Detection
+        console.log("Parsed Document");
 
-    // TODO: Metadata Extraction
+        console.log(parsed);
 
-    return {
+        return {
 
-        accepted: true,
+            accepted: true,
 
-        message: "Source accepted."
+            message: "Source accepted."
 
-    };
+        };
 
-}
+    }
 
 }
