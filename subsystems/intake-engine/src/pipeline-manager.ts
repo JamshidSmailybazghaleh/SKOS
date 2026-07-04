@@ -7,9 +7,9 @@
  * Subsystem : Intake Engine
  * Module    : Pipeline Manager
  *
- * Build     : BUILD-000029
+ * Build     : BUILD-000030
  * Sprint    : Sprint 02
- * Version   : 0.0.2
+ * Version   : 0.0.3
  *
  * Status    : Active
  *
@@ -26,6 +26,8 @@ import {
 } from "./pipeline-step";
 
 import { SourceValidator } from "./source-validator";
+
+import { FileTypeDetector } from "./file-type-detector";
 
 export class PipelineManager {
 
@@ -49,10 +51,16 @@ export class PipelineManager {
 
         );
 
+        this.register(
+
+            new FileTypeDetector()
+
+        );
+
     }
 
     /**
-     * Register a new pipeline step
+     * Register new pipeline step
      */
 
     public register(
@@ -66,7 +74,7 @@ export class PipelineManager {
     }
 
     /**
-     * Execute the complete pipeline
+     * Execute complete pipeline
      */
 
     public execute(
@@ -77,7 +85,7 @@ export class PipelineManager {
 
         console.log("==================================");
 
-        console.log("SKOS Pipeline Started");
+        console.log("SKOS Intake Pipeline");
 
         console.log("==================================");
 
@@ -85,13 +93,23 @@ export class PipelineManager {
 
         for (const step of this.steps) {
 
+            console.log("----------------------------------");
+
+            console.log(
+
+                "Running:",
+
+                step.constructor.name
+
+            );
+
             current = step.execute(current);
 
         }
 
-        console.log("==================================");
+        console.log("----------------------------------");
 
-        console.log("SKOS Pipeline Finished");
+        console.log("Pipeline Completed");
 
         console.log("==================================");
 
@@ -100,7 +118,7 @@ export class PipelineManager {
     }
 
     /**
-     * Remove every registered step
+     * Remove all registered steps
      */
 
     public clear(): void {
@@ -116,6 +134,16 @@ export class PipelineManager {
     public count(): number {
 
         return this.steps.length;
+
+    }
+
+    /**
+     * Return registered steps
+     */
+
+    public getSteps(): PipelineStep[] {
+
+        return [...this.steps];
 
     }
 
