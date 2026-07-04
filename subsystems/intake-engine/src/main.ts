@@ -31,16 +31,22 @@ export class IntakeEngine {
 
     public receive(request: IntakeRequest): IntakeResult {
 
-        console.log("Receiving source...");
+    console.log("Receiving source...");
 
-        return {
+    // TODO: File Type Detection
 
-            accepted: true,
+    // TODO: Language Detection
 
-            message: "Source accepted."
+    // TODO: Metadata Extraction
 
-        };
+    return {
 
-    }
+        accepted: true,
+
+        message: "Source accepted."
+
+    };
+
+}
 
 }
