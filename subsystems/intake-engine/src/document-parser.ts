@@ -1,18 +1,10 @@
-/**
- * ==========================================================
- * SKOS
- * Smaily Knowledge Operating System
- * ==========================================================
- *
- * Subsystem : Intake Engine
- * Module    : Document Parser
- *
- * Build     : BUILD-000024
- * Sprint    : Sprint 02
- * Version   : 0.0.1
- * Status    : Active
- * ==========================================================
- */
+import {
+
+    PipelineContext,
+
+    PipelineStep
+
+} from "./pipeline-step";
 
 export interface ParsedDocument {
 
@@ -22,22 +14,41 @@ export interface ParsedDocument {
 
 }
 
-export class DocumentParser {
+export class DocumentParser implements PipelineStep {
 
-    public parse(text: string): ParsedDocument {
+    public execute(
+
+        context: PipelineContext
+
+    ): PipelineContext {
+
+        console.log("STEP 04 : Document Parsing");
+
+        const text = context.rawContent ?? "";
 
         const paragraphs = text
+
             .split(/\n\s*\n/)
+
             .map(p => p.trim())
+
             .filter(p => p.length > 0);
 
-        return {
+        context.parsedDocument = {
 
             raw: text,
 
             paragraphs
 
         };
+
+        console.log(
+
+            context.parsedDocument
+
+        );
+
+        return context;
 
     }
 
