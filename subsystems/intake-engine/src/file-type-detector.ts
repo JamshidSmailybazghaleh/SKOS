@@ -7,13 +7,21 @@
  * Subsystem : Intake Engine
  * Module    : File Type Detector
  *
- * Build     : BUILD-000021
+ * Build     : BUILD-000030
  * Sprint    : Sprint 02
- * Version   : 0.0.1
+ * Version   : 0.0.2
  *
  * Status    : Active
  * ==========================================================
  */
+
+import {
+
+    PipelineContext,
+
+    PipelineStep
+
+} from "./pipeline-step";
 
 export enum SourceType {
 
@@ -33,42 +41,103 @@ export enum SourceType {
 
 }
 
-export class FileTypeDetector {
+export class FileTypeDetector implements PipelineStep {
 
-    public detect(path: string): SourceType {
+    public execute(
 
-        const value = path.toLowerCase();
+        context: PipelineContext
 
-        if (value.endsWith(".pdf")) return SourceType.PDF;
+    ): PipelineContext {
 
-        if (
-            value.endsWith(".jpg") ||
-            value.endsWith(".jpeg") ||
-            value.endsWith(".png") ||
-            value.endsWith(".webp")
-        ) return SourceType.IMAGE;
+        console.log("STEP 02 : File Type Detection");
 
-        if (
-            value.endsWith(".mp3") ||
-            value.endsWith(".wav")
-        ) return SourceType.AUDIO;
+        const path = context.sourcePath.toLowerCase();
 
-        if (
-            value.endsWith(".mp4") ||
-            value.endsWith(".mkv")
-        ) return SourceType.VIDEO;
+        if (path.endsWith(".pdf")) {
 
-        if (
-            value.endsWith(".txt") ||
-            value.endsWith(".md")
-        ) return SourceType.TEXT;
+            context.sourceType = SourceType.PDF;
 
-        if (
-            value.endsWith(".html") ||
-            value.endsWith(".htm")
-        ) return SourceType.HTML;
+        }
 
-        return SourceType.UNKNOWN;
+        else if (
+
+            path.endsWith(".jpg") ||
+
+            path.endsWith(".jpeg") ||
+
+            path.endsWith(".png") ||
+
+            path.endsWith(".webp")
+
+        ) {
+
+            context.sourceType = SourceType.IMAGE;
+
+        }
+
+        else if (
+
+            path.endsWith(".mp3") ||
+
+            path.endsWith(".wav")
+
+        ) {
+
+            context.sourceType = SourceType.AUDIO;
+
+        }
+
+        else if (
+
+            path.endsWith(".mp4") ||
+
+            path.endsWith(".mkv")
+
+        ) {
+
+            context.sourceType = SourceType.VIDEO;
+
+        }
+
+        else if (
+
+            path.endsWith(".txt") ||
+
+            path.endsWith(".md")
+
+        ) {
+
+            context.sourceType = SourceType.TEXT;
+
+        }
+
+        else if (
+
+            path.endsWith(".html") ||
+
+            path.endsWith(".htm")
+
+        ) {
+
+            context.sourceType = SourceType.HTML;
+
+        }
+
+        else {
+
+            context.sourceType = SourceType.UNKNOWN;
+
+        }
+
+        console.log(
+
+            "Detected:",
+
+            context.sourceType
+
+        );
+
+        return context;
 
     }
 
