@@ -7,53 +7,64 @@
  * Subsystem : Intake Engine
  * Module    : Pipeline Configuration
  *
- * Build     : BUILD-000033
+ * Build     : BUILD-000034
  * Sprint    : Sprint 02
- * Version   : 0.0.3
+ * Version   : 0.0.4
  *
  * Status    : Active
- *
- * Copyright © Smaily Knowledge Foundation
  * ==========================================================
  */
 
 import { PipelineStep } from "./pipeline-step";
 
 import { SourceValidator } from "./source-validator";
-
 import { FileTypeDetector } from "./file-type-detector";
-
 import { LanguageDetector } from "./language-detector";
-
 import { DocumentParser } from "./document-parser";
 
-export function buildPipeline(): PipelineStep[] {
+export interface PipelineDescriptor {
+
+    id: string;
+
+    name: string;
+
+    enabled: boolean;
+
+    step: PipelineStep;
+
+}
+
+export function buildPipeline(): PipelineDescriptor[] {
 
     return [
 
-        //--------------------------------------------------
-        // STEP 01
-        //--------------------------------------------------
+        {
+            id: "STEP-001",
+            name: "Source Validator",
+            enabled: true,
+            step: new SourceValidator()
+        },
 
-        new SourceValidator(),
+        {
+            id: "STEP-002",
+            name: "File Type Detector",
+            enabled: true,
+            step: new FileTypeDetector()
+        },
 
-        //--------------------------------------------------
-        // STEP 02
-        //--------------------------------------------------
+        {
+            id: "STEP-003",
+            name: "Language Detector",
+            enabled: true,
+            step: new LanguageDetector()
+        },
 
-        new FileTypeDetector(),
-
-        //--------------------------------------------------
-        // STEP 03
-        //--------------------------------------------------
-
-        new LanguageDetector(),
-
-        //--------------------------------------------------
-        // STEP 04
-        //--------------------------------------------------
-
-        new DocumentParser()
+        {
+            id: "STEP-004",
+            name: "Document Parser",
+            enabled: true,
+            step: new DocumentParser()
+        }
 
     ];
 
