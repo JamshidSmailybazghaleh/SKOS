@@ -1,41 +1,50 @@
 /**
+ * ==========================================================
  * SKOS
- * Source Validator
+ * Smaily Knowledge Operating System
+ * ==========================================================
  *
- * BUILD-000016
+ * Subsystem : Intake Engine
+ * Module    : Source Validator
+ *
+ * Build     : BUILD-000029
+ * Sprint    : Sprint 02
+ * Version   : 0.0.2
+ *
+ * Status    : Active
+ *
+ * Copyright © Smaily Knowledge Foundation
+ * ==========================================================
  */
 
-export interface ValidationResult {
+import {
+    PipelineContext,
+    PipelineStep
+} from "./pipeline-step";
 
-    valid: boolean;
+export class SourceValidator implements PipelineStep {
 
-    reason: string;
+    public execute(
+        context: PipelineContext
+    ): PipelineContext {
 
-}
+        console.log("STEP 01 : Source Validation");
 
-export class SourceValidator {
+        if (!context.sourcePath) {
 
-    public validate(path: string): ValidationResult {
-
-        if (!path || path.trim().length === 0) {
-
-            return {
-
-                valid: false,
-
-                reason: "Empty source path."
-
-            };
+            throw new Error("Source path is empty.");
 
         }
 
-        return {
+        if (context.sourcePath.trim().length === 0) {
 
-            valid: true,
+            throw new Error("Source path is invalid.");
 
-            reason: "Validation passed."
+        }
 
-        };
+        console.log("Source validation passed.");
+
+        return context;
 
     }
 
