@@ -1,0 +1,9 @@
+export enum MasterSelectionPolicy {
+
+    LATEST_MODIFIED = "LATEST_MODIFIED",
+
+    LARGEST_SIZE = "LARGEST_SIZE",
+
+    SOURCE_PRIORITY = "SOURCE_PRIORITY"
+
+}
