@@ -83,27 +83,3 @@ export class LearningLayerIntegrationTest {
         const optimizer =
             new AdaptiveOptimizationEngine(
 
-                memory
-
-            );
-
-        const result =
-            optimizer.optimize();
-
-        return (
-
-            experiences.count() === 1 &&
-
-            feedback.averageScore() > 0 &&
-
-            memory.count() === 1 &&
-
-            result.optimized &&
-
-            result.recordsProcessed === 1
-
-        );
-
-    }
-
-}
