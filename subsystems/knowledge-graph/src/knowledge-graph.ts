@@ -1,84 +1,143 @@
-import { GraphNode } from "./graph-node";
-import { GraphEdge } from "./graph-edge";
-import { GraphReport } from "./graph-report";
+/**
+ * ==========================================================
+ * SKOS
+ * Smaily Knowledge Operating System
+ * ==========================================================
+ *
+ * Subsystem : Knowledge Graph
+ * Module    : Knowledge Graph
+ *
+ * Build     : BUILD-000171
+ * Sprint    : Phase 3
+ * Version   : 0.1.0
+ *
+ * Status    : Foundation
+ * ==========================================================
+ */
 
+import {
+    GraphNode,
+    GraphNodeRegistry
+} from "./graph-node";
+
+import {
+    GraphEdge,
+    GraphEdgeRegistry
+} from "./graph-edge";
+
+import {
+    SemanticConcept,
+    SemanticIndex
+} from "./semantic-index";
+
+import {
+    InferenceEngine,
+    InferenceResult
+} from "./inference-engine";
+
+/**
+ * Knowledge Graph Engine.
+ */
 export class KnowledgeGraph {
 
+    /**
+     * Node registry.
+     */
     private readonly nodes =
+        new GraphNodeRegistry();
 
-        new Map<string, GraphNode>();
+    /**
+     * Edge registry.
+     */
+    private readonly edges =
+        new GraphEdgeRegistry();
 
-    private readonly edges: GraphEdge[] = [];
+    /**
+     * Semantic index.
+     */
+    private readonly semantic =
+        new SemanticIndex();
 
+    /**
+     * Inference engine.
+     */
+    private readonly inference =
+        new InferenceEngine();
+
+    /**
+     * Register a graph node.
+     */
     public addNode(
-
         node: GraphNode
-
     ): void {
 
-        this.nodes.set(
-
-            node.id,
-
-            node
-
-        );
+        this.nodes.register(node);
 
     }
 
+    /**
+     * Register a graph edge.
+     */
     public addEdge(
-
         edge: GraphEdge
-
     ): void {
 
-        this.edges.push(edge);
+        this.edges.register(edge);
 
     }
 
-    public getNode(
+    /**
+     * Register a semantic concept.
+     */
+    public addConcept(
+        concept: SemanticConcept
+    ): void {
 
-        id: string
-
-    ): GraphNode | undefined {
-
-        return this.nodes.get(id);
+        this.semantic.register(concept);
 
     }
 
-    public getNodes(): GraphNode[] {
+    /**
+     * Execute inference.
+     */
+    public infer(): InferenceResult[] {
 
-        return Array.from(
+        return this.inference.infer(
 
-            this.nodes.values()
+            this.nodes.list(),
+
+            this.edges.list()
 
         );
 
     }
 
-    public getEdges(): GraphEdge[] {
+    /**
+     * Search semantic concepts.
+     */
+    public searchConcept(
+        keyword: string
+    ): SemanticConcept[] {
 
-        return [...this.edges];
+        return this.semantic.search(keyword);
 
     }
 
-    public report(): GraphReport {
+    /**
+     * Return all nodes.
+     */
+    public listNodes(): GraphNode[] {
 
-        return {
+        return this.nodes.list();
 
-            totalNodes:
+    }
 
-                this.nodes.size,
+    /**
+     * Return all edges.
+     */
+    public listEdges(): GraphEdge[] {
 
-            totalEdges:
-
-                this.edges.length,
-
-            generatedAt:
-
-                Date.now()
-
-        };
+        return this.edges.list();
 
     }
 
