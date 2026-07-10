@@ -7,81 +7,85 @@
  * Subsystem : Knowledge Engine
  * Module    : Knowledge Validator
  *
- * Build     : BUILD-000045
- * Sprint    : Sprint 03
- * Version   : 0.0.1
- *
- * Status    : Active
+ * Build     : BUILD-000182
+ * Version   : 1.0.0
  * ==========================================================
  */
 
-import { KnowledgeObjectSchema } from "./knowledge-schema";
+import { TextDocument } from "../../content-intelligence/src/text-document";
 
-export interface ValidationResult {
+import { KnowledgeUnit } from "./knowledge-unit";
+import { KnowledgeExtractionPipeline } from "./knowledge-extraction-pipeline";
 
-    valid: boolean;
+export interface KnowledgeValidationResult {
 
-    errors: string[];
+    success: boolean;
+
+    totalUnits: number;
+
+    keywords: number;
+
+    entities: number;
+
+    averageConfidence: number;
 
 }
 
 export class KnowledgeValidator {
 
+    constructor(
+
+        private readonly pipeline:
+        KnowledgeExtractionPipeline
+
+    ) {}
+
     public validate(
 
-        object: KnowledgeObjectSchema
+        document: TextDocument
 
-    ): ValidationResult {
+    ): KnowledgeValidationResult {
 
-        const errors: string[] = [];
+        const units =
+            this.pipeline.extract(document);
 
-        if (!object.id) {
+        let keywords = 0;
+        let entities = 0;
+        let confidence = 0;
 
-            errors.push("Missing id");
+        for (const unit of units) {
 
-        }
+            confidence += unit.confidence;
 
-        if (!object.title) {
+            switch (unit.type) {
 
-            errors.push("Missing title");
+                case "keyword":
+                    keywords++;
+                    break;
 
-        }
+                case "entity":
+                    entities++;
+                    break;
 
-        if (!object.metadata) {
-
-            errors.push("Missing metadata");
-
-        }
-
-        if (!object.entities) {
-
-            errors.push("Missing entities");
-
-        }
-
-        if (!object.concepts) {
-
-            errors.push("Missing concepts");
-
-        }
-
-        if (!object.relationships) {
-
-            errors.push("Missing relationships");
-
-        }
-
-        if (!object.tags) {
-
-            errors.push("Missing tags");
+            }
 
         }
 
         return {
 
-            valid: errors.length === 0,
+            success: units.length > 0,
 
-            errors
+            totalUnits: units.length,
+
+            keywords,
+
+            entities,
+
+            averageConfidence:
+
+                units.length === 0
+                    ? 0
+                    : confidence / units.length
 
         };
 
