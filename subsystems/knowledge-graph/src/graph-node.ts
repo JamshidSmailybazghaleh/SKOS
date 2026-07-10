@@ -7,50 +7,37 @@
  * Subsystem : Knowledge Graph
  * Module    : Graph Node
  *
- * Build     : BUILD-000171
- * Sprint    : Phase 3
- * Version   : 0.1.0
- *
- * Status    : Foundation
+ * Build     : BUILD-000185
+ * Version   : 1.0.0
  * ==========================================================
  */
 
-import {
-    KnowledgeAssetId
-} from "../../knowledge-vault/src/knowledge-asset";
+import { VaultRecord } from "../../knowledge-vault/src/vault-record";
 
 /**
  * Supported graph node types.
  */
 export enum GraphNodeType {
 
-    Asset = "asset",
+    Knowledge = "knowledge",
 
-    Author = "author",
+    Keyword = "keyword",
 
-    Topic = "topic",
+    Entity = "entity",
 
-    Language = "language",
+    Concept = "concept",
 
-    Tag = "tag",
-
-    Collection = "collection",
-
-    Project = "project",
-
-    Organization = "organization",
-
-    Person = "person"
+    Document = "document"
 
 }
 
 /**
- * Graph node definition.
+ * Graph node.
  */
 export interface GraphNode {
 
     /**
-     * Stable node identifier.
+     * Unique node identifier.
      */
     id: string;
 
@@ -60,85 +47,28 @@ export interface GraphNode {
     type: GraphNodeType;
 
     /**
-     * Display label.
+     * Source vault record.
+     */
+    record: VaultRecord;
+
+    /**
+     * Human-readable label.
      */
     label: string;
 
     /**
-     * Optional Knowledge Asset reference.
+     * Optional description.
      */
-    assetId?: KnowledgeAssetId;
+    description?: string;
 
     /**
-     * Optional metadata.
+     * Node creation timestamp.
+     */
+    createdAt: Date;
+
+    /**
+     * Additional metadata.
      */
     metadata?: Record<string, unknown>;
-
-    /**
-     * Creation timestamp.
-     */
-    createdAt: number;
-
-    /**
-     * Last update timestamp.
-     */
-    updatedAt: number;
-
-}
-
-/**
- * Graph Node Registry.
- */
-export class GraphNodeRegistry {
-
-    private readonly nodes =
-        new Map<string, GraphNode>();
-
-    /**
-     * Register one node.
-     */
-    public register(
-        node: GraphNode
-    ): void {
-
-        this.nodes.set(
-            node.id,
-            node
-        );
-
-    }
-
-    /**
-     * Find one node.
-     */
-    public get(
-        id: string
-    ): GraphNode | undefined {
-
-        return this.nodes.get(id);
-
-    }
-
-    /**
-     * Return all nodes.
-     */
-    public list(): GraphNode[] {
-
-        return Array.from(
-            this.nodes.values()
-        );
-
-    }
-
-    /**
-     * Remove one node.
-     */
-    public remove(
-        id: string
-    ): boolean {
-
-        return this.nodes.delete(id);
-
-    }
 
 }
