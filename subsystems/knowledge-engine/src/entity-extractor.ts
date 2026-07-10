@@ -7,59 +7,84 @@
  * Subsystem : Knowledge Engine
  * Module    : Entity Extractor
  *
- * Build     : BUILD-000037
- * Sprint    : Sprint 03
- * Version   : 0.0.2
- *
- * Status    : Active
+ * Build     : BUILD-000182
+ * Version   : 1.0.0
  * ==========================================================
  */
 
-export interface Entity {
+import {
+    TextDocument
+} from "../../content-intelligence/src/text-document";
 
-    value: string;
+import {
+    KnowledgeUnit,
+    KnowledgeUnitType
+} from "./knowledge-unit";
 
-    type: string;
+export enum EntityType {
+
+    Person = "person",
+
+    Organization = "organization",
+
+    Location = "location",
+
+    Date = "date",
+
+    Number = "number"
 
 }
 
 export class EntityExtractor {
 
     /**
-     * Extract candidate entities
+     * Extract basic entities.
      */
-
     public extract(
+        document: TextDocument
+    ): KnowledgeUnit[] {
 
-        text: string
+        const entities: KnowledgeUnit[] = [];
 
-    ): Entity[] {
+        let index = 0;
 
-        const entities: Entity[] = [];
+        // Extract numbers
+        const numberPattern = /\b\d+\b/g;
 
-        const words = text.split(/\s+/);
+        for (const match of document.normalizedText.matchAll(numberPattern)) {
 
-        for (const word of words) {
+            entities.push({
 
-            if (
+                id: `ent-${index++}`,
 
-                word.length > 3 &&
+                document,
 
-                /^[A-Za-zآ-ی]/.test(word)
+                type: KnowledgeUnitType.Entity,
 
-            ) {
+                value: match[0],
 
-                entities.push({
+                startOffset: match.index ?? -1,
 
-                    value: word,
+                endOffset:
+                    (match.index ?? 0) + match[0].length,
 
-                    type: "UNKNOWN"
+                confidence: 0.90,
 
-                });
+                metadata: {
 
-            }
+                    entityType: EntityType.Number
+
+                }
+
+            });
 
         }
+
+        // Future:
+        // Person detection
+        // Organization detection
+        // Location detection
+        // Date detection
 
         return entities;
 
