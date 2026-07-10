@@ -7,167 +7,62 @@
  * Subsystem : Knowledge Graph
  * Module    : Graph Edge
  *
- * Build     : BUILD-000171
- * Sprint    : Phase 3
- * Version   : 0.1.0
- *
- * Status    : Foundation
+ * Build     : BUILD-000185
+ * Version   : 1.0.0
  * ==========================================================
  */
 
-import {
-    GraphNode
-} from "./graph-node";
-
-/**
- * Supported edge types.
- */
 export enum GraphEdgeType {
 
-    References = "references",
-
-    Translates = "translates",
-
-    DependsOn = "depends-on",
+    Related = "related",
 
     Contains = "contains",
 
-    BelongsTo = "belongs-to",
+    References = "references",
 
-    RelatedTo = "related-to",
+    Parent = "parent",
 
-    AuthoredBy = "authored-by",
+    Child = "child",
 
-    TaggedWith = "tagged-with",
-
-    WrittenIn = "written-in",
-
-    MemberOf = "member-of"
+    Similar = "similar"
 
 }
 
-/**
- * Graph Edge.
- */
 export interface GraphEdge {
 
     /**
-     * Stable edge identifier.
+     * Unique edge identifier.
      */
     id: string;
 
     /**
-     * Source node.
+     * Source node identifier.
      */
-    from: string;
+    sourceNodeId: string;
 
     /**
-     * Destination node.
+     * Target node identifier.
      */
-    to: string;
+    targetNodeId: string;
 
     /**
-     * Edge type.
+     * Relationship type.
      */
     type: GraphEdgeType;
 
     /**
-     * Relation weight.
+     * Relationship strength (0.0–1.0).
      */
     weight: number;
 
     /**
-     * Optional metadata.
-     */
-    metadata?: Record<string, unknown>;
-
-    /**
      * Creation timestamp.
      */
-    createdAt: number;
-
-}
-
-/**
- * Graph Edge Registry.
- */
-export class GraphEdgeRegistry {
-
-    private readonly edges: GraphEdge[] = [];
+    createdAt: Date;
 
     /**
-     * Register edge.
+     * Additional metadata.
      */
-    public register(
-        edge: GraphEdge
-    ): void {
-
-        this.edges.push(edge);
-
-    }
-
-    /**
-     * Return all edges.
-     */
-    public list(): GraphEdge[] {
-
-        return [...this.edges];
-
-    }
-
-    /**
-     * Return all outgoing edges.
-     */
-    public outgoing(
-        node: GraphNode
-    ): GraphEdge[] {
-
-        return this.edges.filter(
-
-            edge => edge.from === node.id
-
-        );
-
-    }
-
-    /**
-     * Return all incoming edges.
-     */
-    public incoming(
-        node: GraphNode
-    ): GraphEdge[] {
-
-        return this.edges.filter(
-
-            edge => edge.to === node.id
-
-        );
-
-    }
-
-    /**
-     * Remove edge.
-     */
-    public remove(
-        edgeId: string
-    ): boolean {
-
-        const index = this.edges.findIndex(
-
-            edge => edge.id === edgeId
-
-        );
-
-        if (index < 0) {
-
-            return false;
-
-        }
-
-        this.edges.splice(index, 1);
-
-        return true;
-
-    }
+    metadata?: Record<string, unknown>;
 
 }
