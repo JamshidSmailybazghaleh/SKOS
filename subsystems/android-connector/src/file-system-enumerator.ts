@@ -1,73 +1,32 @@
-/**
- * ==========================================================
- * SKOS
- * Smaily Knowledge Operating System
- * ==========================================================
- *
- * Module : File System Enumerator
- * Build  : BUILD-000178
- * Version: 1.0.0
- *
- * Responsibility:
- * Enumerate files and directories from a StorageProvider.
- * This module DOES NOT read file contents.
- * ==========================================================
- */
-
 import { StorageProvider } from "./storage-provider";
+import { MetadataExtractor } from "./metadata-extractor";
+import { FileMetadata } from "./file-metadata";
 
-/**
- * Represents a file system entry.
- */
-export interface FileSystemEntry {
-
-    id: string;
-
-    path: string;
-
-    name: string;
-
-    isDirectory: boolean;
-
-    size?: number;
-
-    modifiedAt?: Date;
-
-}
-
-/**
- * File System Enumerator.
- */
 export class FileSystemEnumerator {
 
     constructor(
-        private readonly provider: StorageProvider
+        private readonly provider: StorageProvider,
+        private readonly extractor: MetadataExtractor
     ) {}
 
-    /**
-     * Enumerate a storage root.
-     */
     public async enumerate(
         root: string
-    ): Promise<FileSystemEntry[]> {
+    ): Promise<FileMetadata[]> {
 
-        const entries: FileSystemEntry[] = [];
+        const result: FileMetadata[] = [];
 
         await this.enumerateDirectory(
             root,
-            entries
+            result
         );
 
-        return entries;
+        return result;
 
     }
 
-    /**
-     * Recursive directory enumeration.
-     */
     private async enumerateDirectory(
         path: string,
-        entries: FileSystemEntry[]
+        result: FileMetadata[]
     ): Promise<void> {
 
         const directories =
@@ -75,21 +34,9 @@ export class FileSystemEnumerator {
 
         for (const directory of directories) {
 
-            entries.push({
-
-                id: directory,
-
-                path: directory,
-
-                name: this.getName(directory),
-
-                isDirectory: true
-
-            });
-
             await this.enumerateDirectory(
                 directory,
-                entries
+                result
             );
 
         }
@@ -99,32 +46,13 @@ export class FileSystemEnumerator {
 
         for (const file of files) {
 
-            entries.push({
+            result.push(
 
-                id: file,
+                this.extractor.extract(file)
 
-                path: file,
-
-                name: this.getName(file),
-
-                isDirectory: false
-
-            });
+            );
 
         }
-
-    }
-
-    /**
-     * Extract file or directory name.
-     */
-    private getName(
-        path: string
-    ): string {
-
-        const parts = path.split("/");
-
-        return parts[parts.length - 1];
 
     }
 
