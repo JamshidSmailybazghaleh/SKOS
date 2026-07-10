@@ -7,172 +7,94 @@
  * Subsystem : Content Intelligence
  * Module    : Language Detector
  *
- * Build     : BUILD-000167
- * Sprint    : Phase 3
- * Version   : 0.1.0
- *
- * Status    : Foundation
+ * Build     : BUILD-000181
+ * Version   : 1.0.0
  * ==========================================================
  */
 
-import {
-    ContentLanguage
-} from "./content-type";
+import { DocumentLanguage } from "./text-document";
 
-/**
- * Language detection result.
- */
-export interface LanguageDetectionResult {
-
-    /**
-     * Detected language.
-     */
-    language: ContentLanguage;
-
-    /**
-     * Confidence score.
-     */
-    confidence: number;
-
-    /**
-     * Detection method.
-     */
-    method: string;
-
-}
-
-/**
- * Language Detector.
- */
 export class LanguageDetector {
 
     /**
-     * Detect language.
-     *
-     * Foundation implementation.
+     * Detect document language.
      */
     public detect(
-
         text: string
-
-    ): LanguageDetectionResult {
+    ): DocumentLanguage {
 
         const sample =
+            text.substring(0, 5000);
 
-            text.trim();
+        let persian = 0;
+        let arabic = 0;
+        let latin = 0;
 
-        if (sample.length === 0) {
+        for (const character of sample) {
 
-            return {
+            const code =
+                character.charCodeAt(0);
 
-                language:
-                    ContentLanguage.Unknown,
+            // Persian / Arabic Unicode Block
+            if (code >= 0x0600 && code <= 0x06FF) {
 
-                confidence: 0,
+                if (
+                    character === "پ" ||
+                    character === "چ" ||
+                    character === "ژ" ||
+                    character === "گ"
+                ) {
 
-                method: "empty"
+                    persian++;
 
-            };
+                } else {
 
-        }
+                    arabic++;
 
-        // Persian / Arabic Unicode
-        if (/[\u0600-\u06FF]/.test(sample)) {
-
-            // Simple Gilaki keyword heuristic
-            const gilakiWords = [
-                "ببو",
-                "گیلان",
-                "دیلمان",
-                "گیلکی"
-            ];
-
-            const isGilaki = gilakiWords.some(
-
-                word => sample.includes(word)
-
-            );
-
-            if (isGilaki) {
-
-                return {
-
-                    language:
-                        ContentLanguage.Gilaki,
-
-                    confidence: 0.80,
-
-                    method:
-                        "keyword"
-
-                };
+                }
 
             }
 
-            return {
+            // Latin letters
+            else if (
+                (code >= 65 && code <= 90) ||
+                (code >= 97 && code <= 122)
+            ) {
 
-                language:
-                    ContentLanguage.Persian,
+                latin++;
 
-                confidence: 0.95,
-
-                method:
-                    "unicode"
-
-            };
+            }
 
         }
 
-        // Latin alphabet
-        if (/[A-Za-z]/.test(sample)) {
+        if (
+            persian > arabic &&
+            persian > latin
+        ) {
 
-            return {
-
-                language:
-                    ContentLanguage.English,
-
-                confidence: 0.90,
-
-                method:
-                    "latin"
-
-            };
+            return DocumentLanguage.Persian;
 
         }
 
-        return {
+        if (
+            arabic > persian &&
+            arabic > latin
+        ) {
 
-            language:
-                ContentLanguage.Unknown,
+            return DocumentLanguage.Arabic;
 
-            confidence: 0.20,
+        }
 
-            method:
-                "fallback"
+        if (
+            latin > persian &&
+            latin > arabic
+        ) {
 
-        };
+            return DocumentLanguage.English;
 
-    }
+        }
 
-    /**
-     * Determine whether text
-     * appears multilingual.
-     */
-    public isMultilingual(
-
-        text: string
-
-    ): boolean {
-
-        return (
-
-            /[\u0600-\u06FF]/.test(text)
-
-            &&
-
-            /[A-Za-z]/.test(text)
-
-        );
+        return DocumentLanguage.Unknown;
 
     }
 
