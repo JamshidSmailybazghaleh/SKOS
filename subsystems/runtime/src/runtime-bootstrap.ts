@@ -4,75 +4,64 @@
  * Smaily Knowledge Operating System
  * ==========================================================
  *
- * Subsystem : Runtime
+ * Subsystem : Runtime Foundation
  * Module    : Runtime Bootstrap
  *
- * Build     : BUILD-000176
- * Sprint    : Runtime Foundation
- * Version   : 0.1.0
- *
- * Status    : Foundation
+ * Build     : BUILD-000195
+ * Version   : 1.0.0
  * ==========================================================
  */
 
-import {
-    RuntimeConfigurationManager
-} from "./runtime-config";
+import { RuntimeKernel } from "./runtime-kernel";
+import { ServiceRegistry } from "./service-registry";
+import { TaskScheduler } from "./task-scheduler";
+import { EventBus } from "./event-bus";
+import { RuntimeMonitor } from "./runtime-monitor";
 
-import {
-    RuntimeEnvironmentManager
-} from "./runtime-environment";
-
-import {
-    DependencyChecker
-} from "./dependency-checker";
-
-import {
-    StartupManager
-} from "./startup-manager";
-
-/**
- * Runtime Bootstrap.
- */
 export class RuntimeBootstrap {
 
-    private readonly configuration =
-        new RuntimeConfigurationManager();
+    public readonly kernel =
+        new RuntimeKernel();
 
-    private readonly environment =
-        new RuntimeEnvironmentManager();
+    public readonly services =
+        new ServiceRegistry();
 
-    private readonly dependencyChecker =
-        new DependencyChecker();
+    public readonly scheduler =
+        new TaskScheduler();
 
-    private readonly startupManager =
-        new StartupManager();
+    public readonly eventBus =
+        new EventBus();
+
+    public readonly monitor =
+        new RuntimeMonitor();
 
     /**
-     * Initialize runtime.
+     * Bootstrap runtime.
      */
-    public initialize(): boolean {
+    public initialize(): void {
 
-        // Load configuration
-        this.configuration.get();
+        this.kernel.initialize();
 
-        // Read runtime environment
-        this.environment.get();
+        /*
+         * Future builds:
+         *
+         * Register runtime services
+         * Configure scheduler
+         * Configure event bus
+         * Load configuration
+         * Initialize logging
+         */
 
-        // Check dependencies
-        const result =
-            this.dependencyChecker.check();
+        this.kernel.start();
 
-        if (!result.ready) {
+    }
 
-            return false;
+    /**
+     * Shutdown runtime.
+     */
+    public shutdown(): void {
 
-        }
-
-        // Start registered subsystems
-        this.startupManager.start();
-
-        return true;
+        this.kernel.stop();
 
     }
 
