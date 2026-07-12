@@ -5,21 +5,19 @@
  * ==========================================================
  *
  * BUILD-000199
- * File : PermissionState.kt
+ * File : PermissionResult.kt
  * Version : 1.0.0
  * ==========================================================
  */
 
 package com.smaily.skos.permission
 
-enum class PermissionState {
+data class PermissionResult(
 
-    UNKNOWN,
+    val permission: String,
 
-    GRANTED,
+    val state: PermissionState,
 
-    DENIED,
+    val granted: Boolean
 
-    PERMANENTLY_DENIED
-
-}
+)
