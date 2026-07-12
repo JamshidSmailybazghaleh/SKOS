@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- SKOS Brand Colors -->
+
+    <color name="midnight_blue">#0A2342</color>
+
+    <color name="gold">#D4AF37</color>
+
+    <color name="white">#FFFFFF</color>
+
+    <color name="black">#000000</color>
+
+    <!-- Background -->
+
+    <color name="background_dark">#081A31</color>
+
+    <color name="surface_dark">#102A4C</color>
+
+    <!-- Status Colors -->
+
+    <color name="success">#2E7D32</color>
+
+    <color name="warning">#F9A825</color>
+
+    <color name="error">#C62828</color>
+
+</resources>
