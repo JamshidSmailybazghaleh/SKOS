@@ -1,28 +1,38 @@
 package com.smaily.skos.storage
 
-import android.content.Context
 import android.net.Uri
 
-class StorageManager(
-    private val context: Context
-) {
+class StorageManager {
 
-    private var selectedStorageUri: Uri? = null
 
-    fun setStorageUri(uri: Uri) {
-        selectedStorageUri = uri
+    private var selectedUri: Uri? = null
+
+
+    fun setStorage(uri: Uri) {
+
+        selectedUri = uri
+
     }
 
-    fun getStorageUri(): Uri? {
-        return selectedStorageUri
+
+    fun getStorage(): Uri? {
+
+        return selectedUri
+
     }
 
-    fun hasStorage(): Boolean {
-        return selectedStorageUri != null
+
+    fun isReady(): Boolean {
+
+        return selectedUri != null
+
     }
 
-    fun clearStorage() {
-        selectedStorageUri = null
+
+    fun clear() {
+
+        selectedUri = null
+
     }
 
 }
