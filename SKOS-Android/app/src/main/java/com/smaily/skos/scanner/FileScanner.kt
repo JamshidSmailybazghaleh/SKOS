@@ -1,18 +1,20 @@
 package com.smaily.skos.scanner
 
-import android.content.Context
-import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
 
 class FileScanner(
-    private val context: Context
+
+    private val walker: DirectoryWalker = DirectoryWalker()
+
 ) {
 
-    fun scan(storageUri: Uri): Boolean {
+    fun scan(root: DocumentFile): List<ScannedFile> {
 
-        // BUILD-000200
-        // نسخه اولیه فقط اعتبار URI را بررسی می‌کند.
+        if (!root.exists()) {
+            return emptyList()
+        }
 
-        return storageUri.toString().isNotEmpty()
+        return walker.walk(root)
 
     }
 
