@@ -1,0 +1,27 @@
+package com.smaily.skos.scanner
+
+enum class ScanStage {
+
+    INITIALIZING,
+
+    VALIDATING_PERMISSION,
+
+    VALIDATING_STORAGE,
+
+    WALKING_DIRECTORIES,
+
+    ANALYZING_FILES,
+
+    EXTRACTING_METADATA,
+
+    DETECTING_DUPLICATES,
+
+    BUILDING_ASSETS,
+
+    REGISTERING,
+
+    COMPLETED,
+
+    FAILED
+
+}
