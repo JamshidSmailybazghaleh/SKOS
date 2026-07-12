@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+==========================================================
+SKOS
+Smaily Knowledge Operating System
+
+Build   : BUILD-000196
+File    : AndroidManifest.xml
+Version : 1.0.0
+==========================================================
+-->
+
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Android 13+ Notification -->
+    <uses-permission
+        android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <!-- Android Storage Permissions -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"/>
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/>
+
+    <!-- Android 13+ -->
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES"/>
+
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_VIDEO"/>
+
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_AUDIO"/>
+
+    <!-- Network -->
+    <uses-permission
+        android:name="android.permission.INTERNET"/>
+
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <application
+
+        android:name=".SKOSApplication"
+
+        android:allowBackup="true"
+
+        android:icon="@mipmap/ic_launcher"
+
+        android:label="SKOS"
+
+        android:roundIcon="@mipmap/ic_launcher_round"
+
+        android:supportsRtl="true"
+
+        android:theme="@style/Theme.SKOS">
+
+        <activity
+
+            android:name=".MainActivity"
+
+            android:exported="true">
+
+            <intent-filter>
+
+                <action
+                    android:name="android.intent.action.MAIN"/>
+
+                <category
+                    android:name="android.intent.category.LAUNCHER"/>
+
+            </intent-filter>
+
+        </activity>
+
+    </application>
+
+</manifest>
