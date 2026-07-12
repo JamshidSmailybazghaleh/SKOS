@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <!-- Application -->
+
+    <string name="app_name">SKOS</string>
+
+    <string name="app_full_name">
+        Smaily Knowledge Operating System
+    </string>
+
+    <string name="app_version">
+        Version 1.0.0
+    </string>
+
+    <string name="app_slogan">
+        Knowledge • Wisdom • Impact
+    </string>
+
+    <!-- Runtime -->
+
+    <string name="runtime_ready">
+        Runtime Ready
+    </string>
+
+    <string name="runtime_loading">
+        Runtime Loading...
+    </string>
+
+    <string name="runtime_shutdown">
+        Runtime Shutdown
+    </string>
+
+    <!-- Dashboard -->
+
+    <string name="dashboard">
+        Dashboard
+    </string>
+
+    <string name="knowledge_vault">
+        Knowledge Vault
+    </string>
+
+    <string name="migration_engine">
+        Migration Engine
+    </string>
+
+    <string name="synchronization_engine">
+        Synchronization Engine
+    </string>
+
+    <!-- Status -->
+
+    <string name="status_ready">
+        READY
+    </string>
+
+    <string name="status_waiting">
+        WAITING
+    </string>
+
+    <string name="status_running">
+        RUNNING
+    </string>
+
+</resources>
