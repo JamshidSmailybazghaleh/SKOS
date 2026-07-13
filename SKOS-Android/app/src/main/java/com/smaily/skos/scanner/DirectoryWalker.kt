@@ -1,23 +1,101 @@
 package com.smaily.skos.scanner
 
-import androidx.documentfile.provider.DocumentFile
+import java.io.File
 
-class DirectoryWalker(
-    private val extractor: MetadataExtractor = MetadataExtractor()
-) {
+/**
+ * پیمایش بازگشتی پوشه‌ها
+ */
+class DirectoryWalker {
 
-    fun walk(directory: DocumentFile): List<ScannedFile> {
+    /**
+     * شروع پیمایش
+     */
+    fun walk(
 
-        val results = mutableListOf<ScannedFile>()
+        rootPath: String,
 
-        if (!directory.isDirectory) {
-            return results
+        statistics: ScanStatistics
+
+    ): List<File> {
+
+        val result = mutableListOf<File>()
+
+        val root = File(rootPath)
+
+        if (!root.exists()) {
+
+            return result
+
         }
 
-        for (file in directory.listFiles()) {
-            results.add(extractor.extract(file))
-        }
+        scanDirectory(
 
-        return results
+            root,
+
+            result,
+
+            statistics
+
+        )
+
+        return result
+
     }
+
+    /**
+     * پیمایش بازگشتی
+     */
+    private fun scanDirectory(
+
+        directory: File,
+
+        result: MutableList<File>,
+
+        statistics: ScanStatistics
+
+    ) {
+
+        if (!directory.exists())
+            return
+
+        if (!directory.isDirectory)
+            return
+
+        statistics.folders++
+
+        val children = directory.listFiles()
+            ?: return
+
+        children.forEach { file ->
+
+            if (file.isDirectory) {
+
+                scanDirectory(
+
+                    file,
+
+                    result,
+
+                    statistics
+
+                )
+
+            } else {
+
+                result.add(file)
+
+                FileClassifier.classify(
+
+                    file.name,
+
+                    statistics
+
+                )
+
+            }
+
+        }
+
+    }
+
 }
