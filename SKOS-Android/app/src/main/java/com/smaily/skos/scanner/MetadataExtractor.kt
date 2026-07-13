@@ -1,22 +1,44 @@
 package com.smaily.skos.scanner
 
-import androidx.documentfile.provider.DocumentFile
+import android.webkit.MimeTypeMap
+import java.io.File
 
+/**
+ * استخراج اطلاعات پایه فایل
+ */
 class MetadataExtractor {
 
-    fun extract(document: DocumentFile): ScannedFile {
+    fun extract(
 
-        return ScannedFile(
+        file: File
 
-            name = document.name ?: "Unknown",
+    ): FileMetadata {
 
-            uri = document.uri,
+        val extension = file.extension.lowercase()
 
-            mimeType = document.type,
+        val mime = MimeTypeMap
+            .getSingleton()
+            .getMimeTypeFromExtension(extension)
 
-            size = document.length(),
+        return FileMetadata(
 
-            isDirectory = document.isDirectory
+            name = file.name,
+
+            absolutePath = file.absolutePath,
+
+            extension = extension,
+
+            size = file.length(),
+
+            lastModified = file.lastModified(),
+
+            mimeType = mime,
+
+            isHidden = file.isHidden,
+
+            isReadable = file.canRead(),
+
+            isWritable = file.canWrite()
 
         )
 
