@@ -4,49 +4,110 @@ object FileClassifier {
 
     fun classify(
 
-        name:String,
+        metadata: FileMetadata,
 
         statistics: ScanStatistics
 
-    ){
+    ): FileCategory {
 
-        when{
+        val extension = metadata.extension.lowercase()
 
-            name.endsWith(".pdf",true) ->
-                statistics.pdf++
+        val mime = metadata.mimeType ?: ""
 
-            name.endsWith(".epub",true) ->
-                statistics.epub++
+        val category = when {
 
-            name.endsWith(".docx",true) ->
-                statistics.docx++
+            extension == "pdf" ||
+            extension == "epub" ||
+            extension == "mobi" ->
 
-            name.endsWith(".pptx",true) ->
-                statistics.pptx++
+                FileCategory.BOOK
 
-            name.endsWith(".xlsx",true) ->
-                statistics.xlsx++
+            extension == "doc" ||
+            extension == "docx" ||
+            extension == "odt" ->
 
-            name.endsWith(".txt",true) ->
-                statistics.txt++
+                FileCategory.DOCUMENT
 
-            name.endsWith(".jpg",true) ||
-            name.endsWith(".jpeg",true) ||
-            name.endsWith(".png",true) ->
-                statistics.images++
+            extension == "ppt" ||
+            extension == "pptx" ->
 
-            name.endsWith(".mp3",true) ->
-                statistics.audio++
+                FileCategory.PRESENTATION
 
-            name.endsWith(".mp4",true) ->
-                statistics.video++
+            extension == "xls" ||
+            extension == "xlsx" ->
+
+                FileCategory.SPREADSHEET
+
+            mime.startsWith("image") ->
+
+                FileCategory.IMAGE
+
+            mime.startsWith("audio") ->
+
+                FileCategory.AUDIO
+
+            mime.startsWith("video") ->
+
+                FileCategory.VIDEO
+
+            extension == "zip" ||
+            extension == "rar" ||
+            extension == "7z" ->
+
+                FileCategory.ARCHIVE
+
+            extension == "kt" ||
+            extension == "java" ||
+            extension == "cpp" ||
+            extension == "xml" ||
+            extension == "json" ->
+
+                FileCategory.SOURCE_CODE
+
+            extension == "db" ||
+            extension == "sqlite" ->
+
+                FileCategory.DATABASE
 
             else ->
+
+                FileCategory.UNKNOWN
+
+        }
+
+        when (category) {
+
+            FileCategory.BOOK ->
+                statistics.pdf++
+
+            FileCategory.DOCUMENT ->
+                statistics.docx++
+
+            FileCategory.PRESENTATION ->
+                statistics.pptx++
+
+            FileCategory.SPREADSHEET ->
+                statistics.xlsx++
+
+            FileCategory.IMAGE ->
+                statistics.images++
+
+            FileCategory.AUDIO ->
+                statistics.audio++
+
+            FileCategory.VIDEO ->
+                statistics.video++
+
+            FileCategory.UNKNOWN ->
                 statistics.unknown++
+
+            else -> {}
 
         }
 
         statistics.files++
+
+        return category
 
     }
 
