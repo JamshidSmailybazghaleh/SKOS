@@ -2,19 +2,24 @@ package com.smaily.skos.scanner
 
 import com.smaily.skos.engine.MissionResult
 import com.smaily.skos.knowledge.KnowledgeAssetBuilder
+import com.smaily.skos.knowledge.KnowledgeRegistry
 
 /**
  * Scan Pipeline
  *
- * مسئول اجرای مراحل مختلف اسکن
+ * مسئول اجرای کامل فرآیند اسکن
  */
 class ScanPipeline(
 
     private val directoryWalker: DirectoryWalker,
+
     private val metadataExtractor: MetadataExtractor
 
 ) {
 
+    /**
+     * اجرای Pipeline اسکن
+     */
     fun execute(
 
         context: ScanContext
@@ -23,9 +28,9 @@ class ScanPipeline(
 
         val statistics = ScanStatistics()
 
-        try {
+        return try {
 
-            // مرحله اول
+            // مرحله 1 : پیمایش پوشه
             val files = directoryWalker.walk(
 
                 context.rootPath,
@@ -34,7 +39,7 @@ class ScanPipeline(
 
             )
 
-            // مرحله دوم
+            // مرحله 2 : پردازش فایل‌ها
             files.forEach { file ->
 
                 // استخراج Metadata
@@ -49,7 +54,7 @@ class ScanPipeline(
 
                 )
 
-                // ساخت دارایی دانشی
+                // تبدیل به Knowledge Asset
                 val asset = KnowledgeAssetBuilder.build(
 
                     metadata,
@@ -58,12 +63,16 @@ class ScanPipeline(
 
                 )
 
-                // در Sprint بعدی:
-                // KnowledgeRegistry.register(asset)
+                // ثبت در Registry
+                KnowledgeRegistry.register(
+
+                    asset
+
+                )
 
             }
 
-            return MissionResult(
+            MissionResult(
 
                 success = true,
 
@@ -77,13 +86,14 @@ class ScanPipeline(
 
             )
 
-        } catch (ex: Exception) {
+        } catch (exception: Exception) {
 
-            return MissionResult(
+            MissionResult(
 
                 success = false,
 
-                message = ex.message ?: "Unknown error.",
+                message = exception.message
+                    ?: "Unknown scanner error.",
 
                 processedFiles = statistics.files,
 
