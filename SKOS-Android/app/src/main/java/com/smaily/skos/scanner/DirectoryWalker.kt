@@ -5,7 +5,12 @@ import java.io.File
 /**
  * پیمایش بازگشتی پوشه‌ها
  */
-class DirectoryWalker {
+class DirectoryWalker(
+
+    private val metadataExtractor: MetadataExtractor =
+        MetadataExtractor()
+
+) {
 
     /**
      * شروع پیمایش
@@ -23,18 +28,20 @@ class DirectoryWalker {
         val root = File(rootPath)
 
         if (!root.exists()) {
-
             return result
+        }
 
+        if (!root.isDirectory) {
+            return result
         }
 
         scanDirectory(
 
-            root,
+            directory = root,
 
-            result,
+            result = result,
 
-            statistics
+            statistics = statistics
 
         )
 
@@ -43,7 +50,7 @@ class DirectoryWalker {
     }
 
     /**
-     * پیمایش بازگشتی
+     * پیمایش بازگشتی پوشه‌ها
      */
     private fun scanDirectory(
 
@@ -55,38 +62,41 @@ class DirectoryWalker {
 
     ) {
 
-        if (!directory.exists())
-            return
+        if (!directory.exists()) return
 
-        if (!directory.isDirectory)
-            return
+        if (!directory.isDirectory) return
 
         statistics.folders++
 
         val children = directory.listFiles()
             ?: return
 
-        children.forEach { file ->
+        for (child in children) {
 
-            if (file.isDirectory) {
+            if (child.isDirectory) {
 
                 scanDirectory(
 
-                    file,
+                    directory = child,
 
-                    result,
+                    result = result,
 
-                    statistics
+                    statistics = statistics
 
                 )
 
             } else {
 
-                result.add(file)
+                result.add(child)
 
+                // استخراج Metadata
+                val metadata =
+                    metadataExtractor.extract(child)
+
+                // طبقه‌بندی فایل
                 FileClassifier.classify(
 
-                    file.name,
+                    metadata,
 
                     statistics
 
