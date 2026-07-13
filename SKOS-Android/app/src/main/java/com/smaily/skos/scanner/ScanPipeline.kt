@@ -1,41 +1,71 @@
-Start
+package com.smaily.skos.scanner
 
-↓
+import com.smaily.skos.engine.MissionResult
 
-Validate Permission
+/**
+ * Scan Pipeline
+ *
+ * مسئول اجرای مراحل مختلف اسکن
+ */
+class ScanPipeline(
 
-↓
+    private val directoryWalker: DirectoryWalker,
+    private val metadataExtractor: MetadataExtractor
 
-Validate Storage
+) {
 
-↓
+    fun execute(
 
-Directory Walker
+        context: ScanContext
 
-↓
+    ): MissionResult {
 
-File Analyzer
+        val statistics = ScanStatistics()
 
-↓
+        try {
 
-Metadata Extractor
+            // مرحله ۱
+            val files = directoryWalker.walk(
 
-↓
+                context.rootPath,
 
-Duplicate Detector
+                statistics
 
-↓
+            )
 
-Knowledge Asset Builder
+            // مرحله ۲
+            files.forEach { file ->
 
-↓
+                metadataExtractor.extract(file)
 
-Registry
+            }
 
-↓
+            return MissionResult(
 
-Dashboard
+                success = true,
 
-↓
+                message = "Scan completed.",
 
-Finish
+                processedFiles = statistics.files,
+
+                processedFolders = statistics.folders,
+
+                errors = 0
+
+            )
+
+        } catch (ex: Exception) {
+
+            return MissionResult(
+
+                success = false,
+
+                message = ex.message ?: "Unknown error."
+
+            )
+
+        }
+
+    }
+
+}
