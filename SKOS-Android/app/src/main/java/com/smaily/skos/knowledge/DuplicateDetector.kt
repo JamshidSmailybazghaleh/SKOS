@@ -1,28 +1,60 @@
 package com.smaily.skos.knowledge
 
 /**
- * موتور تشخیص نسخه‌های تکراری
+ * SKOS Duplicate Detector
  *
- * Version 1
+ * Version 2
+ *
+ * تشخیص نسخه‌های تکراری و مشابه
  */
 object DuplicateDetector {
 
     /**
-     * بررسی وجود فایل مشابه
+     * مقایسه یک Asset با Registry
      */
-    fun findDuplicate(
+    fun compare(
 
         asset: KnowledgeAsset,
 
         registry: List<KnowledgeAsset>
 
-    ): KnowledgeAsset? {
+    ): SimilarityResult {
 
-        return registry.firstOrNull {
+        registry.forEach { existing ->
 
-            normalize(it.path) == normalize(asset.path)
+            val score = similarityScore(
+
+                asset,
+
+                existing
+
+            )
+
+            if (score >= 0.90) {
+
+                return SimilarityResult(
+
+                    duplicated = true,
+
+                    score = score,
+
+                    matchedAsset = existing
+
+                )
+
+            }
 
         }
+
+        return SimilarityResult(
+
+            duplicated = false,
+
+            score = 0.0,
+
+            matchedAsset = null
+
+        )
 
     }
 
@@ -37,30 +69,88 @@ object DuplicateDetector {
 
     ): Boolean {
 
-        return findDuplicate(
+        return compare(
 
             asset,
 
             registry
 
-        ) != null
+        ).duplicated
 
     }
 
     /**
-     * نرمال‌سازی مسیر
+     * محاسبه میزان شباهت
+     */
+    private fun similarityScore(
+
+        first: KnowledgeAsset,
+
+        second: KnowledgeAsset
+
+    ): Double {
+
+        var score = 0.0
+
+        // مسیر فایل
+        if (
+
+            normalize(first.path) ==
+
+            normalize(second.path)
+
+        ) {
+
+            score += 0.60
+
+        }
+
+        // نام فایل
+        if (
+
+            normalize(first.name) ==
+
+            normalize(second.name)
+
+        ) {
+
+            score += 0.30
+
+        }
+
+        // اندازه فایل
+        if (
+
+            first.size == second.size
+
+        ) {
+
+            score += 0.10
+
+        }
+
+        return score
+
+    }
+
+    /**
+     * نرمال‌سازی متن
      */
     private fun normalize(
 
-        path: String
+        text: String
 
     ): String {
 
-        return path
+        return text
 
             .trim()
 
             .replace("\\", "/")
+
+            .replace("_", " ")
+
+            .replace("-", " ")
 
             .lowercase()
 
