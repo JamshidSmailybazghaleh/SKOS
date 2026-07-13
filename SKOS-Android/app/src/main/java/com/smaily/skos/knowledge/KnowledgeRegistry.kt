@@ -1,43 +1,50 @@
 package com.smaily.skos.knowledge
 
 /**
- * رجیستری مرکزی دارایی‌های دانشی
+ * رجیستری مرکزی دارایی‌های دانشی SKOS
  */
 object KnowledgeRegistry {
 
     /**
-     * مخزن اصلی دارایی‌ها
+     * مخزن اصلی دارایی‌های دانشی
      */
     private val assets = mutableListOf<KnowledgeAsset>()
 
     /**
-     * ثبت دارایی
+     * ثبت دارایی جدید
      */
     fun register(
-
         asset: KnowledgeAsset
+    ): Boolean {
 
-    ) {
-
-        if (exists(asset.path))
-            return
+        if (
+            DuplicateDetector.isDuplicate(
+                asset,
+                assets
+            )
+        ) {
+            return false
+        }
 
         assets.add(asset)
+
+        return true
 
     }
 
     /**
-     * بررسی وجود دارایی
+     * بررسی وجود دارایی بر اساس مسیر
      */
     fun exists(
-
         path: String
-
     ): Boolean {
 
         return assets.any {
 
-            it.path == path
+            it.path.equals(
+                path,
+                ignoreCase = true
+            )
 
         }
 
@@ -56,9 +63,7 @@ object KnowledgeRegistry {
      * جستجو بر اساس شناسه
      */
     fun findById(
-
         id: String
-
     ): KnowledgeAsset? {
 
         return assets.find {
@@ -73,21 +78,33 @@ object KnowledgeRegistry {
      * جستجو بر اساس مسیر
      */
     fun findByPath(
-
         path: String
-
     ): KnowledgeAsset? {
 
         return assets.find {
 
-            it.path == path
+            it.path.equals(
+                path,
+                ignoreCase = true
+            )
 
         }
 
     }
 
     /**
-     * تعداد دارایی‌ها
+     * حذف یک دارایی
+     */
+    fun remove(
+        asset: KnowledgeAsset
+    ): Boolean {
+
+        return assets.remove(asset)
+
+    }
+
+    /**
+     * تعداد دارایی‌های ثبت‌شده
      */
     fun count(): Int {
 
@@ -96,7 +113,16 @@ object KnowledgeRegistry {
     }
 
     /**
-     * حذف همه
+     * آیا رجیستری خالی است؟
+     */
+    fun isEmpty(): Boolean {
+
+        return assets.isEmpty()
+
+    }
+
+    /**
+     * پاک‌سازی کامل رجیستری
      */
     fun clear() {
 
