@@ -1,6 +1,7 @@
 package com.smaily.skos.scanner
 
 import com.smaily.skos.engine.MissionResult
+import com.smaily.skos.knowledge.KnowledgeAssetBuilder
 
 /**
  * Scan Pipeline
@@ -24,7 +25,7 @@ class ScanPipeline(
 
         try {
 
-            // مرحله ۱
+            // مرحله اول
             val files = directoryWalker.walk(
 
                 context.rootPath,
@@ -33,10 +34,32 @@ class ScanPipeline(
 
             )
 
-            // مرحله ۲
+            // مرحله دوم
             files.forEach { file ->
 
-                metadataExtractor.extract(file)
+                // استخراج Metadata
+                val metadata = metadataExtractor.extract(file)
+
+                // طبقه‌بندی فایل
+                val category = FileClassifier.classify(
+
+                    metadata,
+
+                    statistics
+
+                )
+
+                // ساخت دارایی دانشی
+                val asset = KnowledgeAssetBuilder.build(
+
+                    metadata,
+
+                    category
+
+                )
+
+                // در Sprint بعدی:
+                // KnowledgeRegistry.register(asset)
 
             }
 
@@ -44,7 +67,7 @@ class ScanPipeline(
 
                 success = true,
 
-                message = "Scan completed.",
+                message = "Scan completed successfully.",
 
                 processedFiles = statistics.files,
 
@@ -60,7 +83,13 @@ class ScanPipeline(
 
                 success = false,
 
-                message = ex.message ?: "Unknown error."
+                message = ex.message ?: "Unknown error.",
+
+                processedFiles = statistics.files,
+
+                processedFolders = statistics.folders,
+
+                errors = 1
 
             )
 
