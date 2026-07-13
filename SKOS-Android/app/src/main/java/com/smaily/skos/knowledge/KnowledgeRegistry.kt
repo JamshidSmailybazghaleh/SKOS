@@ -2,6 +2,8 @@ package com.smaily.skos.knowledge
 
 /**
  * رجیستری مرکزی دارایی‌های دانشی SKOS
+ *
+ * مسئول ثبت، جستجو و مدیریت KnowledgeAsset ها
  */
 object KnowledgeRegistry {
 
@@ -12,28 +14,30 @@ object KnowledgeRegistry {
 
     /**
      * ثبت دارایی جدید
+     *
+     * @return true اگر ثبت انجام شد
+     * @return false اگر نسخه تکراری باشد
      */
     fun register(
         asset: KnowledgeAsset
     ): Boolean {
 
-        if (
-            DuplicateDetector.isDuplicate(
-                asset,
-                assets
-            )
-        ) {
+        val similarity = DuplicateDetector.compare(
+            asset,
+            assets
+        )
+
+        if (similarity.duplicated) {
             return false
         }
 
         assets.add(asset)
 
         return true
-
     }
 
     /**
-     * بررسی وجود دارایی بر اساس مسیر
+     * بررسی وجود دارایی
      */
     fun exists(
         path: String
@@ -47,15 +51,6 @@ object KnowledgeRegistry {
             )
 
         }
-
-    }
-
-    /**
-     * دریافت همه دارایی‌ها
-     */
-    fun getAll(): List<KnowledgeAsset> {
-
-        return assets.toList()
 
     }
 
@@ -93,6 +88,24 @@ object KnowledgeRegistry {
     }
 
     /**
+     * دریافت همه دارایی‌ها
+     */
+    fun getAll(): List<KnowledgeAsset> {
+
+        return assets.toList()
+
+    }
+
+    /**
+     * تعداد دارایی‌ها
+     */
+    fun count(): Int {
+
+        return assets.size
+
+    }
+
+    /**
      * حذف یک دارایی
      */
     fun remove(
@@ -104,29 +117,41 @@ object KnowledgeRegistry {
     }
 
     /**
-     * تعداد دارایی‌های ثبت‌شده
+     * حذف بر اساس شناسه
      */
-    fun count(): Int {
+    fun removeById(
+        id: String
+    ): Boolean {
 
-        return assets.size
+        val asset = findById(id)
+
+        return if (asset != null) {
+
+            assets.remove(asset)
+
+        } else {
+
+            false
+
+        }
 
     }
 
     /**
-     * آیا رجیستری خالی است؟
-     */
-    fun isEmpty(): Boolean {
-
-        return assets.isEmpty()
-
-    }
-
-    /**
-     * پاک‌سازی کامل رجیستری
+     * پاک‌سازی رجیستری
      */
     fun clear() {
 
         assets.clear()
+
+    }
+
+    /**
+     * بررسی خالی بودن رجیستری
+     */
+    fun isEmpty(): Boolean {
+
+        return assets.isEmpty()
 
     }
 
