@@ -1,47 +1,100 @@
 package com.smaily.skos.scanner
 
-import android.webkit.MimeTypeMap
+import com.smaily.skos.model.asset.AssetMetadata
 import java.io.File
+import java.nio.file.Files
+import java.security.MessageDigest
+import java.time.Instant
 
 /**
- * استخراج اطلاعات پایه فایل
+ * ---------------------------------------------------------
+ * SKOS
+ * Metadata Extractor
+ * ---------------------------------------------------------
+ *
+ * Extracts metadata from a file and converts it into
+ * AssetMetadata.
+ *
+ * Does not modify the original file.
+ * ---------------------------------------------------------
  */
 class MetadataExtractor {
 
-    fun extract(
+    fun extract(file: File): AssetMetadata {
 
-        file: File
+        val attributes = try {
+            Files.readAttributes(
+                file.toPath(),
+                "*"
+            )
+        } catch (_: Exception) {
+            emptyMap<String, Any>()
+        }
 
-    ): FileMetadata {
+        return AssetMetadata(
 
-        val extension = file.extension.lowercase()
+            path = file.absolutePath,
 
-        val mime = MimeTypeMap
-            .getSingleton()
-            .getMimeTypeFromExtension(extension)
+            fileName = file.name,
 
-        return FileMetadata(
+            extension = file.extension.lowercase(),
 
-            name = file.name,
-
-            absolutePath = file.absolutePath,
-
-            extension = extension,
+            mimeType = Files.probeContentType(file.toPath()),
 
             size = file.length(),
 
-            lastModified = file.lastModified(),
+            sha256 = calculateSha256(file),
 
-            mimeType = mime,
+            createdAt = attributes["creationTime"]
+                ?.let { Instant.ofEpochMilli((it as java.nio.file.attribute.FileTime).toMillis()) },
 
-            isHidden = file.isHidden,
+            modifiedAt = Instant.ofEpochMilli(file.lastModified()),
 
-            isReadable = file.canRead(),
+            lastAccessedAt = attributes["lastAccessTime"]
+                ?.let { Instant.ofEpochMilli((it as java.nio.file.attribute.FileTime).toMillis()) },
 
-            isWritable = file.canWrite()
+            hidden = file.isHidden,
 
+            readable = file.canRead(),
+
+            writable = file.canWrite(),
+
+            executable = file.canExecute()
         )
-
     }
 
+    /**
+     * Calculates SHA-256 fingerprint.
+     */
+    private fun calculateSha256(file: File): String? {
+
+        return try {
+
+            val digest = MessageDigest.getInstance("SHA-256")
+
+            file.inputStream().use { input ->
+
+                val buffer = ByteArray(8192)
+
+                while (true) {
+
+                    val read = input.read(buffer)
+
+                    if (read <= 0)
+                        break
+
+                    digest.update(buffer, 0, read)
+                }
+            }
+
+            digest.digest()
+                .joinToString("") {
+                    "%02x".format(it)
+                }
+
+        } catch (_: Exception) {
+
+            null
+        }
+    }
 }
