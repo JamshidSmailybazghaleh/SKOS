@@ -3,109 +3,59 @@ package com.smaily.skos.scanner
 import java.io.File
 
 /**
- * پیمایش بازگشتی پوشه‌ها
+ * ---------------------------------------------------------
+ * SKOS - Smaily Knowledge Operating System
+ * Directory Walker
+ * ---------------------------------------------------------
+ *
+ * Traverses directories lazily using Kotlin Sequence.
+ *
+ * Author : Jamshid Smaily Bazghaleh
+ * Architecture : SKOS Professional Alpha
+ * Version : 1.0.0
+ * ---------------------------------------------------------
  */
-class DirectoryWalker(
-
-    private val metadataExtractor: MetadataExtractor =
-        MetadataExtractor()
-
-) {
+class DirectoryWalker {
 
     /**
-     * شروع پیمایش
+     * Walks through a directory recursively.
+     *
+     * Files are produced lazily.
      */
     fun walk(
+        root: File,
+        configuration: ScanConfiguration
+    ): Sequence<File> = sequence {
 
-        rootPath: String,
+        if (!root.exists())
+            return@sequence
 
-        statistics: ScanStatistics
+        if (root.isFile) {
 
-    ): List<File> {
+            yield(root)
 
-        val result = mutableListOf<File>()
-
-        val root = File(rootPath)
-
-        if (!root.exists()) {
-            return result
+            return@sequence
         }
 
-        if (!root.isDirectory) {
-            return result
-        }
+        root.walkTopDown()
 
-        scanDirectory(
+            .maxDepth(configuration.maxDepth)
 
-            directory = root,
+            .forEach { file ->
 
-            result = result,
+                if (!configuration.includeHiddenFiles &&
+                    file.isHidden
+                ) {
+                    return@forEach
+                }
 
-            statistics = statistics
+                if (file.isFile &&
+                    file.length() <= configuration.maxFileSize
+                ) {
 
-        )
+                    yield(file)
 
-        return result
-
-    }
-
-    /**
-     * پیمایش بازگشتی پوشه‌ها
-     */
-    private fun scanDirectory(
-
-        directory: File,
-
-        result: MutableList<File>,
-
-        statistics: ScanStatistics
-
-    ) {
-
-        if (!directory.exists()) return
-
-        if (!directory.isDirectory) return
-
-        statistics.folders++
-
-        val children = directory.listFiles()
-            ?: return
-
-        for (child in children) {
-
-            if (child.isDirectory) {
-
-                scanDirectory(
-
-                    directory = child,
-
-                    result = result,
-
-                    statistics = statistics
-
-                )
-
-            } else {
-
-                result.add(child)
-
-                // استخراج Metadata
-                val metadata =
-                    metadataExtractor.extract(child)
-
-                // طبقه‌بندی فایل
-                FileClassifier.classify(
-
-                    metadata,
-
-                    statistics
-
-                )
-
+                }
             }
-
-        }
-
     }
-
 }
