@@ -1,91 +1,54 @@
 package com.smaily.skos.engine
 
-class MissionExecutor(
+/**
+ * ---------------------------------------------------------
+ * SKOS - Smaily Knowledge Operating System
+ * Mission Executor
+ * ---------------------------------------------------------
+ *
+ * Executes missions received from MissionQueueManager.
+ *
+ * This class is responsible only for mission lifecycle
+ * management. Actual mission logic should be implemented
+ * by dedicated handlers.
+ *
+ * Author : Jamshid Smaily Bazghaleh
+ * Architecture : SKOS Professional Alpha
+ * Version : 1.0.0
+ * ---------------------------------------------------------
+ */
+class MissionExecutor {
 
-    private val scannerEngine: ScannerEngine
-
-) {
-
+    /**
+     * Executes a mission.
+     */
     fun execute(
-
-        mission: Mission
-
+        mission: Mission,
+        action: () -> MissionResult
     ): MissionResult {
 
-        return when (mission.type) {
+        return try {
 
-            MissionType.SCAN_FOLDER ->
-                executeFolderScan(mission)
+            mission.start()
 
-            MissionType.SCAN_INTERNAL_STORAGE ->
-                executeInternalStorageScan(mission)
+            val result = action()
 
-            MissionType.SCAN_SD_CARD ->
-                executeSdCardScan(mission)
+            mission.complete(result)
 
-            else ->
-                MissionResult(
+            result
 
-                    success = false,
+        } catch (exception: Exception) {
 
-                    message = "Mission not implemented."
-
-                )
-
-        }
-
-    }
-
-    private fun executeFolderScan(
-
-        mission: Mission
-
-    ): MissionResult {
-
-        val path = mission.targetPath
-
-            ?: return MissionResult(
-
-                false,
-
-                "Target path is null."
-
+            val result = MissionResult(
+                success = false,
+                status = MissionStatus.FAILED,
+                message = exception.message ?: "Unknown error",
+                exception = exception
             )
 
-        return scannerEngine.scanFolder(path)
+            mission.complete(result)
 
+            result
+        }
     }
-
-    private fun executeInternalStorageScan(
-
-        mission: Mission
-
-    ): MissionResult {
-
-        return MissionResult(
-
-            false,
-
-            "Internal Storage Scanner will be implemented."
-
-        )
-
-    }
-
-    private fun executeSdCardScan(
-
-        mission: Mission
-
-    ): MissionResult {
-
-        return MissionResult(
-
-            false,
-
-            "SD Scanner will be implemented."
-
-        )
-
-    }
-
 }
