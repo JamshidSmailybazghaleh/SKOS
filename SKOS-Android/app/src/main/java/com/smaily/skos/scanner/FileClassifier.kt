@@ -1,146 +1,121 @@
 package com.smaily.skos.scanner
 
-/**
- * طبقه‌بندی فایل‌ها بر اساس Metadata
- */
-object FileClassifier {
+import com.smaily.skos.model.asset.AssetCategory
+import com.smaily.skos.model.asset.AssetMetadata
+import com.smaily.skos.model.asset.AssetType
 
-    /**
-     * تعیین دسته فایل و بروزرسانی آمار اسکن
-     */
-    fun classify(
-        metadata: FileMetadata,
-        statistics: ScanStatistics
-    ): FileCategory {
+/**
+ * ---------------------------------------------------------
+ * SKOS
+ * File Classifier
+ * ---------------------------------------------------------
+ *
+ * Classifies an asset into Category and Type.
+ *
+ * Technology independent.
+ * ---------------------------------------------------------
+ */
+class FileClassifier {
+
+    fun classify(metadata: AssetMetadata): ClassificationResult {
 
         val extension = metadata.extension.lowercase()
 
-        val mime = metadata.mimeType ?: ""
+        val type = when (extension) {
 
-        val category = when {
+            "pdf" -> AssetType.PDF
+            "doc" -> AssetType.DOC
+            "docx" -> AssetType.DOCX
+            "txt" -> AssetType.TXT
+            "md" -> AssetType.MARKDOWN
+            "html","htm" -> AssetType.HTML
+            "xml" -> AssetType.XML
+            "json" -> AssetType.JSON
 
-            // ---------- BOOK ----------
-            extension == "pdf" ||
-            extension == "epub" ||
-            extension == "mobi" ->
+            "jpg","jpeg" -> AssetType.JPG
+            "png" -> AssetType.PNG
+            "gif" -> AssetType.GIF
+            "bmp" -> AssetType.BMP
+            "webp" -> AssetType.WEBP
 
-                FileCategory.BOOK
+            "mp3" -> AssetType.MP3
+            "wav" -> AssetType.WAV
+            "flac" -> AssetType.FLAC
 
-            // ---------- DOCUMENT ----------
-            extension == "doc" ||
-            extension == "docx" ||
-            extension == "odt" ||
-            extension == "rtf" ||
-            extension == "txt" ->
+            "mp4" -> AssetType.MP4
+            "mkv" -> AssetType.MKV
+            "avi" -> AssetType.AVI
 
-                FileCategory.DOCUMENT
+            "kt" -> AssetType.KOTLIN
+            "java" -> AssetType.JAVA
+            "py" -> AssetType.PYTHON
+            "cpp","cc","cxx" -> AssetType.CPP
+            "js" -> AssetType.JAVASCRIPT
+            "ts" -> AssetType.TYPESCRIPT
 
-            // ---------- PRESENTATION ----------
-            extension == "ppt" ||
-            extension == "pptx" ||
-            extension == "odp" ->
+            "zip" -> AssetType.ZIP
+            "rar" -> AssetType.RAR
+            "7z" -> AssetType.SEVEN_Z
 
-                FileCategory.PRESENTATION
+            "apk" -> AssetType.APK
 
-            // ---------- SPREADSHEET ----------
-            extension == "xls" ||
-            extension == "xlsx" ||
-            extension == "ods" ->
+            else -> AssetType.UNKNOWN
+        }
 
-                FileCategory.SPREADSHEET
+        val category = when (type) {
 
-            // ---------- IMAGE ----------
-            mime.startsWith("image/") ->
+            AssetType.PDF,
+            AssetType.DOC,
+            AssetType.DOCX,
+            AssetType.TXT,
+            AssetType.HTML,
+            AssetType.XML,
+            AssetType.JSON,
+            AssetType.MARKDOWN ->
+                AssetCategory.DOCUMENT
 
-                FileCategory.IMAGE
+            AssetType.JPG,
+            AssetType.PNG,
+            AssetType.GIF,
+            AssetType.BMP,
+            AssetType.WEBP ->
+                AssetCategory.IMAGE
 
-            // ---------- AUDIO ----------
-            mime.startsWith("audio/") ->
+            AssetType.MP3,
+            AssetType.WAV,
+            AssetType.FLAC ->
+                AssetCategory.AUDIO
 
-                FileCategory.AUDIO
+            AssetType.MP4,
+            AssetType.MKV,
+            AssetType.AVI ->
+                AssetCategory.VIDEO
 
-            // ---------- VIDEO ----------
-            mime.startsWith("video/") ->
+            AssetType.KOTLIN,
+            AssetType.JAVA,
+            AssetType.PYTHON,
+            AssetType.CPP,
+            AssetType.JAVASCRIPT,
+            AssetType.TYPESCRIPT ->
+                AssetCategory.SOURCE_CODE
 
-                FileCategory.VIDEO
+            AssetType.ZIP,
+            AssetType.RAR,
+            AssetType.SEVEN_Z ->
+                AssetCategory.ARCHIVE
 
-            // ---------- ARCHIVE ----------
-            extension == "zip" ||
-            extension == "rar" ||
-            extension == "7z" ||
-            extension == "tar" ||
-            extension == "gz" ->
-
-                FileCategory.ARCHIVE
-
-            // ---------- SOURCE CODE ----------
-            extension == "kt" ||
-            extension == "java" ||
-            extension == "cpp" ||
-            extension == "c" ||
-            extension == "h" ||
-            extension == "xml" ||
-            extension == "json" ||
-            extension == "html" ||
-            extension == "css" ||
-            extension == "js" ||
-            extension == "py" ->
-
-                FileCategory.SOURCE_CODE
-
-            // ---------- DATABASE ----------
-            extension == "db" ||
-            extension == "sqlite" ||
-            extension == "sqlite3" ->
-
-                FileCategory.DATABASE
+            AssetType.APK ->
+                AssetCategory.EXECUTABLE
 
             else ->
-
-                FileCategory.UNKNOWN
+                AssetCategory.UNKNOWN
         }
 
-        when (category) {
-
-            FileCategory.BOOK ->
-                statistics.books++
-
-            FileCategory.DOCUMENT ->
-                statistics.documents++
-
-            FileCategory.PRESENTATION ->
-                statistics.presentations++
-
-            FileCategory.SPREADSHEET ->
-                statistics.spreadsheets++
-
-            FileCategory.IMAGE ->
-                statistics.images++
-
-            FileCategory.AUDIO ->
-                statistics.audio++
-
-            FileCategory.VIDEO ->
-                statistics.video++
-
-            FileCategory.ARCHIVE ->
-                statistics.archives++
-
-            FileCategory.SOURCE_CODE ->
-                statistics.sourceCode++
-
-            FileCategory.DATABASE ->
-                statistics.databases++
-
-            FileCategory.UNKNOWN ->
-                statistics.unknown++
-
-        }
-
-        statistics.files++
-
-        return category
-
+        return ClassificationResult(category, type)
     }
-
 }
+
+data class ClassificationResult(
+    val category: AssetCategory,
+    val type: AssetType
+)
