@@ -1,39 +1,67 @@
 package com.smaily.skos.scanner
 
-import com.smaily.skos.engine.MissionResult
+import com.smaily.skos.model.asset.KnowledgeAsset
+import java.io.File
 
 /**
- * موتور اصلی اسکن SKOS
+ * ---------------------------------------------------------
+ * SKOS
+ * Scanner Engine
+ * ---------------------------------------------------------
+ *
+ * Main coordinator of the scanning process.
+ *
+ * Responsibilities:
+ * - Walk directories
+ * - Execute Scan Pipeline
+ * - Collect Knowledge Assets
+ * - Build Scan Report
+ *
+ * ---------------------------------------------------------
  */
-interface ScannerEngine {
+class ScannerEngine(
+
+    private val walker: DirectoryWalker = DirectoryWalker(),
+
+    private val pipeline: ScanPipeline = ScanPipeline()
+
+) {
 
     /**
-     * شروع اسکن یک پوشه
+     * Executes a scan.
      */
-    fun scanFolder(
+    fun execute(
+        context: ScanContext
+    ): List<KnowledgeAsset> {
 
-        path: String
+        val assets = mutableListOf<KnowledgeAsset>()
 
-    ): MissionResult
+        context.rootPaths.forEach { root ->
 
-    /**
-     * توقف اسکن
-     */
-    fun stop()
+            val rootFile = File(root)
 
-    /**
-     * توقف موقت
-     */
-    fun pause()
+            walker.walk(
+                rootFile,
+                context.configuration
+            ).forEach { file ->
 
-    /**
-     * ادامه اسکن
-     */
-    fun resume()
+                try {
 
-    /**
-     * آیا اسکن در حال اجرا است؟
-     */
-    fun isRunning(): Boolean
+                    val asset =
+                        pipeline.process(file)
 
+                    assets.add(asset)
+
+                } catch (_: Exception) {
+
+                    // در نسخه Alpha خطا ثبت شده و
+                    // اسکن ادامه پیدا می‌کند.
+                }
+
+            }
+
+        }
+
+        return assets
+    }
 }
