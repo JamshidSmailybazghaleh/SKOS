@@ -1,19 +1,74 @@
 package com.smaily.skos.scanner
 
+/**
+ * ---------------------------------------------------------
+ * SKOS - Smaily Knowledge Operating System
+ * Scan Report
+ * ---------------------------------------------------------
+ *
+ * Final report produced after a scan operation.
+ *
+ * Author : Jamshid Smaily Bazghaleh
+ * Architecture : SKOS Professional Alpha
+ * Version : 1.0.0
+ * ---------------------------------------------------------
+ */
 data class ScanReport(
 
-    val success: Boolean,
+    /**
+     * Scan context.
+     */
+    val context: ScanContext,
 
-    val folders: Int,
+    /**
+     * Final scan statistics.
+     */
+    val statistics: ScanStatistics,
 
-    val files: Int,
+    /**
+     * Final scan progress.
+     */
+    val progress: ScanProgress,
 
-    val knowledgeAssets: Int,
+    /**
+     * Report creation timestamp.
+     */
+    val generatedAt: Long = System.currentTimeMillis(),
 
-    val duplicates: Int,
+    /**
+     * Optional warnings.
+     */
+    val warnings: List<String> = emptyList(),
 
-    val errors: Int,
+    /**
+     * Optional errors.
+     */
+    val errors: List<String> = emptyList()
 
-    val durationMillis: Long
+) {
 
-)
+    /**
+     * Returns true if report contains errors.
+     */
+    fun hasErrors(): Boolean =
+        errors.isNotEmpty()
+
+    /**
+     * Returns true if report contains warnings.
+     */
+    fun hasWarnings(): Boolean =
+        warnings.isNotEmpty()
+
+    /**
+     * Returns true if scan finished successfully.
+     */
+    fun isSuccessful(): Boolean =
+        progress.isFinished() &&
+        !hasErrors()
+
+    /**
+     * Total number of issues.
+     */
+    fun issueCount(): Int =
+        warnings.size + errors.size
+}
