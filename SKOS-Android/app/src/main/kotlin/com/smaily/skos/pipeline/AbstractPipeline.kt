@@ -169,8 +169,75 @@ private fun executePipeline() {
     /**
      * Executes the pipeline through the engine lifecycle.
      */
-    final override fun onExecute() {
-    executePipeline()
+    /**
+ * Executes pipeline logic.
+ *
+ * Called by AbstractEngine lifecycle.
+ */
+override fun onExecute() {
+
+    val started =
+        System.currentTimeMillis()
+
+    cancelled = false
+
+    logger.info(
+        "Pipeline '${descriptor.name}' started."
+    )
+
+    try {
+
+        beforeExecution()
+
+        while (!cancelled) {
+
+            beforeStage()
+
+            val continueExecution =
+                executeStage()
+
+            afterStage()
+
+            if (!continueExecution) {
+                break
+            }
+        }
+
+        afterExecution()
+
+        val duration =
+            System.currentTimeMillis() - started
+
+        lastExecutionTime = duration
+
+        statistics.recordSuccess(duration)
+
+
+        logger.info(
+            "Pipeline '${descriptor.name}' completed in ${duration} ms."
+        )
+
+
+    } catch (ex: Exception) {
+
+
+        val duration =
+            System.currentTimeMillis() - started
+
+
+        lastExecutionTime = duration
+
+        statistics.recordFailure(duration)
+
+
+        logger.error(
+            "Pipeline '${descriptor.name}' failed.",
+            ex
+        )
+
+
+        throw ex
+    }
 }
 
     /**
