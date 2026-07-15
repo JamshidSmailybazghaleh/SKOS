@@ -1,5 +1,8 @@
 package com.smaily.skos.core.contracts
 
+import com.smaily.skos.core.types.ComponentId
+import com.smaily.skos.core.types.Version
+
 /**
  * ------------------------------------------------------------------
  * SKOS (Smaily Knowledge Operating System)
@@ -11,14 +14,15 @@ package com.smaily.skos.core.contracts
  * Responsibilities:
  * - Unique component identification
  * - Component display information
- * - Version information
- * - Author/vendor information
- * - Component classification
- * - Dependency declaration
+ * - Semantic version
+ * - Description
+ * - Author and vendor information
+ * - Category classification
+ * - Component dependencies
  * - Feature flags
  *
- * This class contains metadata only and must not include
- * runtime or business logic.
+ * This class contains metadata only and must not contain
+ * any runtime or business logic.
  *
  * Version : 1.0.0
  * ------------------------------------------------------------------
@@ -27,14 +31,8 @@ data class ComponentDescriptor(
 
     /**
      * Unique component identifier.
-     *
-     * Examples:
-     * kernel
-     * pipeline
-     * registry
-     * knowledge
      */
-    val id: String,
+    val id: ComponentId,
 
     /**
      * Internal component name.
@@ -48,14 +46,11 @@ data class ComponentDescriptor(
 
     /**
      * Semantic version.
-     *
-     * Example:
-     * 1.0.0
      */
-    val version: String,
+    val version: Version,
 
     /**
-     * Short description.
+     * Short component description.
      */
     val description: String,
 
@@ -77,20 +72,21 @@ data class ComponentDescriptor(
      * Engine
      * Service
      * Runtime
+     * Pipeline
      */
     val category: String,
 
     /**
-     * Optional component tags.
+     * Optional tags.
      */
     val tags: Set<String> = emptySet(),
 
     /**
      * Component dependencies.
      *
-     * Contains component identifiers only.
+     * References other components by their identifiers.
      */
-    val dependencies: Set<String> = emptySet(),
+    val dependencies: Set<ComponentId> = emptySet(),
 
     /**
      * Indicates whether the component is enabled.
@@ -98,7 +94,7 @@ data class ComponentDescriptor(
     val enabled: Boolean = true,
 
     /**
-     * Indicates experimental status.
+     * Indicates whether the component is experimental.
      */
     val experimental: Boolean = false
 )
