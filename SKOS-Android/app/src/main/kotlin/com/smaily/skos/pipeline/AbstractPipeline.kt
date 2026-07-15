@@ -95,9 +95,18 @@ private fun executePipeline() {
 
             beforeExecution()
 
-            while (!cancelled && executeStage()) {
-                // Continue until no more stages remain.
-            }
+            while (!cancelled) {
+
+    beforeStage()
+
+    val continueExecution = executeStage()
+
+    afterStage()
+
+    if (!continueExecution) {
+        break
+    }
+}
 
             afterExecution()
 
