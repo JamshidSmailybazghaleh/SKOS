@@ -2,7 +2,8 @@ package com.smaily.skos.core.runtime
 
 import com.smaily.skos.core.contracts.ComponentDescriptor
 import com.smaily.skos.core.contracts.Engine
-import com.smaily.skos.core.lifecycle.ComponentState
+import com.smaily.skos.core.types.ComponentState
+
 
 /**
  * ------------------------------------------------------------------
@@ -10,38 +11,160 @@ import com.smaily.skos.core.lifecycle.ComponentState
  * ------------------------------------------------------------------
  * AbstractEngine
  *
- * Base implementation for all SKOS engines.
+ * Base implementation for all executable SKOS engines.
+ *
+ * Responsibilities:
+ * - Lifecycle management
+ * - State transition control
+ * - Execution template
  *
  * Version : 1.0.0
  * ------------------------------------------------------------------
  */
 abstract class AbstractEngine(
 
-    descriptor: ComponentDescriptor
+    final override val descriptor: ComponentDescriptor
 
-) : AbstractComponent(descriptor), Engine {
+) : Engine {
+
 
     /**
-     * Starts the engine.
+     * Current engine state.
      */
-    final override fun start() {
+    protected var state: ComponentState =
+        ComponentState.CREATED
+        private set
 
-        if (state == ComponentState.CREATED) {
-            initialize()
+
+
+    /**
+     * Initializes engine.
+     */
+    final override fun initialize() {
+
+        if (state != ComponentState.CREATED &&
+            state != ComponentState.STOPPED) {
+
+            return
         }
 
-        if (state == ComponentState.INITIALIZED) {
-            validate()
+        changeState(
+            ComponentState.INITIALIZED
+        )
+
+        onInitialize()
+    }
+
+
+
+    /**
+     * Executes engine.
+     */
+    final override fun execute() {
+
+        if (state != ComponentState.INITIALIZED &&
+            state != ComponentState.STOPPED) {
+
+            throw IllegalStateException(
+                "Engine is not initialized."
+            )
         }
 
-        if (state == ComponentState.VALIDATED) {
-            execute()
+
+        changeState(
+            ComponentState.RUNNING
+        )
+
+
+        try {
+
+            onExecute()
+
+            changeState(
+                ComponentState.COMPLETED
+            )
+
+        } catch (ex: Exception) {
+
+            changeState(
+                ComponentState.FAILED
+            )
+
+            throw ex
         }
     }
 
+
+
     /**
-     * Returns true if the engine is currently running.
+     * Stops engine.
      */
-    final override fun isRunning(): Boolean =
-        state == ComponentState.RUNNING
+    final override fun stop() {
+
+        changeState(
+            ComponentState.STOPPED
+        )
+
+        onStop()
+    }
+
+
+
+    /**
+     * Releases resources.
+     */
+    final override fun dispose() {
+
+        changeState(
+            ComponentState.DISPOSED
+        )
+
+        onDispose()
+    }
+
+
+
+    /**
+     * Changes engine state.
+     */
+    protected fun changeState(
+        newState: ComponentState
+    ) {
+
+        state = newState
+    }
+
+
+
+    /**
+     * Initialization hook.
+     */
+    protected open fun onInitialize() {
+
+    }
+
+
+
+    /**
+     * Execution hook.
+     */
+    protected abstract fun onExecute()
+
+
+
+    /**
+     * Stop hook.
+     */
+    protected open fun onStop() {
+
+    }
+
+
+
+    /**
+     * Dispose hook.
+     */
+    protected open fun onDispose() {
+
+    }
 }
