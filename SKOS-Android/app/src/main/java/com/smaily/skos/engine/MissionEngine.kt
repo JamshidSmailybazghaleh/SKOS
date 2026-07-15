@@ -1,123 +1,62 @@
 package com.smaily.skos.engine
 
-import com.smaily.skos.scanner.ScannerEngine
+import com.smaily.skos.common.ComponentType
+import com.smaily.skos.common.Configuration
+import com.smaily.skos.common.RuntimeContext
 
 /**
- * موتور مرکزی اجرای مأموریت‌های SKOS
+ * ---------------------------------------------------------
+ * SKOS Professional
+ * Mission Engine
+ * ---------------------------------------------------------
+ * Coordinates execution missions and workflows.
+ * ---------------------------------------------------------
  */
 class MissionEngine(
 
-    private val scannerEngine: ScannerEngine
+    configuration: Configuration,
+    runtime: RuntimeContext
+
+) : AbstractEngine(
+
+    name = "Mission Engine",
+    type = ComponentType.MISSION,
+    configuration = configuration,
+    runtime = runtime
 
 ) {
 
-    private val scheduler = MissionScheduler()
+    override val priority: Int
+        get() = 10
 
-    /**
-     * ثبت مأموریت جدید
-     */
-    fun submit(
+    override val supportsParallelExecution: Boolean
+        get() = false
 
-        mission: Mission
-
-    ) {
-
-        scheduler.submit(mission)
-
-        MissionLogger.info(
-
-            "Mission submitted : ${mission.name}"
-
-        )
-
+    override fun validate(): Boolean {
+        return true
     }
 
-    /**
-     * اجرای مأموریت بعدی
-     */
-    fun executeNext(): MissionResult? {
-
-        val mission = scheduler.nextMission()
-
-            ?: return null
-
-        val validation = MissionValidator.validate(mission)
-
-        if (!validation.valid) {
-
-            MissionLogger.missionFailed(
-
-                mission,
-
-                validation.message
-
-            )
-
-            return MissionResult(
-
-                success = false,
-
-                message = validation.message
-
-            )
-
-        }
-
-        MissionLogger.missionStarted(mission)
-
-        val dispatcher = MissionDispatcher(scannerEngine)
-
-        val result = dispatcher.dispatch(mission)
-
-        MissionLogger.missionCompleted(
-
-            mission,
-
-            result
-
-        )
-
-        MissionHistory.add(
-
-            MissionHistoryEntry(
-
-                missionId = mission.id,
-
-                missionName = mission.name,
-
-                missionType = mission.type,
-
-                startedAt = System.currentTimeMillis(),
-
-                finishedAt = System.currentTimeMillis(),
-
-                durationMillis = result.durationMillis,
-
-                success = result.success,
-
-                processedFolders = result.processedFolders,
-
-                processedFiles = result.processedFiles,
-
-                errors = result.errors,
-
-                message = result.message
-
-            )
-
-        )
-
-        return result
-
+    override fun onInitialize() {
+        // Initialize mission resources
     }
 
-    /**
-     * تعداد مأموریت‌های صف
-     */
-    fun pendingMissions(): Int {
-
-        return scheduler.pendingCount()
-
+    override fun onStart() {
+        // Prepare mission execution
     }
 
+    override fun onExecute() {
+        // Execute mission workflow
+    }
+
+    override fun onStop() {
+        // Stop mission execution
+    }
+
+    override fun onShutdown() {
+        // Release mission resources
+    }
+
+    override fun onReset() {
+        // Reset internal state
+    }
 }
