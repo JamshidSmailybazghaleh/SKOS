@@ -53,18 +53,6 @@ abstract class AbstractPipeline(
 ) : Pipeline {
 
     /**
-     * Indicates whether the pipeline has been initialized.
-     */
-    @Volatile
-    protected var initialized: Boolean = false
-
-    /**
-     * Indicates whether execution is currently in progress.
-     */
-    @Volatile
-    protected var running: Boolean = false
-
-    /**
      * Pipeline creation timestamp.
      */
     protected val createdAt: Long = System.currentTimeMillis()
@@ -74,34 +62,54 @@ abstract class AbstractPipeline(
      */
     protected var lastExecutionTime: Long? = null
 
+    /**
+     * Current lifecycle state.
+     */
+    @Volatile
+    private var state: PipelineState = PipelineState.CREATED
+
     init {
         logger.info(
             "Pipeline '$name' has been created."
         )
     }
+
+    /**
+     * Returns current lifecycle state.
+     */
+    val currentState: PipelineState
+        get() = state
+
+    /**
+     * Returns true if pipeline is currently running.
+     */
+    fun isRunning(): Boolean =
+        state == PipelineState.RUNNING
+
+    /**
+     * Returns true if pipeline completed successfully.
+     */
+    fun isCompleted(): Boolean =
+        state == PipelineState.COMPLETED
+
+    /**
+     * Returns true if pipeline execution failed.
+     */
+    fun hasFailed(): Boolean =
+        state == PipelineState.FAILED
+
+    /**
+     * Changes pipeline lifecycle state.
+     */
+    protected fun changeState(
+        newState: PipelineState
+    ) {
+
+        logger.info(
+            "Pipeline [$name] : $state -> $newState"
+        )
+
+        state = newState
+    }
+
 }
-
-@Volatile
-private var state: PipelineState = PipelineState.CREATED
-
-fun state(): PipelineState = state
-
-fun isRunning(): Boolean =
-    state == PipelineState.RUNNING
-
-fun isCompleted(): Boolean =
-    state == PipelineState.COMPLETED
-
-fun hasFailed(): Boolean =
-    state == PipelineState.FAILED
-
-protected fun changeState(
-    newState: PipelineState
-) {
-    logger.info(
-        "Pipeline [$name] : $state -> $newState"
-    )
-
-    state = newState
-}
-
