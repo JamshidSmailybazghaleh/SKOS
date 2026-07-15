@@ -101,15 +101,91 @@ abstract class AbstractPipeline(
     /**
      * Changes pipeline lifecycle state.
      */
-    protected fun changeState(
-        newState: PipelineState
-    ) {
+    /**
+ * Returns true if the requested state transition is valid.
+ */
+protected fun canTransitionTo(
+    newState: PipelineState
+): Boolean {
 
-        logger.info(
-            "Pipeline [$name] : $state -> $newState"
-        )
+    return when (state) {
 
-        state = newState
+        PipelineState.CREATED ->
+            newState == PipelineState.INITIALIZED
+
+        PipelineState.INITIALIZED ->
+            newState == PipelineState.VALIDATED
+
+        PipelineState.VALIDATED ->
+            newState == PipelineState.RUNNING
+
+        PipelineState.RUNNING ->
+            newState == PipelineState.COMPLETED ||
+            newState == PipelineState.FAILED
+
+        PipelineState.COMPLETED ->
+            newState == PipelineState.STOPPED
+
+        PipelineState.STOPPED ->
+            newState == PipelineState.DISPOSED
+
+        PipelineState.FAILED ->
+            newState == PipelineState.STOPPED
+
+        PipelineState.DISPOSED ->
+            false
+    }
+}
+/**
+ * Changes the lifecycle state of the pipeline.
+ */
+protected fun changeState(
+    newState: PipelineState
+) {
+
+    require(canTransitionTo(newState)) {
+        "Illegal state transition: $state -> $newState"
+    }
+
+    logger.info(
+        "Pipeline [$name] : $state -> $newState"
+    )
+
+    state = newState
+}
+/**
+ * Returns true if the requested state transition is valid.
+ */
+protected fun canTransitionTo(
+    newState: PipelineState
+): Boolean {
+
+    return when (state) {
+
+        PipelineState.CREATED ->
+            newState == PipelineState.INITIALIZED
+
+        PipelineState.INITIALIZED ->
+            newState == PipelineState.VALIDATED
+
+        PipelineState.VALIDATED ->
+            newState == PipelineState.RUNNING
+
+        PipelineState.RUNNING ->
+            newState == PipelineState.COMPLETED ||
+            newState == PipelineState.FAILED
+
+        PipelineState.COMPLETED ->
+            newState == PipelineState.STOPPED
+
+        PipelineState.STOPPED ->
+            newState == PipelineState.DISPOSED
+
+        PipelineState.FAILED ->
+            newState == PipelineState.STOPPED
+
+        PipelineState.DISPOSED ->
+            false
     }
 
 }
