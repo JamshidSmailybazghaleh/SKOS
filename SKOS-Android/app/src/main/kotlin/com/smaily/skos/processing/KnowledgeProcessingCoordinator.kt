@@ -75,4 +75,53 @@ class KnowledgeProcessingCoordinator(
 
         return nodes.size
     }
+    /**
+ * Processes multiple parse requests.
+ *
+ * @return Total number of generated knowledge nodes.
+ */
+fun processAll(
+    requests: Collection<ParseRequest>
+): Int {
+
+    var totalNodes = 0
+
+    requests.forEach { request ->
+        totalNodes += process(request)
+    }
+
+    return totalNodes
+}
+
+/**
+ * Determines whether a request can be processed.
+ */
+fun canProcess(
+    request: ParseRequest
+): Boolean {
+
+    return parserManager.canParse(request)
+}
+
+/**
+ * Rebuilds the search index from the repository.
+ */
+fun rebuildIndex() {
+
+    indexer.clear()
+
+    repository
+        .findAllNodes()
+        .forEach { node ->
+            indexer.index(node)
+        }
+}
+
+/**
+ * Clears temporary processing state.
+ */
+fun reset() {
+
+    rebuildIndex()
+}
 }
