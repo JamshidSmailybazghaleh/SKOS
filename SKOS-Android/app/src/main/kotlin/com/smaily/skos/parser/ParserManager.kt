@@ -48,4 +48,56 @@ class ParserManager(
 
         return registry.find(request) != null
     }
+/**
+ * Returns true if any registered parser supports the request.
+ */
+fun canParse(
+    request: ParseRequest
+): Boolean {
+
+    return parsers.any {
+        it.supports(request)
+    }
+}
+   /**
+ * Registers multiple parsers.
+ */
+fun registerAll(
+    parsers: Collection<Parser>
+) {
+
+    parsers.forEach(::register)
+}
+/**
+ * Returns the number of registered parsers.
+ */
+fun parserCount(): Int {
+
+    return parsers.size
+}
+/**
+ * Returns all registered parsers.
+ */
+fun registeredParsers(): List<Parser> {
+
+    return parsers.toList()
+}
+/**
+ * Removes all registered parsers.
+ */
+fun clear() {
+
+    parsers.clear()
+}
+/**
+ * Returns the first parser that supports the request.
+ */
+fun findParser(
+    request: ParseRequest
+): Parser? {
+
+    return parsers.firstOrNull {
+        it.supports(request)
+    }
+}
 }
