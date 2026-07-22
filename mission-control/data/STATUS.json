@@ -1,0 +1,21 @@
+{
+  "project":"SKOS",
+
+  "version":"Alpha",
+
+  "latestBuild":"BUILD-000233",
+
+  "buildCount":233,
+
+  "projectStatus":"ACTIVE",
+
+  "architectureProgress":42,
+
+  "implementationProgress":18,
+
+  "engines":19,
+
+  "healthyEngines":5,
+
+  "lastUpdate":"2026-07-22"
+}
