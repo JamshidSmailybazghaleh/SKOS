@@ -1,21 +1,30 @@
 {
-  "project":"SKOS",
+  "project": "SKOS",
+  "projectName": "Smaily Knowledge Operating System",
+  "version": "Alpha",
+  "latestBuild": "BUILD-000233A",
+  "buildCount": 233,
+  "projectStatus": "ACTIVE",
 
-  "version":"Alpha",
+  "architectureProgress": 42,
+  "implementationProgress": 18,
 
-  "latestBuild":"BUILD-000233",
+  "engines": {
+    "total": 19,
+    "healthy": 5,
+    "active": 5,
+    "planned": 14
+  },
 
-  "buildCount":233,
+  "repository": {
+    "github": "https://github.com/JamshidSmailybazghaleh/SKOS",
+    "website": "https://jamshidsmailybazghaleh.github.io/SKOS/"
+  },
 
-  "projectStatus":"ACTIVE",
+  "missionControl": {
+    "status": "ONLINE",
+    "version": "0.2"
+  },
 
-  "architectureProgress":42,
-
-  "implementationProgress":18,
-
-  "engines":19,
-
-  "healthyEngines":5,
-
-  "lastUpdate":"2026-07-22"
+  "lastUpdate": "2026-07-22"
 }
