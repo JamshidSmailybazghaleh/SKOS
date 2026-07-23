@@ -1,3 +1,66 @@
-{
-  "builds": []
-}
+[
+  {
+    "buildId": "BUILD-000235",
+    "title": "Live Build Center",
+    "status": "ACTIVE",
+    "engine": "Mission Control",
+    "version": "1.0",
+    "date": "2026-07-22"
+  },
+  {
+    "buildId": "BUILD-000234",
+    "title": "The First Live Mission Control",
+    "status": "ACTIVE",
+    "engine": "Mission Control",
+    "version": "1.0",
+    "date": "2026-07-22"
+  },
+  {
+    "buildId": "BUILD-000233B",
+    "title": "Mission Control Data Schema (MCDS-001)",
+    "status": "ACTIVE",
+    "engine": "Mission Control",
+    "version": "1.0",
+    "date": "2026-07-22"
+  },
+  {
+    "buildId": "BUILD-000233A",
+    "title": "Mission Control Data Foundation (MCDF-001)",
+    "status": "ACTIVE",
+    "engine": "Mission Control",
+    "version": "1.0",
+    "date": "2026-07-22"
+  },
+  {
+    "buildId": "BUILD-000233",
+    "title": "Mission Control Engine Monitor",
+    "status": "ACTIVE",
+    "engine": "Mission Control",
+    "version": "1.0",
+    "date": "2026-07-22"
+  },
+  {
+    "buildId": "BUILD-000232",
+    "title": "Mission Control Build Center",
+    "status": "ACTIVE",
+    "engine": "Mission Control",
+    "version": "1.0",
+    "date": "2026-07-22"
+  },
+  {
+    "buildId": "BUILD-000231",
+    "title": "SKOS Directory Standard (SDS-001)",
+    "status": "ACTIVE",
+    "engine": "Infrastructure",
+    "version": "1.0",
+    "date": "2026-07-22"
+  },
+  {
+    "buildId": "BUILD-000230",
+    "title": "Mission Control Dashboard Core",
+    "status": "ACTIVE",
+    "engine": "Mission Control",
+    "version": "1.0",
+    "date": "2026-07-22"
+  }
+]
