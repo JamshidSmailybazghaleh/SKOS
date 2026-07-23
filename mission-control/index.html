@@ -11,15 +11,21 @@
 
 <style>
 
-body{
-
+*{
 margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
 
 background:#0b1724;
 
 font-family:Arial,Helvetica,sans-serif;
 
-color:white;
+color:#ffffff;
+
+line-height:1.5;
 
 }
 
@@ -27,17 +33,19 @@ header{
 
 background:#13283b;
 
-padding:20px;
+padding:25px;
 
 text-align:center;
+
+border-bottom:4px solid #3aa7ff;
 
 }
 
 header h1{
 
-margin:0;
+font-size:40px;
 
-font-size:38px;
+margin-bottom:10px;
 
 }
 
@@ -45,13 +53,19 @@ header p{
 
 color:#9ec3df;
 
+font-size:18px;
+
 }
 
 .container{
 
 width:95%;
 
+max-width:1500px;
+
 margin:auto;
+
+padding-bottom:40px;
 
 }
 
@@ -59,17 +73,21 @@ margin:auto;
 
 background:#16293d;
 
-margin-top:20px;
+margin-top:25px;
 
-padding:20px;
+padding:22px;
 
 border-radius:10px;
 
+box-shadow:0 3px 10px rgba(0,0,0,.35);
+
 }
 
-h2{
+.section h2{
 
 color:#55c8ff;
+
+margin-bottom:20px;
 
 }
 
@@ -79,7 +97,7 @@ display:grid;
 
 grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
 
-gap:15px;
+gap:18px;
 
 }
 
@@ -93,25 +111,105 @@ border-radius:8px;
 
 text-align:center;
 
+transition:.25s;
+
+}
+
+.card:hover{
+
+transform:translateY(-3px);
+
+background:#214364;
+
 }
 
 .card h3{
 
-margin-top:0;
+margin-bottom:12px;
 
 color:#7fdcff;
+
+font-size:18px;
 
 }
 
 .card p{
 
-font-size:24px;
+font-size:28px;
 
-margin:8px 0;
+font-weight:bold;
+
+color:#ffffff;
 
 }
 
-a{
+.module-grid{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+
+gap:20px;
+
+margin-top:20px;
+
+}
+
+.module-card{
+
+display:block;
+
+background:#1d3954;
+
+padding:22px;
+
+border-radius:8px;
+
+text-decoration:none;
+
+color:white;
+
+transition:.25s;
+
+}
+
+.module-card:hover{
+
+background:#214364;
+
+transform:translateY(-3px);
+
+}
+
+.module-card h3{
+
+color:#7fdcff;
+
+margin-bottom:12px;
+
+}
+
+.module-card p{
+
+color:#d8e9f7;
+
+font-size:15px;
+
+}
+
+.quick-links ul{
+
+list-style:none;
+
+}
+
+.quick-links li{
+
+margin-bottom:10px;
+
+}
+
+.quick-links a{
 
 color:#7fdcff;
 
@@ -119,7 +217,7 @@ text-decoration:none;
 
 }
 
-a:hover{
+.quick-links a:hover{
 
 text-decoration:underline;
 
@@ -129,11 +227,53 @@ footer{
 
 margin-top:40px;
 
-padding:20px;
+padding:25px;
 
 text-align:center;
 
+background:#13283b;
+
 color:#9fb8cf;
+
+border-top:4px solid #3aa7ff;
+
+}
+
+.status-active{
+
+color:#4cff72;
+
+font-weight:bold;
+
+}
+
+.status-online{
+
+color:#4cff72;
+
+font-weight:bold;
+
+}
+
+@media(max-width:768px){
+
+header h1{
+
+font-size:30px;
+
+}
+
+.grid{
+
+grid-template-columns:1fr;
+
+}
+
+.module-grid{
+
+grid-template-columns:1fr;
+
+}
 
 }
 
@@ -147,7 +287,11 @@ color:#9fb8cf;
 
 <h1>SKOS Mission Control</h1>
 
-<p>Smaily Knowledge Operating System</p>
+<p>
+
+Smaily Knowledge Operating System
+
+</p>
 
 </header>
 
@@ -163,7 +307,11 @@ color:#9fb8cf;
 
 <h3>Total Builds</h3>
 
-<p>18</p>
+<p id="buildCount">
+
+Loading...
+
+</p>
 
 </div>
 
@@ -171,7 +319,11 @@ color:#9fb8cf;
 
 <h3>Latest Build</h3>
 
-<p>BUILD-000232</p>
+<p id="latestBuild">
+
+Loading...
+
+</p>
 
 </div>
 
@@ -179,15 +331,25 @@ color:#9fb8cf;
 
 <h3>Project Status</h3>
 
-<p>ACTIVE</p>
+<p class="status-active"
+
+id="projectStatus">
+
+ACTIVE
+
+</p>
 
 </div>
 
 <div class="card">
 
-<h3>Version</h3>
+<h3>Current Version</h3>
 
-<p>Alpha</p>
+<p id="projectVersion">
+
+Alpha 0.1
+
+</p>
 
 </div>
 
@@ -195,7 +357,11 @@ color:#9fb8cf;
 
 <h3>Architecture</h3>
 
-<p>Foundation</p>
+<p>
+
+Foundation
+
+</p>
 
 </div>
 
@@ -203,67 +369,9 @@ color:#9fb8cf;
 
 <h3>Mission</h3>
 
-<p>ONLINE</p>
+<p class="status-online">
 
-</div>
-
-</div>
-
-</div>
-
-<div class="section">
-
-<h2>Mission Control Modules</h2>
-
-<ul>
-
-<li>Mission Dashboard</li>
-
-<li>Build Center</li>
-
-<li>Engine Monitor</li>
-
-<li>Architecture Viewer</li>
-
-<li>Documentation Center</li>
-
-<li>Roadmap Center</li>
-
-<li>SKE Explorer</li>
-
-<li>Knowledge Graph</li>
-
-</ul>
-
-</div>
-
-<div class="section">
-
-<h2>Quick Access</h2>
-
-<ul>
-
-<li><a href="../README.md">README</a></li>
-
-<li><a href="../CHANGELOG.md">CHANGELOG</a></li>
-
-<li><a href="../MANIFEST.md">MANIFEST</a></li>
-
-<li><a href="../build/">Build Center</a></li>
-
-<li><a href="https://github.com/JamshidSmailybazghaleh/SKOS">GitHub Repository</a></li>
-
-</ul>
-
-</div>
-
-<div class="section">
-
-<h2>Current Mission</h2>
-
-<p>
-
-Developing the world's first Knowledge Operating System.
+ONLINE
 
 </p>
 
@@ -271,14 +379,4 @@ Developing the world's first Knowledge Operating System.
 
 </div>
 
-<footer>
-
-SKOS Mission Control Center
-
-Version Alpha
-
-</footer>
-
-</body>
-
-</html>
+</div>
