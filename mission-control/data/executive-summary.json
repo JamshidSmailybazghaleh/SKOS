@@ -1,1 +1,8 @@
-
+{
+  "currentBuild": "BUILD-000316",
+  "currentRelease": "RELEASE-001",
+  "currentSprint": "SPRINT-001",
+  "status": "ACTIVE",
+  "todayPriority": "Mission Control Refactoring",
+  "nextAction": "Complete Executive Summary Module"
+}
