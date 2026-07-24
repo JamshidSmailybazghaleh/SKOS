@@ -1,25 +1,35 @@
 /*
 ====================================================
-SKOS Mission Control Kernel
-File: kernel.js
-Version: 1.0
-Status: ACTIVE
+SKOS Mission Control
+
+Kernel
+
+File:
+kernel.js
+
+Version:
+1.1
+
+Status:
+ACTIVE
 ====================================================
 */
 
 const SKOS = {
 
-    version: "Alpha 0.2",
+    version: CONFIG.system.version,
 
     initialized: false,
 
     modules: [],
 
+
+
     async initialize() {
 
         console.log("================================");
-        console.log("SKOS Mission Control Kernel");
-        console.log("Initializing...");
+        console.log(CONFIG.system.name);
+        console.log("Kernel Initializing...");
         console.log("================================");
 
         await this.loadRegistry();
@@ -32,9 +42,14 @@ const SKOS = {
 
         this.initialized = true;
 
-        console.log("Kernel Ready.");
+        console.log("================================");
+        console.log("Kernel Ready");
+        console.log("Version:", this.version);
+        console.log("================================");
 
     },
+
+
 
     async loadRegistry() {
 
@@ -49,41 +64,101 @@ const SKOS = {
 
     },
 
+
+
     async loadModules() {
 
         console.log("Loading Modules...");
 
-        /*
-        Future:
+        const loaded = await ModuleLoader.load(
 
-        MODULE-001
+            "executive-summary",
 
-        MODULE-002
+            CONFIG.dashboard.containerId
 
-        ...
+        );
 
-        */
+        if (loaded) {
+
+            this.modules.push("executive-summary");
+
+        }
 
     },
+
+
 
     async loadStatus() {
 
         console.log("Loading Status...");
 
-        /*
-        Future:
+        try {
 
-        STATUS.json
+            const response = await fetch(
 
-        */
+                CONFIG.paths.data +
+                CONFIG.files.status
+
+            );
+
+            if (!response.ok) {
+
+                throw new Error("STATUS.json not found");
+
+            }
+
+            const status = await response.json();
+
+            console.log(
+
+                "Latest Build:",
+                status.latestBuild
+
+            );
+
+        }
+
+        catch (error) {
+
+            console.warn(
+
+                "Status loading skipped."
+
+            );
+
+        }
 
     },
+
+
 
     renderDashboard() {
 
-        console.log("Rendering Dashboard...");
+        console.log(
+
+            "Rendering Dashboard..."
+
+        );
 
     },
+
+
+
+    getLoadedModules() {
+
+        return this.modules;
+
+    },
+
+
+
+    isInitialized() {
+
+        return this.initialized;
+
+    },
+
+
 
     start() {
 
@@ -92,6 +167,7 @@ const SKOS = {
     }
 
 };
+
 
 
 window.addEventListener(
