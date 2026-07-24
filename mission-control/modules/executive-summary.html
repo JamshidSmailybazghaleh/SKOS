@@ -1,1 +1,119 @@
+<div class="section" id="executive-summary-module">
 
+    <h2>Executive Summary</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>Current Build</h3>
+            <p id="currentBuild">
+                Loading...
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>Current Release</h3>
+            <p id="currentRelease">
+                Loading...
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>Current Sprint</h3>
+            <p id="currentSprint">
+                Loading...
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>Status</h3>
+            <p id="projectStatus">
+                Loading...
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>Today's Priority</h3>
+            <p id="todayPriority">
+                Loading...
+            </p>
+        </div>
+
+
+        <div class="card">
+            <h3>Next Action</h3>
+            <p id="nextAction">
+                Loading...
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+async function loadExecutiveSummary(){
+
+    try{
+
+        const response = await fetch(
+            "../data/executive-summary.json"
+        );
+
+
+        const data = await response.json();
+
+
+        document.getElementById(
+            "currentBuild"
+        ).textContent = data.currentBuild;
+
+
+        document.getElementById(
+            "currentRelease"
+        ).textContent = data.currentRelease;
+
+
+        document.getElementById(
+            "currentSprint"
+        ).textContent = data.currentSprint;
+
+
+        document.getElementById(
+            "projectStatus"
+        ).textContent = data.status;
+
+
+        document.getElementById(
+            "todayPriority"
+        ).textContent = data.todayPriority;
+
+
+        document.getElementById(
+            "nextAction"
+        ).textContent = data.nextAction;
+
+
+    }
+
+    catch(error){
+
+        console.log(
+            "Executive Summary data not found."
+        );
+
+    }
+
+}
+
+
+loadExecutiveSummary();
+
+
+</script>
