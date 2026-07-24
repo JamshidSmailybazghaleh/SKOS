@@ -2,7 +2,7 @@
 ====================================================
 SKOS Mission Control
 
-Module Loader
+Runtime Module Loader
 
 File:
 module-loader.js
@@ -23,30 +23,19 @@ const ModuleLoader = {
 
     async loadModule(moduleName) {
 
-        console.log(
-            "================================"
-        );
-
-        console.log(
-            "Loading Module:",
-            moduleName
-        );
-
-        console.log(
-            "================================"
-        );
+        console.log("================================");
+        console.log("Loading Module:", moduleName);
+        console.log("================================");
 
 
 
-        const htmlLoaded =
-            await this.loadHTML(
-                moduleName
-            );
+        const htmlLoaded = await this.loadHTML(moduleName);
 
         if (!htmlLoaded) {
 
             console.error(
-                "Module loading aborted."
+                "Module aborted:",
+                moduleName
             );
 
             return false;
@@ -55,27 +44,19 @@ const ModuleLoader = {
 
 
 
-        await this.loadScript(
-            moduleName
-        );
+        await this.loadScript(moduleName);
 
 
 
-        await this.loadData(
-            moduleName
-        );
+        await this.loadData(moduleName);
 
 
 
-        this.initializeModule(
-            moduleName
-        );
+        this.initializeModule(moduleName);
 
 
 
-        this.loadedModules.push(
-            moduleName
-        );
+        this.loadedModules.push(moduleName);
 
 
 
@@ -96,35 +77,36 @@ const ModuleLoader = {
 
         try {
 
-            const response =
-                await fetch(
+            const response = await fetch(
 
-                    CONFIG.paths.modules +
+                CONFIG.paths.modules +
 
-                    moduleName +
+                moduleName +
 
-                    ".html"
+                ".html"
 
-                );
+            );
 
 
 
             if (!response.ok) {
 
                 throw new Error(
-                    "HTML file not found."
+
+                    "HTML not found."
+
                 );
 
             }
 
 
 
-            const html =
-                await response.text();
+            const html = await response.text();
 
 
 
             const container =
+
                 document.getElementById(
 
                     CONFIG.dashboard.containerId
@@ -136,20 +118,23 @@ const ModuleLoader = {
             if (!container) {
 
                 throw new Error(
-                    "Dashboard container not found."
+
+                    "Container not found."
+
                 );
 
             }
 
 
 
-            container.innerHTML =
-                html;
+            container.innerHTML = html;
 
 
 
             console.log(
+
                 "HTML Loaded."
+
             );
 
 
@@ -160,9 +145,7 @@ const ModuleLoader = {
 
         catch(error){
 
-            console.error(
-                error
-            );
+            console.error(error);
 
             return false;
 
@@ -176,33 +159,59 @@ const ModuleLoader = {
 
             const script = document.createElement("script");
 
+            script.type = "text/javascript";
+
             script.src =
+
                 CONFIG.paths.scripts +
+
                 moduleName +
+
                 ".js";
+
+
 
             script.onload = () => {
 
                 console.log(
+
                     "JavaScript Loaded."
+
                 );
+
+
 
                 resolve(true);
 
             };
 
+
+
             script.onerror = () => {
 
                 console.warn(
+
                     "JavaScript file not found:",
+
                     moduleName
+
                 );
+
+
 
                 resolve(false);
 
             };
 
-            document.body.appendChild(script);
+
+
+            document.body.appendChild(
+
+                script
+
+            );
+
+
 
         });
 
@@ -217,33 +226,60 @@ const ModuleLoader = {
             const response = await fetch(
 
                 CONFIG.paths.data +
+
                 moduleName +
+
                 ".json"
 
             );
 
+
+
             if (!response.ok) {
 
                 console.warn(
-                    "JSON file not found:",
+
+                    "JSON not found:",
+
                     moduleName
+
                 );
+
+
 
                 return;
 
             }
 
-            const json = await response.json();
 
-            window[moduleName + "Data"] = json;
+
+            const json =
+
+                await response.json();
+
+
+
+            window[
+
+                moduleName +
+
+                "Data"
+
+            ] = json;
+
+
 
             console.log(
+
                 "JSON Loaded."
+
             );
+
+
 
         }
 
-        catch (error) {
+        catch(error){
 
             console.warn(error);
 
@@ -251,27 +287,25 @@ const ModuleLoader = {
 
     },
 
-
-
-    initializeModule(moduleName) {
+        initializeModule(moduleName) {
 
         const objectName =
             this.toObjectName(moduleName);
 
+        const moduleObject =
+            window[objectName];
+
         if (
-
-            window[objectName] &&
-
-            typeof window[objectName].initialize === "function"
-
+            moduleObject &&
+            typeof moduleObject.initialize === "function"
         ) {
 
-            window[objectName].initialize();
-
             console.log(
-                objectName +
-                " initialized."
+                "Initializing:",
+                objectName
             );
+
+            moduleObject.initialize();
 
         }
 
@@ -298,9 +332,9 @@ const ModuleLoader = {
 
                 part =>
 
-                part.charAt(0).toUpperCase() +
+                    part.charAt(0).toUpperCase() +
 
-                part.slice(1)
+                    part.slice(1)
 
             )
 
@@ -337,4 +371,5 @@ const ModuleLoader = {
 };
 
 
-Object.freeze(ModuleLoader); 
+
+Object.freeze(ModuleLoader);
