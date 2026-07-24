@@ -1,86 +1,106 @@
-async function loadExecutiveSummary() {
+/*
+====================================================
+SKOS Mission Control
 
-    try {
+Executive Summary Module
 
-        const response = await fetch(
-            "../data/executive-summary.json"
+File:
+executive-summary.js
+
+Version:
+2.0
+
+Status:
+ACTIVE
+====================================================
+*/
+
+const ExecutiveSummary = {
+
+    data: null,
+
+
+
+    async initialize() {
+
+        console.log(
+            "Initializing Executive Summary..."
         );
 
+        await this.load();
 
-        if (!response.ok) {
+        this.render();
 
-            throw new Error(
-                "Executive Summary JSON not found"
-            );
+    },
+
+
+
+    async load() {
+
+        try {
+
+            this.data =
+
+                window["executive-summaryData"];
+
+            if (!this.data) {
+
+                const response = await fetch(
+
+                    CONFIG.paths.data +
+
+                    "executive-summary.json"
+
+                );
+
+                this.data = await response.json();
+
+            }
 
         }
 
+        catch(error){
 
-        const data = await response.json();
-
-
-        document.getElementById(
-            "currentBuild"
-        ).textContent =
-            data.currentBuild;
-
-
-        document.getElementById(
-            "currentRelease"
-        ).textContent =
-            data.currentRelease;
-
-
-        document.getElementById(
-            "currentSprint"
-        ).textContent =
-            data.currentSprint;
-
-
-        document.getElementById(
-            "projectStatus"
-        ).textContent =
-            data.status;
-
-
-        document.getElementById(
-            "todayPriority"
-        ).textContent =
-            data.todayPriority;
-
-
-        document.getElementById(
-            "nextAction"
-        ).textContent =
-            data.nextAction;
-
-
-    }
-
-    catch(error) {
-
-        console.error(
-            "Executive Summary Module Error:",
-            error
-        );
-
-
-        const status =
-            document.getElementById(
-                "projectStatus"
-            );
-
-
-        if(status){
-
-            status.textContent =
-                "ERROR";
+            console.error(error);
 
         }
 
+    },
+
+
+
+    render() {
+
+        if(!this.data){
+
+            return;
+
+        }
+
+        document.getElementById("currentBuild").textContent =
+            this.data.currentBuild;
+
+        document.getElementById("currentRelease").textContent =
+            this.data.currentRelease;
+
+        document.getElementById("currentSprint").textContent =
+            this.data.currentSprint;
+
+        document.getElementById("projectStatus").textContent =
+            this.data.status;
+
+        document.getElementById("todayPriority").textContent =
+            this.data.todayPriority;
+
+        document.getElementById("nextAction").textContent =
+            this.data.nextAction;
+
+        console.log(
+            "Executive Summary Ready."
+        );
+
     }
 
-}
+};
 
-
-loadExecutiveSummary();
+Object.freeze(ExecutiveSummary);
