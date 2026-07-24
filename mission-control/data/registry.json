@@ -4,9 +4,12 @@
   "modules": [
     {
       "id": "MODULE-001",
-      "name": "Executive Summary",
-      "file": "executive-summary.html",
-      "container": "executive-summary-container",
+      "name": "executive-summary",
+      "enabled": true
+    },
+    {
+      "id": "MODULE-002",
+      "name": "build-center",
       "enabled": true
     }
   ]
