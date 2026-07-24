@@ -53,16 +53,21 @@ const SKOS = {
 
     async loadRegistry() {
 
-        console.log("Loading Registry...");
+    console.log("Loading Registry...");
 
-        /*
-        Future:
+    const loaded = await Registry.load();
 
-        registry.json
+    if (!loaded) {
 
-        */
+        console.error(
 
-    },
+            "Registry could not be loaded."
+
+        );
+
+    }
+
+},
 
 
 
