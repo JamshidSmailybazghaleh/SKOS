@@ -4,11 +4,8 @@ SKOS Mission Control
 
 Module Loader
 
-File:
-module-loader.js
-
 Version:
-1.0
+2.0
 
 Status:
 ACTIVE
@@ -19,65 +16,79 @@ const ModuleLoader = {
 
     loadedModules: [],
 
-    async load(moduleName, containerId) {
+    async loadModule(moduleName) {
+
+        console.log(
+            "Loading Module:",
+            moduleName
+        );
+
+        const htmlLoaded =
+            await this.loadHTML(moduleName);
+
+        if (!htmlLoaded) {
+
+            return false;
+
+        }
+
+        await this.loadScript(moduleName);
+
+        await this.loadData(moduleName);
+
+        this.loadedModules.push(moduleName);
+
+        console.log(
+            "Module Ready:",
+            moduleName
+        );
+
+        return true;
+
+    },
+
+
+
+    async loadHTML(moduleName) {
 
         try {
 
-            console.log(
-                "Loading Module:",
-                moduleName
-            );
-
             const response =
                 await fetch(
+
                     CONFIG.paths.modules +
                     moduleName +
                     ".html"
+
                 );
 
             if (!response.ok) {
 
-                throw new Error(
-                    "Module not found: " +
-                    moduleName
-                );
+                throw new Error();
 
             }
 
             const html =
                 await response.text();
 
-            const container =
-                document.getElementById(
-                    containerId
-                );
+            document.getElementById(
 
-            if (!container) {
+                CONFIG.dashboard.containerId
 
-                throw new Error(
-                    "Container not found: " +
-                    containerId
-                );
-
-            }
-
-            container.innerHTML = html;
-
-            this.loadedModules.push(moduleName);
-
-            console.log(
-                "Module Loaded:",
-                moduleName
-            );
+            ).innerHTML = html;
 
             return true;
 
         }
 
-        catch (error) {
+        catch {
 
             console.error(
-                error
+
+                "HTML not found:",
+
+                moduleName
+
             );
 
             return false;
@@ -88,7 +99,89 @@ const ModuleLoader = {
 
 
 
-    isLoaded(moduleName) {
+    async loadScript(moduleName) {
+
+        return new Promise(
+
+            (resolve)=>{
+
+                const script =
+                    document.createElement(
+                        "script"
+                    );
+
+                script.src =
+
+                    CONFIG.paths.scripts +
+
+                    moduleName +
+
+                    ".js";
+
+                script.onload =
+                    ()=>resolve(true);
+
+                script.onerror =
+                    ()=>resolve(false);
+
+                document.body.appendChild(
+                    script
+                );
+
+            }
+
+        );
+
+    },
+
+
+
+    async loadData(moduleName) {
+
+        try {
+
+            const response =
+                await fetch(
+
+                    CONFIG.paths.data +
+
+                    moduleName +
+
+                    ".json"
+
+                );
+
+            if (!response.ok) {
+
+                return;
+
+            }
+
+            const json =
+                await response.json();
+
+            window[moduleName+"Data"] =
+                json;
+
+        }
+
+        catch{
+
+            console.warn(
+
+                "JSON not found:",
+
+                moduleName
+
+            );
+
+        }
+
+    },
+
+
+
+    isLoaded(moduleName){
 
         return this.loadedModules.includes(
             moduleName
@@ -98,17 +191,9 @@ const ModuleLoader = {
 
 
 
-    list() {
+    list(){
 
         return this.loadedModules;
-
-    },
-
-
-
-    clear() {
-
-        this.loadedModules = [];
 
     }
 
