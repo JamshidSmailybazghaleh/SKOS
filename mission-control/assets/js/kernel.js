@@ -26,7 +26,8 @@ const SKOS = {
 
 
     async initialize() {
-
+alert("Kernel Started");
+    
         console.log("================================");
         console.log(CONFIG.system.name);
         console.log("Kernel Initializing...");
