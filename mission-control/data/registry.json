@@ -3,14 +3,16 @@
   "status": "ACTIVE",
   "modules": [
     {
-      "id": "MODULE-001",
-      "name": "executive-summary",
-      "enabled": true
-    },
+  "id":"MODULE-001",
+  "name":"executive-summary",
+  "container":"executive-summary-container",
+  "enabled":true
+},
     {
-      "id": "MODULE-002",
-      "name": "build-center",
-      "enabled": true
-    }
+  "id":"MODULE-002",
+  "name":"build-center",
+  "container":"build-center-container",
+  "enabled":true
+}
   ]
 }
