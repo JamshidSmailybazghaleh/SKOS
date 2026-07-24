@@ -8,10 +8,10 @@ File:
 module-loader.js
 
 Version:
-3.0
+4.0
 
 Status:
-ACTIVE
+STABLE
 ====================================================
 */
 
@@ -19,131 +19,41 @@ const ModuleLoader = {
 
     loadedModules: [],
 
-
-
     async loadModule(moduleName) {
 
         console.log("================================");
         console.log("Loading Module:", moduleName);
         console.log("================================");
 
-
-
-        const htmlLoaded = await this.loadHTML(moduleName);
-
-        if (!htmlLoaded) {
-
-            console.error(
-                "Module aborted:",
-                moduleName
-            );
-
-            return false;
-
-        }
-
-
-
-        await this.loadScript(moduleName);
-
-
-
-        await this.loadData(moduleName);
-
-
-
-        this.initializeModule(moduleName);
-
-
-
-        this.loadedModules.push(moduleName);
-
-
-
-        console.log(
-            "Module Ready:",
-            moduleName
-        );
-
-
-
-        return true;
-
-    },
-
-
-
-    async loadHTML(moduleName) {
-
         try {
 
-            const response = await fetch(
+            const htmlLoaded = await this.loadHTML(moduleName);
 
-                CONFIG.paths.modules +
+            if (!htmlLoaded) {
 
-                moduleName +
+                console.error("Module HTML failed:", moduleName);
 
-                ".html"
-
-            );
-
-
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "HTML not found."
-
-                );
+                return false;
 
             }
 
+            await this.loadScript(moduleName);
 
+            await this.loadData(moduleName);
 
-            const html = await response.text();
+            // اطمینان از آماده شدن DOM
+            await this.waitDOM();
 
+            await this.initializeModule(moduleName);
 
+            this.loadedModules.push(moduleName);
 
-            const container =
-
-                document.getElementById(
-
-                    CONFIG.dashboard.containerId
-
-                );
-
-
-
-            if (!container) {
-
-                throw new Error(
-
-                    "Container not found."
-
-                );
-
-            }
-
-
-
-            container.innerHTML = html;
-
-
-
-            console.log(
-
-                "HTML Loaded."
-
-            );
-
-
+            console.log("Module Ready:", moduleName);
 
             return true;
 
         }
-
-        catch(error){
+        catch (error) {
 
             console.error(error);
 
@@ -153,71 +63,112 @@ const ModuleLoader = {
 
     },
 
-       async loadScript(moduleName) {
+    async loadHTML(moduleName) {
+
+        try {
+
+            const response = await fetch(
+
+                CONFIG.paths.modules +
+                moduleName +
+                ".html"
+
+            );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Module HTML not found."
+                );
+
+            }
+
+            const html = await response.text();
+
+            const container =
+                document.getElementById(
+                    CONFIG.dashboard.containerId
+                );
+
+            if (!container) {
+
+                throw new Error(
+                    "Dashboard container not found."
+                );
+
+            }
+
+            container.classList.remove("loading");
+
+            container.innerHTML = "";
+
+            container.insertAdjacentHTML(
+                "beforeend",
+                html
+            );
+
+            console.log("HTML Loaded.");
+
+            return true;
+
+        }
+        catch (error) {
+
+            console.error(error);
+
+            return false;
+
+        }
+
+    },
+
+    async loadScript(moduleName) {
 
         return new Promise((resolve) => {
 
-            const script = document.createElement("script");
+            const objectName =
+                this.toObjectName(moduleName);
 
-            script.type = "text/javascript";
+            if (window[objectName]) {
+
+                resolve(true);
+
+                return;
+
+            }
+
+            const script =
+                document.createElement("script");
 
             script.src =
-
                 CONFIG.paths.scripts +
-
                 moduleName +
-
                 ".js";
-
-
 
             script.onload = () => {
 
-                console.log(
-
-                    "JavaScript Loaded."
-
-                );
-
-
+                console.log("JavaScript Loaded.");
 
                 resolve(true);
 
             };
 
-
-
             script.onerror = () => {
 
                 console.warn(
-
-                    "JavaScript file not found:",
-
+                    "JavaScript not found:",
                     moduleName
-
                 );
-
-
 
                 resolve(false);
 
             };
 
-
-
-            document.body.appendChild(
-
-                script
-
-            );
-
-
+            document.body.appendChild(script);
 
         });
 
     },
-
-
 
     async loadData(moduleName) {
 
@@ -226,68 +177,39 @@ const ModuleLoader = {
             const response = await fetch(
 
                 CONFIG.paths.data +
-
                 moduleName +
-
                 ".json"
 
             );
 
-
-
             if (!response.ok) {
-
-                console.warn(
-
-                    "JSON not found:",
-
-                    moduleName
-
-                );
-
-
 
                 return;
 
             }
 
-
-
             const json =
-
                 await response.json();
 
-
-
             window[
-
-                moduleName +
-
-                "Data"
-
+                moduleName + "Data"
             ] = json;
 
-
-
-            console.log(
-
-                "JSON Loaded."
-
-            );
-
-
+            console.log("JSON Loaded.");
 
         }
+        catch {
 
-        catch(error){
-
-            console.warn(error);
+            console.log(
+                "No JSON for",
+                moduleName
+            );
 
         }
 
     },
 
-        initializeModule(moduleName) {
+    async initializeModule(moduleName) {
 
         const objectName =
             this.toObjectName(moduleName);
@@ -305,22 +227,33 @@ const ModuleLoader = {
                 objectName
             );
 
-            moduleObject.initialize();
+            await moduleObject.initialize();
 
         }
-
         else {
 
             console.warn(
                 objectName +
-                ".initialize() not found."
+                ".initialize() missing."
             );
 
         }
 
     },
 
+    async waitDOM() {
 
+        return new Promise(resolve => {
+
+            requestAnimationFrame(() => {
+
+                requestAnimationFrame(resolve);
+
+            });
+
+        });
+
+    },
 
     toObjectName(moduleName) {
 
@@ -328,13 +261,10 @@ const ModuleLoader = {
 
             .split("-")
 
-            .map(
+            .map(part =>
 
-                part =>
-
-                    part.charAt(0).toUpperCase() +
-
-                    part.slice(1)
+                part.charAt(0).toUpperCase() +
+                part.slice(1)
 
             )
 
@@ -342,25 +272,17 @@ const ModuleLoader = {
 
     },
 
-
-
     isLoaded(moduleName) {
 
-        return this.loadedModules.includes(
-            moduleName
-        );
+        return this.loadedModules.includes(moduleName);
 
     },
-
-
 
     list() {
 
-        return this.loadedModules;
+        return [...this.loadedModules];
 
     },
-
-
 
     clear() {
 
@@ -369,7 +291,5 @@ const ModuleLoader = {
     }
 
 };
-
-
 
 Object.freeze(ModuleLoader);
