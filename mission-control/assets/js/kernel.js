@@ -73,23 +73,31 @@ const SKOS = {
 
     async loadModules() {
 
-        console.log("Loading Modules...");
+    console.log("Loading Modules...");
 
-        const loaded = await ModuleLoader.load(
+    const modules = await Registry.getModules();
 
-            "executive-summary",
+    for (const module of modules) {
 
-            CONFIG.dashboard.containerId
+        const loaded = await ModuleLoader.loadModule(
+
+            module.name
 
         );
 
         if (loaded) {
 
-            this.modules.push("executive-summary");
+            this.modules.push(
+
+                module.name
+
+            );
 
         }
 
-    },
+    }
+
+},
 
 
 
