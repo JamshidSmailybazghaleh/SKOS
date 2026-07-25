@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "SKOS Revenue Schema",
+
+  "description": "Revenue Pipeline Standard Schema",
+
+  "version": "1.0",
+
+  "type": "object",
+
+  "required": [
+    "invoiceId",
+    "productId",
+    "assetId",
+    "amount",
+    "currency",
+    "status",
+    "createdAt"
+  ],
+
+  "properties": {
+
+    "invoiceId": {
+      "type": "string"
+    },
+
+    "paymentId": {
+      "type": "string"
+    },
+
+    "licenseId": {
+      "type": "string"
+    },
+
+    "deliveryId": {
+      "type": "string"
+    },
+
+    "productId": {
+      "type": "string"
+    },
+
+    "assetId": {
+      "type": "string"
+    },
+
+    "customerId": {
+      "type": "string"
+    },
+
+    "amount": {
+      "type": "number"
+    },
+
+    "currency": {
+      "type": "string"
+    },
+
+    "discount": {
+      "type": "number"
+    },
+
+    "tax": {
+      "type": "number"
+    },
+
+    "total": {
+      "type": "number"
+    },
+
+    "paymentMethod": {
+      "type": "string"
+    },
+
+    "paymentProvider": {
+      "type": "string"
+    },
+
+    "licenseType": {
+      "type": "string"
+    },
+
+    "deliveryMethod": {
+      "type": "string"
+    },
+
+    "status": {
+      "type": "string"
+    },
+
+    "createdAt": {
+      "type": "string"
+    },
+
+    "paidAt": {
+      "type": "string"
+    },
+
+    "deliveredAt": {
+      "type": "string"
+    },
+
+    "cancelledAt": {
+      "type": "string"
+    },
+
+    "metadata": {
+      "type": "object"
+    }
+
+  }
+}
