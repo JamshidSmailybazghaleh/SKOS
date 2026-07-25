@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "SKOS Workflow Schema",
+
+  "description": "Standard Workflow Definition",
+
+  "version": "1.0",
+
+  "type": "object",
+
+  "required": [
+    "id",
+    "title",
+    "version",
+    "status",
+    "steps",
+    "createdAt"
+  ],
+
+  "properties": {
+
+    "id": {
+      "type": "string"
+    },
+
+    "title": {
+      "type": "string"
+    },
+
+    "description": {
+      "type": "string"
+    },
+
+    "version": {
+      "type": "string"
+    },
+
+    "status": {
+      "type": "string"
+    },
+
+    "priority": {
+      "type": "integer"
+    },
+
+    "owner": {
+      "type": "string"
+    },
+
+    "category": {
+      "type": "string"
+    },
+
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "input": {
+      "type": "object"
+    },
+
+    "output": {
+      "type": "object"
+    },
+
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "retryPolicy": {
+      "type": "string"
+    },
+
+    "rollbackPolicy": {
+      "type": "string"
+    },
+
+    "timeout": {
+      "type": "integer"
+    },
+
+    "permissions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "metadata": {
+      "type": "object"
+    },
+
+    "createdAt": {
+      "type": "string"
+    },
+
+    "updatedAt": {
+      "type": "string"
+    }
+
+  }
+}
