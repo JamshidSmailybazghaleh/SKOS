@@ -23,6 +23,8 @@ const Registry = {
 
     async load() {
 
+        alert("Registry Started");
+        
         try {
 
             console.log(
@@ -51,6 +53,8 @@ const Registry = {
                 "Registry Loaded."
             );
 
+            alert("Registry Finished");
+            
             return true;
 
         }
