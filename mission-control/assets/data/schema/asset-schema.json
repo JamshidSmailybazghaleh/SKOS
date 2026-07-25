@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "SKOS Asset Schema",
+
+  "version": "1.0",
+
+  "type": "object",
+
+  "required": [
+    "id",
+    "title",
+    "category",
+    "version",
+    "language",
+    "author",
+    "license",
+    "status",
+    "createdAt"
+  ],
+
+  "properties": {
+
+    "id": {
+      "type": "string"
+    },
+
+    "title": {
+      "type": "string"
+    },
+
+    "category": {
+      "type": "string"
+    },
+
+    "version": {
+      "type": "string"
+    },
+
+    "language": {
+      "type": "string"
+    },
+
+    "author": {
+      "type": "string"
+    },
+
+    "owner": {
+      "type": "string"
+    },
+
+    "license": {
+      "type": "string"
+    },
+
+    "status": {
+      "type": "string"
+    },
+
+    "description": {
+      "type": "string"
+    },
+
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "location": {
+      "type": "string"
+    },
+
+    "checksum": {
+      "type": "string"
+    },
+
+    "digitalSignature": {
+      "type": "string"
+    },
+
+    "createdAt": {
+      "type": "string"
+    },
+
+    "updatedAt": {
+      "type": "string"
+    },
+
+    "publishedAt": {
+      "type": "string"
+    },
+
+    "metadata": {
+      "type": "object"
+    }
+
+  }
+
+}
