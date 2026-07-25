@@ -21,6 +21,8 @@ const ModuleLoader = {
 
     async loadModule(moduleName) {
 
+        alert("Loading Module : " + moduleName);
+      
         console.log("================================");
         console.log("Loading Module:", moduleName);
         console.log("================================");
