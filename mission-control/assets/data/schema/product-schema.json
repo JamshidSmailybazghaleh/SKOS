@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "SKOS Product Schema",
+
+  "version": "1.0",
+
+  "type": "object",
+
+  "required": [
+    "id",
+    "assetId",
+    "title",
+    "category",
+    "format",
+    "version",
+    "language",
+    "author",
+    "license",
+    "status",
+    "createdAt"
+  ],
+
+  "properties": {
+
+    "id": {
+      "type": "string"
+    },
+
+    "assetId": {
+      "type": "string"
+    },
+
+    "title": {
+      "type": "string"
+    },
+
+    "category": {
+      "type": "string"
+    },
+
+    "format": {
+      "type": "string"
+    },
+
+    "version": {
+      "type": "string"
+    },
+
+    "language": {
+      "type": "string"
+    },
+
+    "author": {
+      "type": "string"
+    },
+
+    "owner": {
+      "type": "string"
+    },
+
+    "license": {
+      "type": "string"
+    },
+
+    "status": {
+      "type": "string"
+    },
+
+    "description": {
+      "type": "string"
+    },
+
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "price": {
+      "type": "number"
+    },
+
+    "currency": {
+      "type": "string"
+    },
+
+    "distribution": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "checksum": {
+      "type": "string"
+    },
+
+    "digitalSignature": {
+      "type": "string"
+    },
+
+    "createdAt": {
+      "type": "string"
+    },
+
+    "updatedAt": {
+      "type": "string"
+    },
+
+    "publishedAt": {
+      "type": "string"
+    },
+
+    "metadata": {
+      "type": "object"
+    }
+
+  }
+
+}
