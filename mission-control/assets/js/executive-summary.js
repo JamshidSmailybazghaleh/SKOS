@@ -8,7 +8,7 @@ File:
 executive-summary.js
 
 Version:
-2.0
+3.0
 
 Status:
 ACTIVE
@@ -18,8 +18,6 @@ ACTIVE
 const ExecutiveSummary = {
 
     data: null,
-
-
 
     async initialize() {
 
@@ -33,14 +31,11 @@ const ExecutiveSummary = {
 
     },
 
-
-
     async load() {
 
         try {
 
             this.data =
-
                 window["executive-summaryData"];
 
             if (!this.data) {
@@ -53,46 +48,78 @@ const ExecutiveSummary = {
 
                 );
 
-                this.data = await response.json();
+                if (!response.ok) {
+
+                    throw new Error(
+                        "executive-summary.json not found."
+                    );
+
+                }
+
+                this.data =
+                    await response.json();
 
             }
 
+            console.log(
+                "Executive Summary Data Loaded."
+            );
+
         }
 
-        catch(error){
+        catch (error) {
 
-            console.error(error);
+            console.error(
+                "Executive Summary Load Error:",
+                error
+            );
+
+            this.data = null;
 
         }
 
     },
 
-
-
     render() {
 
-        if(!this.data){
+        if (!this.data) {
+
+            console.warn(
+                "Executive Summary Data Empty."
+            );
 
             return;
 
         }
 
-        document.getElementById("currentBuild").textContent =
+        document.getElementById(
+            "currentBuild"
+        ).textContent =
             this.data.currentBuild;
 
-        document.getElementById("currentRelease").textContent =
+        document.getElementById(
+            "currentRelease"
+        ).textContent =
             this.data.currentRelease;
 
-        document.getElementById("currentSprint").textContent =
+        document.getElementById(
+            "currentSprint"
+        ).textContent =
             this.data.currentSprint;
 
-        document.getElementById("projectStatus").textContent =
+        document.getElementById(
+            "projectStatus"
+        ).textContent =
             this.data.status;
 
-        document.getElementById("todayPriority").textContent =
+        document.getElementById(
+            "todayPriority"
+        ).textContent =
             this.data.todayPriority;
 
-        document.getElementById("nextAction").textContent =
+        document.getElementById(
+            "nextAction"
+        ).textContent =
             this.data.nextAction;
 
         console.log(
@@ -103,4 +130,17 @@ const ExecutiveSummary = {
 
 };
 
-Object.freeze(ExecutiveSummary);
+/* ============================================
+Register Module
+============================================ */
+
+window.ExecutiveSummary =
+    ExecutiveSummary;
+
+/* ============================================
+Freeze Object
+============================================ */
+
+Object.freeze(
+    ExecutiveSummary
+);
