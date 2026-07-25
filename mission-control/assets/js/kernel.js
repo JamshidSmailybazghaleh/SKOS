@@ -181,17 +181,3 @@ alert("Kernel Started");
     }
 
 };
-
-
-
-window.addEventListener(
-
-    "DOMContentLoaded",
-
-    () => {
-
-        SKOS.start();
-
-    }
-
-);
