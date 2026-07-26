@@ -1,0 +1,208 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "schemaId": "kernel-schema",
+
+  "schemaVersion": "1.0.0",
+
+  "operation": "OP-020",
+
+  "build": "BUILD-000419",
+
+  "title": "SKOS Core Kernel Schema",
+
+  "description": "Defines the standard data model for the SKOS Core Kernel, including system state, engines, services, lifecycle management, events and operational history.",
+
+
+  "kernel": {
+
+    "id": "string",
+
+    "name": "SKOSKernel",
+
+    "version": "string",
+
+    "status": "BOOTING | READY | RUNNING | DEGRADED | STOPPED | FAILED",
+
+    "environment": "DEVELOPMENT | TEST | PRODUCTION",
+
+    "bootTime": "datetime",
+
+    "shutdownTime": "datetime",
+
+    "createdAt": "datetime",
+
+    "updatedAt": "datetime"
+
+  },
+
+
+  "engine": {
+
+    "id": "string",
+
+    "name": "string",
+
+    "version": "string",
+
+    "status": "REGISTERED | INITIALIZED | RUNNING | STOPPED | FAILED",
+
+    "dependencies": [
+
+      "string"
+
+    ],
+
+    "registeredAt": "datetime",
+
+    "startedAt": "datetime",
+
+    "stoppedAt": "datetime"
+
+  },
+
+
+  "service": {
+
+    "id": "string",
+
+    "name": "string",
+
+    "version": "string",
+
+    "status": "REGISTERED | INITIALIZED | RUNNING | STOPPED | FAILED",
+
+    "provider": "string",
+
+    "dependencies": [
+
+      "string"
+
+    ],
+
+    "registeredAt": "datetime"
+
+  },
+
+
+  "configuration": {
+
+    "id": "string",
+
+    "key": "string",
+
+    "value": "any",
+
+    "scope": "SYSTEM | ENGINE | SERVICE | PIPELINE",
+
+    "version": "string",
+
+    "updatedAt": "datetime"
+
+  },
+
+
+  "lifecycle": {
+
+    "componentId": "string",
+
+    "componentType": "ENGINE | SERVICE | MODULE | PLUGIN",
+
+    "previousState": "string",
+
+    "currentState": "string",
+
+    "action": "CREATE | INITIALIZE | START | STOP | RESTART | SHUTDOWN",
+
+    "timestamp": "datetime"
+
+  },
+
+
+  "event": {
+
+    "id": "string",
+
+    "name": "string",
+
+    "source": "string",
+
+    "target": "string",
+
+    "type": "SYSTEM | ENGINE | SERVICE | PIPELINE | ERROR",
+
+    "payload": "object",
+
+    "timestamp": "datetime"
+
+  },
+
+
+  "history": {
+
+    "id": "string",
+
+    "eventType": "KERNEL | ENGINE | SERVICE | LIFECYCLE | ERROR",
+
+    "entityId": "string",
+
+    "data": "object",
+
+    "timestamp": "datetime"
+
+  },
+
+
+  "snapshot": {
+
+    "id": "string",
+
+    "name": "string",
+
+    "kernelState": "object",
+
+    "engineCount": "number",
+
+    "serviceCount": "number",
+
+    "createdAt": "datetime"
+
+  },
+
+
+  "statistics": {
+
+    "systemStarts": "number",
+
+    "systemStops": "number",
+
+    "enginesRegistered": "number",
+
+    "servicesRegistered": "number",
+
+    "eventsPublished": "number",
+
+    "historyRecords": "number",
+
+    "snapshotsCreated": "number"
+
+  },
+
+
+  "metadata": {
+
+    "author": "SKOS",
+
+    "organization": "Smaily Knowledge Operating System",
+
+    "license": "MIT",
+
+    "language": "en",
+
+    "compatibleWith": "SKOS v1.x",
+
+    "lastUpdated": "2026-07-26"
+
+  }
+
+}
