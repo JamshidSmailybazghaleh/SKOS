@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "schemaId": "pipeline-schema",
+  "schemaVersion": "1.0.0",
+  "operation": "OP-019",
+  "build": "BUILD-000411",
+  "title": "SKOS Knowledge Pipeline Schema",
+  "description": "Defines the standard data model for the Knowledge Pipeline Engine within the Smaily Knowledge Operating System.",
+
+  "engine": {
+    "id": "string",
+    "name": "KnowledgePipelineEngine",
+    "version": "string",
+    "status": "READY | RUNNING | PAUSED | STOPPED",
+    "createdAt": "datetime",
+    "updatedAt": "datetime"
+  },
+
+  "pipeline": {
+    "id": "string",
+    "name": "string",
+    "description": "string",
+    "type": "DEFAULT | KNOWLEDGE | IMPORT | EXPORT | CUSTOM",
+    "status": "READY | RUNNING | PAUSED | COMPLETED | FAILED | CANCELLED",
+    "priority": "LOW | MEDIUM | HIGH | CRITICAL",
+    "currentStage": "string",
+    "progress": "number",
+    "owner": "string",
+    "createdAt": "datetime",
+    "startedAt": "datetime",
+    "completedAt": "datetime"
+  },
+
+  "workflow": {
+    "id": "string",
+    "name": "string",
+    "stages": [
+      "string"
+    ],
+    "currentStage": "string",
+    "executionMode": "SEQUENTIAL | PARALLEL | HYBRID",
+    "status": "READY | RUNNING | COMPLETED | FAILED",
+    "createdAt": "datetime",
+    "completedAt": "datetime"
+  },
+
+  "job": {
+    "id": "string",
+    "pipelineId": "string",
+    "workflowId": "string",
+    "name": "string",
+    "type": "IMPORT | PROCESS | EXPORT | ANALYTICS | CUSTOM",
+    "priority": "LOW | MEDIUM | HIGH | CRITICAL",
+    "status": "QUEUED | RUNNING | COMPLETED | FAILED | CANCELLED",
+    "retryCount": "number",
+    "payload": "object",
+    "createdAt": "datetime",
+    "startedAt": "datetime",
+    "completedAt": "datetime"
+  },
+
+  "route": {
+    "id": "string",
+    "fromStage": "string",
+    "toStage": "string",
+    "engine": "string",
+    "status": "ACTIVE | DISABLED",
+    "createdAt": "datetime"
+  },
+
+  "monitor": {
+    "pipelineStatus": "READY | RUNNING | PAUSED | STOPPED",
+    "activeJobs": "number",
+    "alerts": "number",
+    "bottlenecks": "number",
+    "averageExecutionTime": "number",
+    "lastCheck": "datetime"
+  },
+
+  "history": {
+    "id": "string",
+    "eventType": "WORKFLOW | JOB | ROUTING | MONITORING | ERROR",
+    "entityId": "string",
+    "status": "string",
+    "timestamp": "datetime"
+  },
+
+  "statistics": {
+    "pipelinesCreated": "number",
+    "workflowsExecuted": "number",
+    "jobsCreated": "number",
+    "jobsCompleted": "number",
+    "jobsFailed": "number",
+    "routesResolved": "number",
+    "alertsGenerated": "number"
+  },
+
+  "metadata": {
+    "author": "SKOS",
+    "organization": "Smaily Knowledge Operating System",
+    "license": "MIT",
+    "language": "en",
+    "compatibleWith": "SKOS v1.x",
+    "lastUpdated": "2026-07-26"
+  }
+}
