@@ -1,0 +1,480 @@
+/**
+ * ============================================================
+ * SKOS - Smaily Knowledge Operating System
+ * Marketplace Schema
+ * ------------------------------------------------------------
+ * File      : marketplace-schema.json
+ * Operation : OP-014
+ * Build     : BUILD-000372
+ * Version   : 1.0.0
+ * Status    : ACTIVE
+ * ============================================================
+ *
+ * Mission:
+ * Defines the standard data structure for
+ * Knowledge Marketplace operations.
+ *
+ * Purpose:
+ * - Standardize marketplace entities
+ * - Enable interoperability between modules
+ * - Support product discovery
+ * - Support subscription and transaction flows
+ * - Prepare future Knowledge Economy expansion
+ *
+ * Principle:
+ * Marketplace Schema defines the language of
+ * economic interaction around knowledge assets.
+ *
+ * It does not:
+ * - create knowledge
+ * - process payments
+ * - make business decisions
+ *
+ * ============================================================
+ */
+
+
+{
+  "schema": {
+
+    "name": "SKOS Knowledge Marketplace Schema",
+
+    "version": "1.0.0",
+
+    "namespace": "skos.marketplace"
+
+  },
+
+
+  "product": {
+
+
+    "id": "string",
+
+    "assetID": "string",
+
+    "title": "string",
+
+    "description": "string",
+
+
+    "type": [
+
+      "BOOK",
+
+      "ARTICLE",
+
+      "REPORT",
+
+      "COURSE",
+
+      "DATASET",
+
+      "KNOWLEDGE_PACKAGE",
+
+      "SERVICE"
+
+    ],
+
+
+    "category": "string",
+
+
+    "owner": "string",
+
+
+    "status": [
+
+      "REGISTERED",
+
+      "AVAILABLE",
+
+      "INACTIVE",
+
+      "ARCHIVED"
+
+    ],
+
+
+    "metadata": {
+
+      "language": "string",
+
+      "keywords": [
+
+        "string"
+
+      ],
+
+      "createdAt": "datetime",
+
+      "updatedAt": "datetime"
+
+    }
+
+
+  },
+
+
+  "listing": {
+
+
+    "id": "string",
+
+    "productID": "string",
+
+
+    "visibility": [
+
+      "PUBLIC",
+
+      "PRIVATE",
+
+      "ENTERPRISE"
+
+    ],
+
+
+    "accessType": [
+
+      "OPEN",
+
+      "SUBSCRIPTION",
+
+      "LICENSE",
+
+      "PURCHASE"
+
+    ],
+
+
+    "pricingModel": [
+
+      "FREE",
+
+      "ONE_TIME",
+
+      "SUBSCRIPTION",
+
+      "ENTERPRISE"
+
+    ],
+
+
+    "status": [
+
+      "ACTIVE",
+
+      "INACTIVE",
+
+      "PENDING"
+
+    ],
+
+
+    "createdAt": "datetime"
+
+
+  },
+
+
+  "user": {
+
+
+    "id": "string",
+
+
+    "type": [
+
+      "INDIVIDUAL",
+
+      "ORGANIZATION",
+
+      "INSTITUTION",
+
+      "ENTERPRISE"
+
+    ],
+
+
+    "profile": {
+
+
+      "name": "string",
+
+      "organization": "string",
+
+      "interests": [
+
+        "string"
+
+      ]
+
+    },
+
+
+    "createdAt": "datetime"
+
+
+  },
+
+
+  "subscription": {
+
+
+    "id": "string",
+
+    "userID": "string",
+
+    "planID": "string",
+
+    "productID": "string",
+
+
+    "plan": {
+
+
+      "name": "string",
+
+      "duration": [
+
+        "WEEKLY",
+
+        "MONTHLY",
+
+        "YEARLY"
+
+      ],
+
+
+      "accessLevel": "string"
+
+
+    },
+
+
+    "status": [
+
+      "ACTIVE",
+
+      "EXPIRED",
+
+      "CANCELLED"
+
+    ],
+
+
+    "startedAt": "datetime",
+
+    "expiresAt": "datetime"
+
+
+  },
+
+
+  "transaction": {
+
+
+    "id": "string",
+
+    "userID": "string",
+
+    "productID": "string",
+
+    "subscriptionID": "string",
+
+
+    "type": [
+
+      "KNOWLEDGE_ACCESS",
+
+      "SUBSCRIPTION",
+
+      "LICENSE",
+
+      "PURCHASE"
+
+    ],
+
+
+    "amount": "number",
+
+    "currency": "string",
+
+
+    "status": [
+
+      "PENDING",
+
+      "COMPLETED",
+
+      "CANCELLED"
+
+    ],
+
+
+    "createdAt": "datetime"
+
+
+  },
+
+
+  "interaction": {
+
+
+    "id": "string",
+
+    "userID": "string",
+
+    "productID": "string",
+
+
+    "type": [
+
+      "VIEW",
+
+      "SEARCH",
+
+      "DOWNLOAD",
+
+      "SUBSCRIBE",
+
+      "PURCHASE"
+
+    ],
+
+
+    "timestamp": "datetime"
+
+
+  },
+
+
+  "marketplaceEvent": {
+
+
+    "id": "string",
+
+    "type": [
+
+      "PRODUCT",
+
+      "LISTING",
+
+      "USER",
+
+      "SUBSCRIPTION",
+
+      "TRANSACTION",
+
+      "SYSTEM"
+
+    ],
+
+
+    "action": "string",
+
+    "entityID": "string",
+
+    "actor": "string",
+
+    "timestamp": "datetime",
+
+    "details": "object"
+
+
+  },
+
+
+  "analytics": {
+
+
+    "productMetrics": {
+
+
+      "views": "number",
+
+      "subscriptions": "number",
+
+      "transactions": "number",
+
+      "revenue": "number"
+
+
+    },
+
+
+    "marketMetrics": {
+
+
+      "activeUsers": "number",
+
+      "activeProducts": "number",
+
+      "conversionRate": "number"
+
+
+    }
+
+
+  },
+
+
+  "validationRules": {
+
+
+    "productRequired": [
+
+      "id",
+
+      "title",
+
+      "assetID"
+
+    ],
+
+
+    "listingRequired": [
+
+      "id",
+
+      "productID",
+
+      "status"
+
+    ],
+
+
+    "transactionTrackingRequired": true,
+
+
+    "historyTrackingRequired": true,
+
+
+    "userAssociationRequired": true
+
+
+  },
+
+
+  "futureExtensions": {
+
+
+    "paymentGatewayIntegration": true,
+
+    "enterpriseLicensing": true,
+
+    "dynamicPricing": true,
+
+    "aiRecommendation": true,
+
+    "knowledgeDemandPrediction": true,
+
+    "globalKnowledgeMarketplace": true,
+
+    "knowledgeTokenEconomy": true
+
+  }
+
+
+}
