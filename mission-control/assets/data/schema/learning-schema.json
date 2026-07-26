@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "SKOS Learning Schema",
+
+  "description": "Standard Learning Engine Schema",
+
+  "version": "1.0",
+
+  "type": "object",
+
+  "required": [
+    "learningId",
+    "generatedAt",
+    "patterns",
+    "improvements"
+  ],
+
+  "properties": {
+
+    "learningId": {
+      "type": "string"
+    },
+
+    "experienceId": {
+      "type": "string"
+    },
+
+    "workflowId": {
+      "type": "string"
+    },
+
+    "generatedAt": {
+      "type": "string"
+    },
+
+    "patterns": {
+
+      "type": "array",
+
+      "items": {
+        "type": "string"
+      }
+
+    },
+
+    "improvements": {
+
+      "type": "array",
+
+      "items": {
+        "type": "string"
+      }
+
+    },
+
+    "feedback": {
+
+      "type": "array",
+
+      "items": {
+        "type": "object"
+      }
+
+    },
+
+    "confidenceScore": {
+      "type": "number"
+    },
+
+    "status": {
+      "type": "string"
+    },
+
+    "metadata": {
+      "type": "object"
+    }
+
+  }
+}
