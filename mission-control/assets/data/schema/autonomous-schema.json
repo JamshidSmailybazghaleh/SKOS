@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "SKOS Autonomous Schema",
+
+  "description": "Standard Autonomous Execution Schema",
+
+  "version": "1.0",
+
+  "type": "object",
+
+  "required": [
+    "planId",
+    "status",
+    "createdAt",
+    "actions"
+  ],
+
+  "properties": {
+
+    "planId": {
+      "type": "string"
+    },
+
+    "decisionId": {
+      "type": "string"
+    },
+
+    "workflowId": {
+      "type": "string"
+    },
+
+    "status": {
+      "type": "string"
+    },
+
+    "createdAt": {
+      "type": "string"
+    },
+
+    "approvedAt": {
+      "type": "string"
+    },
+
+    "executedAt": {
+      "type": "string"
+    },
+
+    "actions": {
+
+      "type": "array",
+
+      "items": {
+
+        "type": "object",
+
+        "properties": {
+
+          "actionId": {
+            "type": "string"
+          },
+
+          "type": {
+            "type": "string"
+          },
+
+          "description": {
+            "type": "string"
+          },
+
+          "priority": {
+            "type": "string"
+          },
+
+          "status": {
+            "type": "string"
+          }
+
+        }
+
+      }
+
+    },
+
+    "approval": {
+      "type": "object"
+    },
+
+    "executionResult": {
+      "type": "object"
+    },
+
+    "history": {
+      "type": "array"
+    },
+
+    "metadata": {
+      "type": "object"
+    }
+
+  }
+}
