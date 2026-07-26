@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "schemaId": "improvement-schema",
+  "schemaVersion": "1.0.0",
+  "operation": "OP-018",
+  "build": "BUILD-000403",
+  "title": "SKOS Knowledge Improvement Schema",
+  "description": "Defines the standard data model for the Knowledge Improvement Engine within the Smaily Knowledge Operating System.",
+
+  "engine": {
+    "id": "string",
+    "name": "KnowledgeImprovementEngine",
+    "version": "string",
+    "status": "ACTIVE | INACTIVE | MAINTENANCE",
+    "createdAt": "datetime",
+    "updatedAt": "datetime"
+  },
+
+  "improvement": {
+    "id": "string",
+    "title": "string",
+    "objective": "string",
+    "description": "string",
+    "category": "GENERAL | PROCESS | QUALITY | PERFORMANCE | SECURITY | KNOWLEDGE | MARKETPLACE | SYSTEM",
+    "priority": "LOW | MEDIUM | HIGH | CRITICAL",
+    "status": "PROPOSED | APPROVED | IN_PROGRESS | COMPLETED | REJECTED",
+    "estimatedImpact": "LOW | MEDIUM | HIGH",
+    "owner": "string",
+    "createdAt": "datetime",
+    "completedAt": "datetime"
+  },
+
+  "performanceEvaluation": {
+    "id": "string",
+    "entityId": "string",
+    "entityType": "PROJECT | WORKFLOW | TASK | PRODUCT | ENGINE",
+    "score": "number",
+    "grade": "A | B | C | D | F",
+    "strengths": [
+      "string"
+    ],
+    "weaknesses": [
+      "string"
+    ],
+    "evaluatedAt": "datetime"
+  },
+
+  "feedback": {
+    "id": "string",
+    "source": "USER | SYSTEM | ENGINE | MARKETPLACE | ANALYTICS",
+    "category": "GENERAL | BUG | FEATURE | QUALITY | PERFORMANCE",
+    "priority": "LOW | MEDIUM | HIGH | CRITICAL",
+    "title": "string",
+    "message": "string",
+    "score": "number",
+    "status": "NEW | VALIDATED | RESOLVED | REJECTED",
+    "createdAt": "datetime",
+    "resolvedAt": "datetime"
+  },
+
+  "optimization": {
+    "id": "string",
+    "title": "string",
+    "objective": "string",
+    "actions": [
+      "string"
+    ],
+    "priority": "LOW | MEDIUM | HIGH | CRITICAL",
+    "status": "PLANNED | RUNNING | COMPLETED | CANCELLED",
+    "impact": "number",
+    "createdAt": "datetime"
+  },
+
+  "learningRecord": {
+    "id": "string",
+    "title": "string",
+    "source": "SYSTEM | USER | ENGINE",
+    "summary": "string",
+    "knowledgeAssetId": "string",
+    "createdAt": "datetime"
+  },
+
+  "lessonLearned": {
+    "id": "string",
+    "title": "string",
+    "description": "string",
+    "impact": "LOW | MEDIUM | HIGH",
+    "recommendation": "string",
+    "createdAt": "datetime"
+  },
+
+  "bestPractice": {
+    "id": "string",
+    "title": "string",
+    "description": "string",
+    "version": "string",
+    "status": "ACTIVE | ARCHIVED",
+    "createdAt": "datetime"
+  },
+
+  "history": {
+    "id": "string",
+    "eventType": "IMPROVEMENT | EVALUATION | FEEDBACK | OPTIMIZATION | LEARNING | BEST_PRACTICE",
+    "entityId": "string",
+    "status": "string",
+    "timestamp": "datetime"
+  },
+
+  "statistics": {
+    "improvementsGenerated": "number",
+    "evaluationsCompleted": "number",
+    "feedbackReceived": "number",
+    "optimizationsCompleted": "number",
+    "learningRecords": "number",
+    "bestPracticesRegistered": "number"
+  },
+
+  "metadata": {
+    "author": "SKOS",
+    "organization": "Smaily Knowledge Operating System",
+    "license": "MIT",
+    "language": "en",
+    "compatibleWith": "SKOS v1.x",
+    "lastUpdated": "2026-07-26"
+  }
+}
