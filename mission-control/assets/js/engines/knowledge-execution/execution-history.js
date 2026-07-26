@@ -1,44 +1,43 @@
 /**
  * ============================================================
  * SKOS - Smaily Knowledge Operating System
- * Progress Monitor
+ * Execution History
  * ------------------------------------------------------------
- * File      : progress-monitor.js
+ * File      : execution-history.js
  * Operation : OP-017
- * Build     : BUILD-000394
+ * Build     : BUILD-000395
  * Version   : 1.0.0
  * Status    : ACTIVE
  * ============================================================
  *
  * Mission:
- * Monitors execution progress across projects,
- * workflows and tasks, providing real-time
- * operational visibility.
+ * Preserves the complete operational execution history
+ * across the SKOS ecosystem.
  *
  * Responsibilities:
- * - Monitor execution progress
- * - Calculate completion metrics
- * - Detect delays
- * - Generate alerts
- * - Produce execution summaries
- * - Support analytics integration
+ * - Record execution events
+ * - Preserve project history
+ * - Preserve workflow history
+ * - Preserve task history
+ * - Record progress snapshots
+ * - Support auditing and analytics
  *
  * Principle:
- * Progress Monitor observes execution.
+ * Execution History remembers execution.
  *
  * It does not:
- * - execute tasks
- * - modify workflows
- * - make strategic decisions
+ * - execute workflows
+ * - modify historical records
+ * - make operational decisions
  *
  * ============================================================
  */
 
-class ProgressMonitor {
+class ExecutionHistory {
 
     constructor(config = {}) {
 
-        this.name = "ProgressMonitor";
+        this.name = "ExecutionHistory";
         this.version = "1.0.0";
 
         this.config = config;
@@ -46,18 +45,24 @@ class ProgressMonitor {
         this.initialized = false;
         this.running = false;
 
-        this.projects = [];
-        this.workflows = [];
-        this.tasks = [];
-        this.alerts = [];
+        this.records = [];
+        this.timeline = [];
         this.snapshots = [];
 
         this.statistics = {
 
-            monitoredProjects: 0,
-            monitoredWorkflows: 0,
-            monitoredTasks: 0,
-            alertsGenerated: 0,
+            totalRecords: 0,
+
+            projectEvents: 0,
+
+            workflowEvents: 0,
+
+            taskEvents: 0,
+
+            progressEvents: 0,
+
+            alertEvents: 0,
+
             snapshotsCreated: 0
 
         };
@@ -110,148 +115,102 @@ class ProgressMonitor {
     }
 
     /**
-     * Register Project
+     * Record Event
      */
-    registerProject(project) {
+    record(type, entity = {}) {
 
-        this.projects.push(project);
-
-        this.statistics.monitoredProjects++;
-
-        return project;
-
-    }
-
-    /**
-     * Register Workflow
-     */
-    registerWorkflow(workflow) {
-
-        this.workflows.push(workflow);
-
-        this.statistics.monitoredWorkflows++;
-
-        return workflow;
-
-    }
-
-    /**
-     * Register Task
-     */
-    registerTask(task) {
-
-        this.tasks.push(task);
-
-        this.statistics.monitoredTasks++;
-
-        return task;
-
-    }
-
-    /**
-     * Calculate Overall Progress
-     */
-    calculateProgress() {
-
-        if (this.tasks.length === 0) {
-
-            return 0;
-
-        }
-
-        const total = this.tasks.reduce(
-
-            (sum, task) => sum + (task.progress || 0),
-
-            0
-
-        );
-
-        return Math.round(total / this.tasks.length);
-
-    }
-
-    /**
-     * Detect Delayed Tasks
-     */
-    detectDelays(currentDate = new Date()) {
-
-        const delayed = this.tasks.filter(task =>
-
-            task.dueDate &&
-            new Date(task.dueDate) < currentDate &&
-            task.status !== "COMPLETED"
-
-        );
-
-        delayed.forEach(task => {
-
-            this.createAlert(
-
-                "TASK_DELAY",
-
-                task.id,
-
-                `Task "${task.title}" is overdue.`
-
-            );
-
-        });
-
-        return delayed;
-
-    }
-
-    /**
-     * Create Alert
-     */
-    createAlert(type, entityId, message) {
-
-        const alert = {
+        const record = {
 
             id: this.generateID(),
 
             type,
 
-            entityId,
+            entityId: entity.id || null,
 
-            message,
+            entityName: entity.name || entity.title || "",
 
-            createdAt: new Date()
+            status: entity.status || "UNKNOWN",
+
+            payload: entity,
+
+            timestamp: new Date()
 
         };
 
-        this.alerts.push(alert);
+        this.records.push(record);
+        this.timeline.push(record);
 
-        this.statistics.alertsGenerated++;
+        this.statistics.totalRecords++;
 
-        return alert;
+        this.updateStatistics(type);
+
+        return record;
+
+    }
+
+    /**
+     * Project Event
+     */
+    recordProject(project) {
+
+        return this.record("PROJECT", project);
+
+    }
+
+    /**
+     * Workflow Event
+     */
+    recordWorkflow(workflow) {
+
+        return this.record("WORKFLOW", workflow);
+
+    }
+
+    /**
+     * Task Event
+     */
+    recordTask(task) {
+
+        return this.record("TASK", task);
+
+    }
+
+    /**
+     * Progress Event
+     */
+    recordProgress(progress) {
+
+        return this.record("PROGRESS", progress);
+
+    }
+
+    /**
+     * Alert Event
+     */
+    recordAlert(alert) {
+
+        return this.record("ALERT", alert);
 
     }
 
     /**
      * Create Snapshot
      */
-    createSnapshot() {
+    createSnapshot(label = "Execution Snapshot") {
 
         const snapshot = {
 
             id: this.generateID(),
 
-            overallProgress:
-                this.calculateProgress(),
+            label,
 
-            projects:
-                this.projects.length,
+            totalRecords: this.records.length,
 
-            workflows:
-                this.workflows.length,
+            statistics: {
 
-            tasks:
-                this.tasks.length,
+                ...this.statistics
 
-            alerts:
-                this.alerts.length,
+            },
 
             createdAt: new Date()
 
@@ -266,11 +225,87 @@ class ProgressMonitor {
     }
 
     /**
-     * Get Alerts
+     * Find Records By Type
      */
-    getAlerts() {
+    findByType(type) {
 
-        return this.alerts;
+        return this.records.filter(
+
+            record => record.type === type
+
+        );
+
+    }
+
+    /**
+     * Latest Records
+     */
+    latest(limit = 20) {
+
+        return this.records.slice(-limit);
+
+    }
+
+    /**
+     * Get Timeline
+     */
+    getTimeline() {
+
+        return this.timeline;
+
+    }
+
+    /**
+     * Update Statistics
+     */
+    updateStatistics(type) {
+
+        switch (type) {
+
+            case "PROJECT":
+                this.statistics.projectEvents++;
+                break;
+
+            case "WORKFLOW":
+                this.statistics.workflowEvents++;
+                break;
+
+            case "TASK":
+                this.statistics.taskEvents++;
+                break;
+
+            case "PROGRESS":
+                this.statistics.progressEvents++;
+                break;
+
+            case "ALERT":
+                this.statistics.alertEvents++;
+                break;
+
+        }
+
+    }
+
+    /**
+     * Generate ID
+     */
+    generateID() {
+
+        return (
+
+            "execution-history-" +
+
+            Date.now() +
+
+            "-" +
+
+            Math.floor(
+
+                Math.random() * 100000
+
+            )
+
+        );
 
     }
 
@@ -281,7 +316,7 @@ class ProgressMonitor {
 
         return {
 
-            monitor: this.name,
+            module: this.name,
 
             version: this.version,
 
@@ -289,18 +324,9 @@ class ProgressMonitor {
 
             running: this.running,
 
-            projects: this.projects.length,
-
-            workflows: this.workflows.length,
-
-            tasks: this.tasks.length,
+            records: this.records.length,
 
             snapshots: this.snapshots.length,
-
-            alerts: this.alerts.length,
-
-            overallProgress:
-                this.calculateProgress(),
 
             statistics: this.statistics
 
@@ -309,41 +335,28 @@ class ProgressMonitor {
     }
 
     /**
-     * Generate Unique ID
-     */
-    generateID() {
-
-        return (
-
-            "progress-" +
-
-            Date.now() +
-
-            "-" +
-
-            Math.floor(Math.random() * 100000)
-
-        );
-
-    }
-
-    /**
      * Reset
      */
     reset() {
 
-        this.projects = [];
-        this.workflows = [];
-        this.tasks = [];
-        this.alerts = [];
+        this.records = [];
+        this.timeline = [];
         this.snapshots = [];
 
         this.statistics = {
 
-            monitoredProjects: 0,
-            monitoredWorkflows: 0,
-            monitoredTasks: 0,
-            alertsGenerated: 0,
+            totalRecords: 0,
+
+            projectEvents: 0,
+
+            workflowEvents: 0,
+
+            taskEvents: 0,
+
+            progressEvents: 0,
+
+            alertEvents: 0,
+
             snapshotsCreated: 0
 
         };
@@ -358,12 +371,12 @@ class ProgressMonitor {
 
 if (typeof module !== "undefined") {
 
-    module.exports = ProgressMonitor;
+    module.exports = ExecutionHistory;
 
 }
 
 if (typeof window !== "undefined") {
 
-    window.ProgressMonitor = ProgressMonitor;
+    window.ExecutionHistory = ExecutionHistory;
 
 }
