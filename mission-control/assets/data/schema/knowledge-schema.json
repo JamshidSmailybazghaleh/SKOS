@@ -1,0 +1,400 @@
+/**
+ * ============================================================
+ * SKOS - Smaily Knowledge Operating System
+ * Knowledge Schema
+ * ------------------------------------------------------------
+ * File      : knowledge-schema.json
+ * Operation : OP-013
+ * Build     : BUILD-000362
+ * Version   : 1.0.0
+ * Status    : ACTIVE
+ * ============================================================
+ *
+ * Mission:
+ * Defines the standard data model for knowledge assets
+ * produced and managed by SKOS.
+ *
+ * Purpose:
+ * - Standardize knowledge objects
+ * - Define lifecycle structure
+ * - Enable interoperability
+ * - Support publication workflows
+ * - Prepare knowledge marketplace integration
+ *
+ * Principle:
+ * Knowledge Schema defines the language of knowledge assets.
+ * It does not create or evaluate knowledge.
+ *
+ * ============================================================
+ */
+
+
+{
+  "schema": {
+
+    "name": "SKOS Knowledge Schema",
+
+    "version": "1.0.0",
+
+    "namespace": "skos.knowledge"
+
+  },
+
+
+  "knowledgeAsset": {
+
+
+    "id": "string",
+
+    "title": "string",
+
+    "type": [
+
+      "BOOK",
+
+      "ARTICLE",
+
+      "REPORT",
+
+      "COURSE",
+
+      "DATASET",
+
+      "ENCYCLOPEDIA_ENTRY",
+
+      "KNOWLEDGE_PACKAGE",
+
+      "GENERAL"
+
+    ],
+
+
+    "status": [
+
+      "CREATED",
+
+      "PROCESSED",
+
+      "STRUCTURED",
+
+      "VALIDATED",
+
+      "READY_FOR_PUBLICATION",
+
+      "PUBLISHED",
+
+      "ARCHIVED"
+
+    ],
+
+
+    "content": "object",
+
+
+    "source": {
+
+
+      "id": "string",
+
+      "type": "string",
+
+      "reference": "string"
+
+    },
+
+
+    "metadata": {
+
+
+      "author": "string",
+
+      "language": "string",
+
+      "category": "string",
+
+      "keywords": [
+
+        "string"
+
+      ],
+
+      "createdAt": "datetime",
+
+      "updatedAt": "datetime"
+
+    },
+
+
+    "structure": {
+
+
+      "sections": [
+
+        "object"
+
+      ],
+
+
+      "chapters": [
+
+        "object"
+
+      ],
+
+
+      "concepts": [
+
+        "string"
+
+      ],
+
+
+      "entities": [
+
+        "string"
+
+      ],
+
+
+      "relationships": [
+
+        "object"
+
+      ]
+
+    },
+
+
+    "quality": {
+
+
+      "validated": "boolean",
+
+      "score": "number",
+
+      "validationID": "string"
+
+    },
+
+
+    "version": {
+
+
+      "current": "string",
+
+      "history": [
+
+        "object"
+
+      ]
+
+    },
+
+
+    "publication": {
+
+
+      "ready": "boolean",
+
+      "channels": [
+
+        "string"
+
+      ],
+
+      "publishedAt": "datetime"
+
+    }
+
+
+  },
+
+
+  "knowledgeObject": {
+
+
+    "id": "string",
+
+    "concept": "string",
+
+    "definition": "string",
+
+    "relations": [
+
+      {
+
+        "type": "string",
+
+        "target": "string"
+
+      }
+
+    ],
+
+
+    "metadata": "object"
+
+
+  },
+
+
+  "processing": {
+
+
+    "inputID": "string",
+
+    "processor": "string",
+
+    "processedAt": "datetime",
+
+    "status": [
+
+      "PENDING",
+
+      "COMPLETED",
+
+      "FAILED"
+
+    ]
+
+  },
+
+
+  "transformation": {
+
+
+    "sourceID": "string",
+
+    "transformer": "string",
+
+    "method": "string",
+
+    "createdAt": "datetime"
+
+  },
+
+
+  "package": {
+
+
+    "id": "string",
+
+    "assetID": "string",
+
+    "format": [
+
+      "JSON",
+
+      "DOCUMENT",
+
+      "PDF",
+
+      "WEB",
+
+      "COURSE"
+
+    ],
+
+    "distribution": [
+
+      "LIBRARY",
+
+      "WEBSITE",
+
+      "MARKETPLACE",
+
+      "API"
+
+    ]
+
+  },
+
+
+  "historyEvent": {
+
+
+    "id": "string",
+
+    "assetID": "string",
+
+    "eventType": [
+
+      "CREATED",
+
+      "PROCESSED",
+
+      "TRANSFORMED",
+
+      "UPDATED",
+
+      "VALIDATED",
+
+      "PUBLISHED",
+
+      "ARCHIVED"
+
+    ],
+
+
+    "actor": "string",
+
+    "timestamp": "datetime",
+
+    "details": "object"
+
+  },
+
+
+  "validationRules": {
+
+
+    "requiredFields": [
+
+      "id",
+
+      "title",
+
+      "type",
+
+      "status",
+
+      "metadata"
+
+    ],
+
+
+    "qualityRequired": true,
+
+
+    "sourceTrackingRequired": true,
+
+
+    "versionControlRequired": true,
+
+
+    "historyTrackingRequired": true
+
+  },
+
+
+  "futureExtensions": {
+
+
+    "knowledgeGraphIntegration": true,
+
+    "semanticRelations": true,
+
+    "aiGeneratedKnowledgeTracking": true,
+
+    "digitalRightsManagement": true,
+
+    "knowledgeMarketplace": true,
+
+    "tokenizedKnowledgeAssets": true,
+
+    "globalKnowledgeExchange": true
+
+  }
+
+
+}
