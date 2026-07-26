@@ -1,0 +1,314 @@
+/**
+ * ============================================================
+ * SKOS - Smaily Knowledge Operating System
+ * Strategy Schema
+ * ------------------------------------------------------------
+ * File      : strategy-schema.json
+ * Operation : OP-016
+ * Build     : BUILD-000388
+ * Version   : 1.0.0
+ * Status    : ACTIVE
+ * ============================================================
+ *
+ * Mission:
+ * Defines the standard data model for the
+ * Knowledge Strategy layer.
+ *
+ * Purpose:
+ * - Standardize strategic entities
+ * - Ensure interoperability
+ * - Support planning and recommendations
+ * - Enable long-term strategic evolution
+ *
+ * Principle:
+ * Strategy Schema is the common language of
+ * Knowledge Strategy inside SKOS.
+ *
+ * ============================================================
+ */
+
+{
+  "schema": {
+    "name": "SKOS Knowledge Strategy Schema",
+    "namespace": "skos.strategy",
+    "version": "1.0.0"
+  },
+
+  "strategy": {
+
+    "id": "string",
+
+    "title": "string",
+
+    "objective": "string",
+
+    "description": "string",
+
+    "category": "string",
+
+    "status": [
+      "DRAFT",
+      "PROPOSED",
+      "APPROVED",
+      "ACTIVE",
+      "COMPLETED",
+      "ARCHIVED"
+    ],
+
+    "priority": [
+      "LOW",
+      "MEDIUM",
+      "HIGH",
+      "CRITICAL"
+    ],
+
+    "owner": "string",
+
+    "createdAt": "datetime",
+
+    "updatedAt": "datetime"
+
+  },
+
+  "opportunity": {
+
+    "id": "string",
+
+    "title": "string",
+
+    "category": "string",
+
+    "source": "string",
+
+    "score": "number",
+
+    "confidence": "number",
+
+    "priority": [
+      "LOW",
+      "MEDIUM",
+      "HIGH"
+    ],
+
+    "status": [
+      "DETECTED",
+      "UNDER_REVIEW",
+      "QUALIFIED",
+      "REJECTED",
+      "IMPLEMENTED"
+    ],
+
+    "createdAt": "datetime"
+
+  },
+
+  "priority": {
+
+    "id": "string",
+
+    "entityId": "string",
+
+    "score": "number",
+
+    "level": [
+      "LOW",
+      "MEDIUM",
+      "HIGH",
+      "CRITICAL"
+    ],
+
+    "impact": "number",
+
+    "urgency": "number",
+
+    "strategicValue": "number",
+
+    "businessValue": "number"
+
+  },
+
+  "roadmap": {
+
+    "id": "string",
+
+    "title": "string",
+
+    "objective": "string",
+
+    "phases": [
+
+      {
+
+        "order": "number",
+
+        "name": "string",
+
+        "status": [
+          "PENDING",
+          "ACTIVE",
+          "COMPLETED"
+        ]
+
+      }
+
+    ],
+
+    "milestones": [
+
+      {
+
+        "id": "string",
+
+        "title": "string",
+
+        "targetDate": "datetime"
+
+      }
+
+    ],
+
+    "dependencies": [
+
+      "string"
+
+    ],
+
+    "estimatedDuration": "string"
+
+  },
+
+  "recommendation": {
+
+    "id": "string",
+
+    "title": "string",
+
+    "category": "string",
+
+    "priority": [
+      "LOW",
+      "MEDIUM",
+      "HIGH"
+    ],
+
+    "confidence": "number",
+
+    "impact": [
+      "LOW",
+      "MEDIUM",
+      "HIGH"
+    ],
+
+    "rationale": [
+
+      "string"
+
+    ],
+
+    "actions": [
+
+      "string"
+
+    ],
+
+    "status": [
+      "PROPOSED",
+      "ACCEPTED",
+      "REJECTED",
+      "ARCHIVED"
+    ],
+
+    "createdAt": "datetime"
+
+  },
+
+  "history": {
+
+    "id": "string",
+
+    "type": [
+      "STRATEGY",
+      "OPPORTUNITY",
+      "PRIORITY",
+      "ROADMAP",
+      "RECOMMENDATION"
+    ],
+
+    "entityId": "string",
+
+    "timestamp": "datetime",
+
+    "payload": "object"
+
+  },
+
+  "statistics": {
+
+    "strategiesGenerated": "number",
+
+    "opportunitiesDetected": "number",
+
+    "prioritiesCalculated": "number",
+
+    "roadmapsGenerated": "number",
+
+    "recommendationsGenerated": "number"
+
+  },
+
+  "validationRules": {
+
+    "strategyRequired": [
+      "id",
+      "title",
+      "objective",
+      "priority"
+    ],
+
+    "opportunityRequired": [
+      "id",
+      "title",
+      "score"
+    ],
+
+    "recommendationRequired": [
+      "id",
+      "title",
+      "status"
+    ],
+
+    "roadmapRequired": [
+      "id",
+      "title",
+      "phases"
+    ],
+
+    "historyTracking": true,
+
+    "timestampRequired": true
+
+  },
+
+  "futureExtensions": {
+
+    "scenarioPlanning": true,
+
+    "strategicSimulation": true,
+
+    "investmentOptimization": true,
+
+    "resourceAllocation": true,
+
+    "predictiveStrategy": true,
+
+    "portfolioManagement": true,
+
+    "crossEnginePlanning": true,
+
+    "enterpriseStrategy": true,
+
+    "globalKnowledgeStrategy": true
+
+  }
+
+}
