@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "SKOS Reasoning Schema",
+
+  "description": "Standard Reasoning Definition",
+
+  "version": "1.0",
+
+  "type": "object",
+
+  "required": [
+    "reasoningId",
+    "generatedAt",
+    "summary",
+    "recommendations"
+  ],
+
+  "properties": {
+
+    "reasoningId": {
+      "type": "string"
+    },
+
+    "workflowId": {
+      "type": "string"
+    },
+
+    "generatedAt": {
+      "type": "string"
+    },
+
+    "summary": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+
+    "confidenceScore": {
+      "type": "number"
+    },
+
+    "priority": {
+      "type": "string"
+    },
+
+    "source": {
+      "type": "string"
+    },
+
+    "metadata": {
+      "type": "object"
+    }
+
+  }
+}
