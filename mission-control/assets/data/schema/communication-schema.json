@@ -1,0 +1,271 @@
+/**
+ * ============================================================
+ * SKOS - Smaily Knowledge Operating System
+ * Communication Schema
+ * ------------------------------------------------------------
+ * File      : communication-schema.json
+ * Operation : OP-010
+ * Build     : BUILD-000337
+ * Version   : 1.0.0
+ * Status    : ACTIVE
+ * ============================================================
+ *
+ * Mission:
+ * Defines the standard communication data structure
+ * between SKOS components.
+ *
+ * Purpose:
+ * - Message standardization
+ * - Event standardization
+ * - Notification standardization
+ * - API communication format
+ * - Future distributed communication support
+ *
+ * Principle:
+ * Schema defines structure.
+ * It does not process or interpret data.
+ * ============================================================
+ */
+
+{
+  "schema": {
+    "name": "SKOS Communication Schema",
+    "version": "1.0.0",
+    "namespace": "skos.communication"
+  },
+
+
+  "communication": {
+
+
+    "message": {
+
+      "id": "string",
+
+      "timestamp": "datetime",
+
+      "source": "string",
+
+      "destination": "string",
+
+      "type": [
+        "COMMAND",
+        "REQUEST",
+        "RESPONSE",
+        "EVENT",
+        "NOTIFICATION",
+        "SYSTEM"
+      ],
+
+      "priority": [
+        "LOW",
+        "NORMAL",
+        "HIGH",
+        "CRITICAL"
+      ],
+
+      "payload": "object",
+
+      "metadata": "object",
+
+      "status": [
+        "CREATED",
+        "QUEUED",
+        "SENT",
+        "DELIVERED",
+        "FAILED"
+      ]
+
+    },
+
+
+
+    "event": {
+
+      "id": "string",
+
+      "timestamp": "datetime",
+
+      "source": "string",
+
+      "eventType": "string",
+
+      "payload": "object",
+
+      "severity": [
+        "INFO",
+        "WARNING",
+        "ERROR",
+        "CRITICAL"
+      ],
+
+      "status": [
+        "NEW",
+        "PROCESSED",
+        "FAILED"
+      ]
+
+    },
+
+
+
+    "notification": {
+
+      "id": "string",
+
+      "timestamp": "datetime",
+
+      "target": "string",
+
+      "channel": "string",
+
+      "title": "string",
+
+      "message": "string",
+
+      "priority": [
+        "LOW",
+        "NORMAL",
+        "HIGH"
+      ],
+
+      "status": [
+        "NEW",
+        "DELIVERED",
+        "READ",
+        "FAILED"
+      ]
+
+    },
+
+
+
+    "apiRequest": {
+
+      "id": "string",
+
+      "timestamp": "datetime",
+
+      "source": "string",
+
+      "endpoint": "string",
+
+      "method": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+
+      "headers": "object",
+
+      "body": "object",
+
+      "authentication": "object"
+
+    },
+
+
+
+    "apiResponse": {
+
+      "id": "string",
+
+      "timestamp": "datetime",
+
+      "requestId": "string",
+
+      "statusCode": "number",
+
+      "success": "boolean",
+
+      "data": "object",
+
+      "error": "object"
+
+    }
+
+
+  },
+
+
+  "validation": {
+
+
+    "requiredMessageFields": [
+
+      "id",
+
+      "timestamp",
+
+      "source",
+
+      "destination",
+
+      "type",
+
+      "payload"
+
+    ],
+
+
+    "requiredEventFields": [
+
+      "id",
+
+      "timestamp",
+
+      "source",
+
+      "eventType"
+
+    ],
+
+
+    "requiredNotificationFields": [
+
+      "id",
+
+      "timestamp",
+
+      "target",
+
+      "message"
+
+    ]
+
+  },
+
+
+  "security": {
+
+
+    "authentication": true,
+
+    "authorization": false,
+
+    "encryption": false,
+
+    "signature": false
+
+  },
+
+
+  "futureExtensions": {
+
+
+    "distributedCommunication": true,
+
+    "cloudSynchronization": true,
+
+    "webSocketSupport": true,
+
+    "messageQueueIntegration": true,
+
+    "multiAgentCommunication": true,
+
+    "federatedKnowledgeExchange": true
+
+  }
+
+}
