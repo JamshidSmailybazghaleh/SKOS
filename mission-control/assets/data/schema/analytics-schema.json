@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "SKOS Analytics Schema",
+
+  "description": "Standard Analytics Data Model",
+
+  "version": "1.0",
+
+  "type": "object",
+
+  "required": [
+    "reportId",
+    "reportType",
+    "generatedAt",
+    "summary"
+  ],
+
+  "properties": {
+
+    "reportId": {
+      "type": "string"
+    },
+
+    "reportType": {
+      "type": "string"
+    },
+
+    "generatedAt": {
+      "type": "string"
+    },
+
+    "summary": {
+
+      "type": "object",
+
+      "properties": {
+
+        "assets": {
+          "type": "integer"
+        },
+
+        "products": {
+          "type": "integer"
+        },
+
+        "publications": {
+          "type": "integer"
+        },
+
+        "sales": {
+          "type": "integer"
+        },
+
+        "workflows": {
+          "type": "integer"
+        },
+
+        "successRate": {
+          "type": "number"
+        }
+
+      }
+
+    },
+
+    "statistics": {
+      "type": "object"
+    },
+
+    "kpi": {
+      "type": "object"
+    },
+
+    "dashboard": {
+      "type": "object"
+    },
+
+    "history": {
+      "type": "array"
+    },
+
+    "metadata": {
+      "type": "object"
+    }
+
+  }
+}
