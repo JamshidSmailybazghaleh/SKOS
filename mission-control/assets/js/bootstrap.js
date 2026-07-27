@@ -59,7 +59,7 @@ const Bootstrap = {
 
         catch (error) {
 
-    alert(error.message);
+    
 
     console.error(
         "Bootstrap Error:",
