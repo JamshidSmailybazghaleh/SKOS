@@ -29,7 +29,12 @@ await this.loadModules();
 
 Logger.info("Step 3");
 
-await this.loadStatus();) {
+await this.loadStatus();
+
+Logger.info("Step 4");
+
+this.renderDashboard();
+) {
 
         console.log(
             "Initializing Executive Summary..."
