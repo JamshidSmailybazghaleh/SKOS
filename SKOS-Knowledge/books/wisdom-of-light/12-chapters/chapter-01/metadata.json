@@ -3,29 +3,55 @@
   "bookId": "KA-000001",
   "order": 1,
   "title": {
-    "fa": "",
-    "en": ""
+    "fa": "ماهیت شناخت و مسئله آگاهی",
+    "en": "The Nature of Knowledge and the Problem of Consciousness"
   },
   "status": "INTAKE",
   "version": "1.0.0",
   "languages": [
     "fa",
     "en"
+  ],
+  "sections": [
+    {
+      "order": 1,
+      "titleFa": "هدف: تعریف علمی و فلسفی",
+      "titleEn": "Objective: Scientific and Philosophical Definition"
+    },
+    {
+      "order": 2,
+      "titleFa": "تعریف خرد، عقل و عرفان",
+      "titleEn": "Definitions of Wisdom, Reason and Mysticism"
+    },
+    {
+      "order": 3,
+      "titleFa": "تفکیک دقیق مفاهیم",
+      "titleEn": "Precise Distinction of Concepts"
+    },
+    {
+      "order": 4,
+      "titleFa": "عقل (Reason)",
+      "titleEn": "Reason"
+    },
+    {
+      "order": 5,
+      "titleFa": "خرد (Wisdom)",
+      "titleEn": "Wisdom"
+    },
+    {
+      "order": 6,
+      "titleFa": "شهود (Intuition)",
+      "titleEn": "Intuition"
+    },
+    {
+      "order": 7,
+      "titleFa": "معرفت نوری (Illumination)",
+      "titleEn": "Illumination"
+    },
+    {
+      "order": 8,
+      "titleFa": "هدف: تثبیت واژگان بنیادی",
+      "titleEn": "Objective: Establishing Fundamental Terminology"
+    }
   ]
 }
-
-{
-  "chapterId": "KA-000001-CH01",
-  "titleFa": "ماهیت شناخت و مسئله آگاهی",
-  "titleEn": "The Nature of Knowledge and the Problem of Consciousness",
-  "sections": [
-    "هدف: تعریف علمی و فلسفی"
-"تعریف خرد، عقل، و عرفان"
-"تفکیک دقیق:"
-"عقل (Reason)"
-"خرد (Wisdom)"
-"شهود (Intuition)"
-"معرفت نوری (Illumination)"
-"هدف: تثبیت واژگان بنیادی"
-  ]
-  }
