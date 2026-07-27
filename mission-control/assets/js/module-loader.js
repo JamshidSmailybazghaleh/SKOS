@@ -69,6 +69,7 @@ const ModuleLoader = {
 
         try {
 
+            Logger.info("Loading HTML: " + CONFIG.paths.modules + moduleName + ".html");
             const response = await fetch(
 
                 CONFIG.paths.modules +
@@ -86,6 +87,7 @@ const ModuleLoader = {
             }
 
             const html = await response.text();
+            Logger.info("HTML Loaded: " + moduleName);
 
             const container =
                 document.getElementById(
