@@ -1,19 +1,34 @@
-Initialize()
+/*
+====================================================
+SKOS Mission Control
 
-Shutdown()
+Kernel API
 
-Restart()
+File:
+kernel-api.js
 
-RegisterEngine()
+Version:
+1.0
 
-RegisterModule()
+Status:
+ACTIVE
+====================================================
+*/
 
-PublishEvent()
+const KernelAPI = {
 
-GetStatus()
+    Registry: {
 
-GetVersion()
+        async Load() {
 
-HealthCheck()
+            return await Registry.load();
 
-GetSystemInfo()
+        }
+
+    }
+
+};
+
+window.KernelAPI = KernelAPI;
+
+Object.freeze(KernelAPI);
