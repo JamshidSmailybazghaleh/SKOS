@@ -20,7 +20,7 @@ const ExecutiveSummary = {
     data: null,
 
     async initialize() {
-
+alert("Executive Summary initialize()");
         console.log(
             "Initializing Executive Summary..."
         );
