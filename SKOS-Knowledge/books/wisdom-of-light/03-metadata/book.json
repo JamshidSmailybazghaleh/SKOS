@@ -1,0 +1,17 @@
+{
+  "assetId": "KA-000001",
+  "productId": "PRD-000001",
+  "title": {
+    "fa": "حکمت نور",
+    "en": "Wisdom of Light"
+  },
+  "author": "Jamshid Smaily Bazghaleh",
+  "languages": [
+    "fa",
+    "en"
+  ],
+  "type": "Book",
+  "category": "Wisdom",
+  "status": "INTAKE",
+  "version": "1.0.0"
+}
