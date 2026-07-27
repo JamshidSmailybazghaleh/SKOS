@@ -21,6 +21,12 @@ const ExecutiveSummary = {
 
     async initialize(Logger.info("Step 1");
 
+await this.loadRegistry();
+
+Logger.info("Step 2");
+
+await this.loadModules(););
+
 await this.loadRegistry();) {
 
         console.log(
