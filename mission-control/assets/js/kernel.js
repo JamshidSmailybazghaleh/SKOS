@@ -54,22 +54,23 @@ const SKOS = {
 
     async loadRegistry() {
 
-    console.log("Loading Registry...");
+    console.log("Registry object:", Registry);
 
-    const loaded = await Registry.load();
+    console.log("Registry.data BEFORE:", Registry.data);
+
+    const loaded = await KernelAPI.Registry.Load();
+
+    console.log("Registry.data AFTER:", Registry.data);
 
     if (!loaded) {
 
         console.error(
-
             "Registry could not be loaded."
-
         );
 
     }
 
-},
-
+}
 
 
     async loadModules() {
