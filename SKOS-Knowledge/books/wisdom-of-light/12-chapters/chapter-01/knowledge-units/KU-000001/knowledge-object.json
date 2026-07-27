@@ -1,0 +1,31 @@
+{
+  "id": "KA-000001-CH01-KU01",
+
+  "identity": {
+    "bookId": "KA-000001",
+    "chapterId": "KA-000001-CH01",
+    "sectionId": "KA-000001-CH01-S01",
+    "version": "1.0.0"
+  },
+
+  "content": {
+    "fa": "",
+    "en": ""
+  },
+
+  "concepts": [],
+
+  "definitions": [],
+
+  "keywords": [],
+
+  "relationships": [],
+
+  "quality": {
+    "status": "INTAKE"
+  },
+
+  "publication": {
+    "status": "DRAFT"
+  }
+}
