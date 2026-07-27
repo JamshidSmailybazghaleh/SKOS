@@ -25,7 +25,11 @@ await this.loadRegistry();
 
 Logger.info("Step 2");
 
-await this.loadModules();) {
+await this.loadModules();
+
+Logger.info("Step 3");
+
+await this.loadStatus();) {
 
         console.log(
             "Initializing Executive Summary..."
