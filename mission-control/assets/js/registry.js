@@ -48,10 +48,7 @@ const Registry = {
             }
 
             this.data = await response.json();
-            console.log("Registry URL:", response.url);
-console.log("Registry Data:", this.data);
-console.log("Modules:", this.data.modules);
-
+            
             console.log(
                 "Registry Loaded."
             );
