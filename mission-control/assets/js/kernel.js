@@ -30,7 +30,7 @@ const SKOS = {
     
         console.log("================================");
         console.log(CONFIG.system.name);
-        console.log("Kernel Initializing...");
+        Logger.info("Kernel Initializing...");
         console.log("================================");
 
         await this.loadRegistry();
@@ -44,7 +44,7 @@ const SKOS = {
         this.initialized = true;
 
         console.log("================================");
-        console.log("Kernel Ready");
+        Logger.info("Kernel Ready");
         console.log("Version:", this.version);
         console.log("================================");
 
