@@ -23,7 +23,7 @@ const Registry = {
 
     async load() {
 
-        alert("Registry Started");
+      // alert("Registry Started");
         
         try {
 
@@ -53,7 +53,7 @@ const Registry = {
                 "Registry Loaded."
             );
 
-            alert("Registry Finished");
+         // alert("Registry Finished");
             
             return true;
 
