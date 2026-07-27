@@ -151,11 +151,13 @@ const ModuleLoader = {
 
             script.onload = () => {
 
-                console.log("JavaScript Loaded.");
+    alert("Script Loaded : " + moduleName);
 
-                resolve(true);
+    console.log("JavaScript Loaded.");
 
-            };
+    resolve(true);
+
+};
 
             script.onerror = () => {
 
