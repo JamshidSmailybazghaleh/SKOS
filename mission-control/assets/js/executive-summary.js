@@ -34,6 +34,8 @@ await this.loadStatus();
 Logger.info("Step 4");
 
 this.renderDashboard();
+
+Logger.info("Step 5");
 ) {
 
         console.log(
