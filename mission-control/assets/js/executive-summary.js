@@ -19,24 +19,7 @@ const ExecutiveSummary = {
 
     data: null,
 
-    async initialize(Logger.info("Step 1");
-
-await this.loadRegistry();
-
-Logger.info("Step 2");
-
-await this.loadModules();
-
-Logger.info("Step 3");
-
-await this.loadStatus();
-
-Logger.info("Step 4");
-
-this.renderDashboard();
-
-Logger.info("Step 5");
-) {
+    async initialize() {
 
         console.log(
             "Initializing Executive Summary..."
