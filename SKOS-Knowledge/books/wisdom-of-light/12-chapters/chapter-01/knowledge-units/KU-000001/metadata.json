@@ -1,0 +1,17 @@
+{
+  "knowledgeUnitId": "KU-000001",
+  "bookId": "KA-000001",
+  "chapterId": "KA-000001-CH01",
+  "sectionId": "KA-000001-CH01-S01",
+  "title": {
+    "fa": "هدف: تعریف علمی و فلسفی",
+    "en": "Objective: Scientific and Philosophical Definition"
+  },
+  "type": "Objective",
+  "status": "INTAKE",
+  "version": "1.0.0",
+  "languages": [
+    "fa",
+    "en"
+  ]
+}
