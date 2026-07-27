@@ -1,1 +1,15 @@
-
+{
+  "chapterId": "KA-000001-CH01",
+  "bookId": "KA-000001",
+  "order": 1,
+  "title": {
+    "fa": "",
+    "en": ""
+  },
+  "status": "INTAKE",
+  "version": "1.0.0",
+  "languages": [
+    "fa",
+    "en"
+  ]
+}
