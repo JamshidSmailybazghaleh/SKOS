@@ -174,10 +174,14 @@ const SKOS = {
 
 
 
-    start() {
+        start() {
 
         this.initialize();
 
     }
 
 };
+
+window.SKOS = SKOS;
+
+Object.freeze(SKOS);
