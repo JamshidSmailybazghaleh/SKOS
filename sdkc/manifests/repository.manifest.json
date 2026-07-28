@@ -1,0 +1,29 @@
+{
+  "repository": {
+    "id": "SDKC-REPOSITORY",
+    "name": "Smaily Knowledge Development Core Repository",
+    "version": "1.0",
+    "status": "ACTIVE",
+    "created": "2026-07-28",
+    "updated": "2026-07-28"
+  },
+
+  "statistics": {
+    "objects": 0,
+    "books": 0,
+    "documents": 0,
+    "articles": 0,
+    "modules": 0,
+    "engines": 0,
+    "services": 0,
+    "projects": 0
+  },
+
+  "schemas": [
+    "knowledge-object.schema.json"
+  ],
+
+  "indexes": [
+    "sdkc-index.json"
+  ]
+}
