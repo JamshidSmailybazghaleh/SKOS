@@ -1,0 +1,208 @@
+{
+  "id": "SDKC-METADATA-REGISTRY",
+
+  "version": "1.0",
+
+  "status": "ACTIVE",
+
+  "repository": "SDKC",
+
+  "description":
+    "Central registry for SDKC metadata standards.",
+
+  "lastUpdated":
+    "2026-07-28T00:00:00Z",
+
+
+  "fields": {
+
+
+    "title": {
+
+      "type": "string",
+
+      "required": true,
+
+      "description":
+        "Primary title of knowledge object."
+
+    },
+
+
+    "description": {
+
+      "type": "string",
+
+      "required": false,
+
+      "description":
+        "Short explanation of the object."
+
+    },
+
+
+    "author": {
+
+      "type": "string",
+
+      "required": true,
+
+      "description":
+        "Creator or owner of knowledge object."
+
+    },
+
+
+    "language": {
+
+      "type": "string",
+
+      "required": true,
+
+      "description":
+        "Primary language of object."
+
+    },
+
+
+    "category": {
+
+      "type": "string",
+
+      "required": true,
+
+      "description":
+        "Knowledge classification."
+
+    },
+
+
+    "tags": {
+
+      "type": "array",
+
+      "required": false,
+
+      "description":
+        "Searchable labels."
+
+    },
+
+
+    "keywords": {
+
+      "type": "array",
+
+      "required": false,
+
+      "description":
+        "Semantic search terms."
+
+    },
+
+
+    "created": {
+
+      "type": "datetime",
+
+      "required": true,
+
+      "description":
+        "Creation timestamp."
+
+    },
+
+
+    "modified": {
+
+      "type": "datetime",
+
+      "required": true,
+
+      "description":
+        "Last modification timestamp."
+
+    },
+
+
+    "checksum": {
+
+      "type": "string",
+
+      "required": false,
+
+      "description":
+        "Integrity verification hash."
+
+    }
+
+  },
+
+
+  "objectTypes": {
+
+
+    "BOOK": {
+
+      "requiredFields": [
+
+        "title",
+
+        "author",
+
+        "language",
+
+        "category"
+
+      ]
+
+    },
+
+
+    "DOCUMENT": {
+
+      "requiredFields": [
+
+        "title",
+
+        "author",
+
+        "language"
+
+      ]
+
+    },
+
+
+    "ARTICLE": {
+
+      "requiredFields": [
+
+        "title",
+
+        "author",
+
+        "category"
+
+      ]
+
+    },
+
+
+    "PROJECT": {
+
+      "requiredFields": [
+
+        "title",
+
+        "author",
+
+        "status"
+
+      ]
+
+    }
+
+  }
+
+}
