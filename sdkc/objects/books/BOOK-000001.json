@@ -1,0 +1,68 @@
+{
+  "id": "BOOK-000001",
+
+  "type": "BOOK",
+
+  "title": "Hekmat Noor",
+
+  "description": "Knowledge Object",
+
+  "version": "1.0",
+
+  "status": "ACTIVE",
+
+  "repository": "SDKC",
+
+  "metadata": {
+
+    "author": "Jamshid Smaily",
+
+    "language": "Persian",
+
+    "category": "Philosophy",
+
+    "tags": [
+
+      "Wisdom",
+
+      "Knowledge",
+
+      "SKOS"
+
+    ],
+
+    "created": "2026-07-28",
+
+    "modified": "2026-07-28",
+
+    "checksum": ""
+
+  },
+
+  "content": {
+
+    "manifest": "manifest.json",
+
+    "chapters": [
+
+    ],
+
+    "resources": [
+
+    ]
+
+  },
+
+  "relations": [
+
+    {
+
+      "type": "PROJECT",
+
+      "target": "PRJ-000001"
+
+    }
+
+  ]
+
+}
