@@ -1,0 +1,26 @@
+{
+  "id": "SDKC-INDEX",
+  "version": "1.0",
+  "status": "ACTIVE",
+  "repository": "SDKC",
+
+  "statistics": {
+    "totalObjects": 0,
+    "books": 0,
+    "documents": 0,
+    "articles": 0,
+    "projects": 0,
+    "modules": 0,
+    "services": 0,
+    "engines": 0,
+    "datasets": 0,
+    "images": 0,
+    "videos": 0,
+    "audio": 0
+  },
+
+  "objects": [
+
+  ]
+
+}
