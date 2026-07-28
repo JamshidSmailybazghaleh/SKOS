@@ -1,0 +1,22 @@
+{
+  "id": "SDKC-AUDIT-LOG",
+
+  "version": "1.0",
+
+  "status": "ACTIVE",
+
+  "repository": "SDKC",
+
+  "description":
+    "Persistent audit history for all SDKC operations.",
+
+  "created":
+    "2026-07-28T00:00:00Z",
+
+  "lastUpdated":
+    "2026-07-28T00:00:00Z",
+
+  "totalEvents": 0,
+
+  "events": []
+}
