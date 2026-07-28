@@ -4,22 +4,25 @@ SKOS Mission Control
 
 Audit Service
 
-File:
-audit-service.js
+BUILD-000378
 
 Version:
-1.0
+1.0.0
 
 Status:
 ACTIVE
 ====================================================
 */
 
+class AuditService {
 
-const AuditService = {
+    constructor() {
 
+        this.logs = [];
 
-    logs: [],
+        this.initialized = false;
+
+    }
 
 
     async initialize() {
@@ -28,147 +31,143 @@ const AuditService = {
             "Audit Service Initializing..."
         );
 
+        this.initialized = true;
+
         return true;
 
-    },
+    }
 
 
     record(
-        action,
-        object,
-        details = {}
+        eventType,
+        data = {}
     ) {
 
+        const event = {
 
-        const entry = {
+            eventId:
 
+                "AUD-" + Date.now(),
 
-            id:
+            eventType,
 
-                this.generateAuditID(),
+            actor:
 
+                data.actor || "SYSTEM",
 
-            action:
+            resource:
 
-                action,
-
-
-            objectID:
-
-                object
-                    ? object.id
-                    : null,
-
-
-            objectType:
-
-                object
-                    ? object.type
-                    : null,
-
-
-            timestamp:
-
-                new Date()
-                .toISOString(),
-
+                data.resource || null,
 
             details:
 
-                details
+                data,
 
+            timestamp:
+
+                new Date().toISOString(),
+
+            status:
+
+                "SUCCESS"
 
         };
 
 
-        this.logs.push(entry);
+        this.logs.push(event);
 
 
         Logger.info(
 
-            "Audit Recorded: " +
+            "Audit Event: " +
 
-            action
-
-        );
-
-
-        if (window.EventBus) {
-
-            EventBus.publish(
-
-                "audit.recorded",
-
-                entry
-
-            );
-
-        }
-
-
-        return entry;
-
-    },
-
-
-    generateAuditID() {
-
-
-        return (
-
-            "AUDIT-" +
-
-            Date.now()
+            eventType
 
         );
 
-    },
+
+        return event;
+
+    }
 
 
-    getLogs() {
-
+    getAll() {
 
         return this.logs;
 
-    },
+    }
 
 
-    getObjectHistory(id) {
-
+    findByType(eventType) {
 
         return this.logs.filter(
 
             log =>
 
-            log.objectID === id
+            log.eventType === eventType
 
         );
 
-    },
+    }
+
+
+    findByActor(actor) {
+
+        return this.logs.filter(
+
+            log =>
+
+            log.actor === actor
+
+        );
+
+    }
+
+
+    latest(limit = 10) {
+
+        return this.logs.slice(
+
+            -limit
+
+        );
+
+    }
 
 
     clear() {
 
-
         this.logs = [];
 
-    },
+    }
 
 
     status() {
 
-        return "READY";
+        return {
+
+            initialized:
+
+                this.initialized,
+
+            records:
+
+                this.logs.length
+
+        };
 
     }
 
-};
+}
 
 
 window.AuditService =
 
-    AuditService;
+    new AuditService();
 
 
 Object.freeze(
-    AuditService
+
+    window.AuditService
+
 );
