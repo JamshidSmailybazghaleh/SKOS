@@ -1,0 +1,226 @@
+/* ============================================================
+   SKOS Component Library
+   ------------------------------------------------------------
+   File      : badge.css
+   Version   : 1.0.0
+   Build     : BUILD-000507
+   Purpose   : Badge Component
+============================================================ */
+
+/* ============================================================
+   Base Badge
+============================================================ */
+
+.badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    padding: 4px 10px;
+
+    border-radius: var(--radius-round);
+
+    font-size: var(--font-size-xs);
+
+    font-weight: var(--font-weight-bold);
+
+    white-space: nowrap;
+
+    user-select: none;
+
+}
+
+/* ============================================================
+   Semantic Badges
+============================================================ */
+
+.badge-primary {
+
+    background: rgba(31,78,121,.12);
+
+    color: var(--brand-primary);
+
+}
+
+.badge-secondary {
+
+    background: rgba(59,130,246,.12);
+
+    color: var(--brand-secondary);
+
+}
+
+.badge-success {
+
+    background: rgba(22,163,74,.12);
+
+    color: var(--color-success);
+
+}
+
+.badge-warning {
+
+    background: rgba(245,158,11,.15);
+
+    color: var(--color-warning);
+
+}
+
+.badge-danger {
+
+    background: rgba(220,38,38,.12);
+
+    color: var(--color-danger);
+
+}
+
+.badge-info {
+
+    background: rgba(14,165,233,.12);
+
+    color: var(--color-info);
+
+}
+
+.badge-neutral {
+
+    background: rgba(107,114,128,.12);
+
+    color: var(--text-secondary);
+
+}
+
+/* ============================================================
+   Priority
+============================================================ */
+
+.badge-critical {
+
+    background: var(--color-danger);
+
+    color: var(--text-white);
+
+}
+
+.badge-high {
+
+    background: var(--color-warning);
+
+    color: var(--text-white);
+
+}
+
+.badge-normal {
+
+    background: var(--brand-secondary);
+
+    color: var(--text-white);
+
+}
+
+.badge-low {
+
+    background: var(--color-success);
+
+    color: var(--text-white);
+
+}
+
+/* ============================================================
+   Build
+============================================================ */
+
+.badge-build {
+
+    background: #EEF6FF;
+
+    color: var(--brand-primary);
+
+    border: 1px solid rgba(31,78,121,.20);
+
+}
+
+/* ============================================================
+   Version
+============================================================ */
+
+.badge-version {
+
+    background: #F3F4F6;
+
+    color: var(--text-secondary);
+
+}
+
+/* ============================================================
+   Engine
+============================================================ */
+
+.badge-engine {
+
+    background: #E8F7FF;
+
+    color: var(--brand-accent);
+
+}
+
+/* ============================================================
+   Mission Status
+============================================================ */
+
+.badge-running {
+
+    background: rgba(59,130,246,.12);
+
+    color: var(--brand-secondary);
+
+}
+
+.badge-completed {
+
+    background: rgba(22,163,74,.12);
+
+    color: var(--color-success);
+
+}
+
+.badge-paused {
+
+    background: rgba(245,158,11,.12);
+
+    color: var(--color-warning);
+
+}
+
+.badge-failed {
+
+    background: rgba(220,38,38,.12);
+
+    color: var(--color-danger);
+
+}
+
+/* ============================================================
+   Size
+============================================================ */
+
+.badge-sm {
+
+    font-size: 11px;
+
+    padding: 2px 8px;
+
+}
+
+.badge-lg {
+
+    font-size: var(--font-size-sm);
+
+    padding: 6px 14px;
+
+}
