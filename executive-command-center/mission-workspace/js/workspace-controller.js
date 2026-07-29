@@ -4,9 +4,9 @@
  * Workspace Controller
  * ------------------------------------------------------------
  * File      : workspace-controller.js
- * Version   : 1.0.0
+ * Version   : 2.0.0
  * Build     : BUILD-000505
- * Purpose   : Coordinate Mission Workspace components
+ * Purpose   : Coordinate all Mission Workspace components
  * ============================================================
  */
 
@@ -20,6 +20,8 @@ class WorkspaceController {
 
         this.status = "OFFLINE";
 
+        this.renderers = {};
+
     }
 
     async initialize() {
@@ -30,67 +32,63 @@ class WorkspaceController {
 
         this.data = await this.loader.loadAll();
 
+        this.initializeRenderers();
+
         this.status = "ONLINE";
 
-        await this.execute();
+        this.execute();
 
     }
 
-    async execute() {
+    initializeRenderers() {
 
-        this.renderMission();
+        this.renderers.mission =
+            new MissionRenderer();
 
-        this.renderTasks();
+        this.renderers.task =
+            new TaskRenderer();
 
-        this.renderMilestones();
+        this.renderers.milestone =
+            new MilestoneRenderer();
 
-        this.renderOperations();
+        this.renderers.operation =
+            new OperationRenderer();
 
-        this.renderProgress();
+        this.renderers.progress =
+            new ProgressRenderer();
 
-        this.renderHistory();
+        this.renderers.history =
+            new HistoryRenderer();
 
-    }
+        Object.values(this.renderers).forEach(renderer => {
 
-    renderMission() {
+            renderer.initialize();
 
-        console.log(this.data.missions);
-
-    }
-
-    renderTasks() {
-
-        console.log(this.data.tasks);
-
-    }
-
-    renderMilestones() {
-
-        console.log(this.data.milestones);
+        });
 
     }
 
-    renderOperations() {
+    execute() {
 
-        console.log(this.data.operations);
+        this.renderers.mission.render(this.data);
 
-    }
+        this.renderers.task.render(this.data);
 
-    renderProgress() {
+        this.renderers.milestone.render(this.data);
 
-        console.log(this.data.progress);
+        this.renderers.operation.render(this.data);
 
-    }
+        this.renderers.progress.render(this.data.progress);
 
-    renderHistory() {
-
-        console.log(this.data.history);
+        this.renderers.history.render(this.data);
 
     }
 
-    refresh() {
+    async refresh() {
 
-        this.initialize();
+        this.data = await this.loader.loadAll();
+
+        this.execute();
 
     }
 
@@ -101,6 +99,12 @@ class WorkspaceController {
     }
 
     shutdown() {
+
+        Object.values(this.renderers).forEach(renderer => {
+
+            renderer.shutdown();
+
+        });
 
         this.loader.shutdown();
 
