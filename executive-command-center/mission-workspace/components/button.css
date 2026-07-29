@@ -1,0 +1,216 @@
+/* ============================================================
+   SKOS Component Library
+   ------------------------------------------------------------
+   File      : button.css
+   Version   : 1.0.0
+   Build     : BUILD-000507
+   Purpose   : Button Component
+============================================================ */
+
+/* ============================================================
+   Base Button
+============================================================ */
+
+.btn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 10px 18px;
+
+    border: none;
+
+    border-radius: var(--radius-md);
+
+    cursor: pointer;
+
+    font-family: var(--font-family);
+
+    font-size: var(--font-size-sm);
+
+    font-weight: var(--font-weight-bold);
+
+    text-decoration: none;
+
+    transition: var(--transition-normal);
+
+    user-select: none;
+
+}
+
+/* ============================================================
+   Hover / Focus
+============================================================ */
+
+.btn:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: var(--shadow-md);
+
+}
+
+.btn:active {
+
+    transform: scale(.98);
+
+}
+
+.btn:disabled {
+
+    opacity: .50;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow: none;
+
+}
+
+/* ============================================================
+   Variants
+============================================================ */
+
+.btn-primary {
+
+    background: var(--brand-primary);
+
+    color: var(--text-white);
+
+}
+
+.btn-secondary {
+
+    background: var(--brand-secondary);
+
+    color: var(--text-white);
+
+}
+
+.btn-success {
+
+    background: var(--color-success);
+
+    color: var(--text-white);
+
+}
+
+.btn-warning {
+
+    background: var(--color-warning);
+
+    color: var(--text-white);
+
+}
+
+.btn-danger {
+
+    background: var(--color-danger);
+
+    color: var(--text-white);
+
+}
+
+.btn-info {
+
+    background: var(--color-info);
+
+    color: var(--text-white);
+
+}
+
+/* ============================================================
+   Outline
+============================================================ */
+
+.btn-outline {
+
+    background: transparent;
+
+    border: 1px solid var(--border-color);
+
+    color: var(--text-primary);
+
+}
+
+.btn-outline:hover {
+
+    background: var(--background-panel);
+
+}
+
+/* ============================================================
+   Ghost
+============================================================ */
+
+.btn-ghost {
+
+    background: transparent;
+
+    color: var(--brand-primary);
+
+}
+
+.btn-ghost:hover {
+
+    background: rgba(31,78,121,.08);
+
+}
+
+/* ============================================================
+   Sizes
+============================================================ */
+
+.btn-sm {
+
+    padding: 6px 12px;
+
+    font-size: var(--font-size-xs);
+
+}
+
+.btn-md {
+
+    padding: 10px 18px;
+
+}
+
+.btn-lg {
+
+    padding: 14px 24px;
+
+    font-size: var(--font-size-md);
+
+}
+
+/* ============================================================
+   Width
+============================================================ */
+
+.btn-block {
+
+    width: 100%;
+
+}
+
+/* ============================================================
+   Icon Button
+============================================================ */
+
+.btn-icon {
+
+    width: 42px;
+
+    height: 42px;
+
+    padding: 0;
+
+    border-radius: 50%;
+
+}
