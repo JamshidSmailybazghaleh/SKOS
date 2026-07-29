@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "workspace": "Mission Workspace",
+  "organization": "SKOS",
+  "lastUpdated": "2026-07-29T20:47:00+03:30",
+  "milestones": [
+    {
+      "id": "MS-000001",
+      "missionId": "MISSION-000001",
+      "title": "Executive Command Center Structure Created",
+      "description": "Directory structure and core files are created.",
+      "order": 1,
+      "status": "COMPLETED",
+      "progress": 100
+    },
+    {
+      "id": "MS-000002",
+      "missionId": "MISSION-000001",
+      "title": "Executive Command Center Home Ready",
+      "description": "The main page is operational.",
+      "order": 2,
+      "status": "RUNNING",
+      "progress": 40
+    },
+    {
+      "id": "MS-000003",
+      "missionId": "MISSION-000001",
+      "title": "Mission Workspace Connected",
+      "description": "Mission Workspace is connected to the Executive Command Center.",
+      "order": 3,
+      "status": "WAITING",
+      "progress": 0
+    },
+    {
+      "id": "MS-000004",
+      "missionId": "MISSION-000001",
+      "title": "First Product Connected",
+      "description": "Book-000001 is visible in the Executive Command Center.",
+      "order": 4,
+      "status": "WAITING",
+      "progress": 0
+    },
+    {
+      "id": "MS-000005",
+      "missionId": "MISSION-000001",
+      "title": "Executive Command Center Online",
+      "description": "The first operational version is published on GitHub Pages.",
+      "order": 5,
+      "status": "WAITING",
+      "progress": 0
+    }
+  ]
+}
