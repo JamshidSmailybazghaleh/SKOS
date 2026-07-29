@@ -1,0 +1,60 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-07-29T00:00:00Z",
+  "operations": [
+    {
+      "id": "OP-000001",
+      "name": "Executive Command Center",
+      "category": "Infrastructure",
+      "status": "RUNNING",
+      "progress": 15,
+      "priority": "CRITICAL",
+      "relatedMission": "Mission-000001"
+    },
+    {
+      "id": "OP-000002",
+      "name": "Mission Workspace",
+      "category": "Operations",
+      "status": "RUNNING",
+      "progress": 10,
+      "priority": "HIGH",
+      "relatedMission": "Mission-000001"
+    },
+    {
+      "id": "OP-000003",
+      "name": "Persian Book Verification",
+      "category": "Publication",
+      "status": "COMPLETED",
+      "progress": 100,
+      "priority": "HIGH",
+      "relatedProduct": "Book-000001"
+    },
+    {
+      "id": "OP-000004",
+      "name": "English Book Completion",
+      "category": "Publication",
+      "status": "RUNNING",
+      "progress": 70,
+      "priority": "CRITICAL",
+      "relatedProduct": "Book-000001"
+    },
+    {
+      "id": "OP-000005",
+      "name": "Cover Design Approval",
+      "category": "Design",
+      "status": "WAITING",
+      "progress": 90,
+      "priority": "MEDIUM",
+      "relatedProduct": "Book-000001"
+    },
+    {
+      "id": "OP-000006",
+      "name": "Publication Preparation",
+      "category": "Release",
+      "status": "WAITING",
+      "progress": 0,
+      "priority": "HIGH",
+      "relatedProduct": "Book-000001"
+    }
+  ]
+}
