@@ -1,0 +1,241 @@
+/* ============================================================
+   SKOS Mission Workspace
+   ------------------------------------------------------------
+   File      : history-board.css
+   Version   : 1.0.0
+   Build     : BUILD-000506
+   Purpose   : History Board Styles
+============================================================ */
+
+/* ============================================================
+   History Panel
+============================================================ */
+
+#history-panel {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: var(--space-4);
+
+}
+
+/* ============================================================
+   History Card
+============================================================ */
+
+.history-card {
+
+    background: var(--background-card);
+
+    border: 1px solid var(--border-color);
+
+    border-left: 5px solid var(--brand-secondary);
+
+    border-radius: var(--radius-md);
+
+    padding: var(--space-4);
+
+    box-shadow: var(--shadow-sm);
+
+    transition: var(--transition-normal);
+
+}
+
+.history-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: var(--shadow-md);
+
+}
+
+/* ============================================================
+   Header
+============================================================ */
+
+.history-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: var(--space-3);
+
+}
+
+.history-title {
+
+    font-size: var(--font-size-lg);
+
+    font-weight: var(--font-weight-bold);
+
+    color: var(--brand-primary);
+
+}
+
+.history-id {
+
+    font-size: var(--font-size-xs);
+
+    color: var(--text-muted);
+
+}
+
+/* ============================================================
+   Time
+============================================================ */
+
+.history-time {
+
+    font-size: var(--font-size-sm);
+
+    color: var(--text-secondary);
+
+    margin-bottom: var(--space-3);
+
+}
+
+/* ============================================================
+   Description
+============================================================ */
+
+.history-description {
+
+    color: var(--text-primary);
+
+    line-height: 1.6;
+
+    margin-bottom: var(--space-3);
+
+}
+
+/* ============================================================
+   Footer
+============================================================ */
+
+.history-footer {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    border-top: 1px solid var(--border-light);
+
+    padding-top: var(--space-2);
+
+}
+
+/* ============================================================
+   Event Type
+============================================================ */
+
+.history-type {
+
+    font-size: var(--font-size-xs);
+
+    color: var(--text-muted);
+
+    font-weight: var(--font-weight-medium);
+
+}
+
+/* ============================================================
+   Status Badge
+============================================================ */
+
+.history-status {
+
+    padding: 4px 10px;
+
+    border-radius: var(--radius-round);
+
+    font-size: var(--font-size-xs);
+
+    font-weight: var(--font-weight-bold);
+
+}
+
+.history-success {
+
+    background: rgba(22,163,74,.15);
+
+    color: var(--color-success);
+
+}
+
+.history-running {
+
+    background: rgba(59,130,246,.15);
+
+    color: var(--brand-secondary);
+
+}
+
+.history-warning {
+
+    background: rgba(245,158,11,.15);
+
+    color: var(--color-warning);
+
+}
+
+.history-failed {
+
+    background: rgba(220,38,38,.15);
+
+    color: var(--color-danger);
+
+}
+
+/* ============================================================
+   Scroll Area
+============================================================ */
+
+.history-list {
+
+    max-height: 700px;
+
+    overflow-y: auto;
+
+    padding-right: 4px;
+
+}
+
+.history-list::-webkit-scrollbar {
+
+    width: 8px;
+
+}
+
+.history-list::-webkit-scrollbar-thumb {
+
+    background: var(--border-color);
+
+    border-radius: var(--radius-round);
+
+}
+
+/* ============================================================
+   Responsive
+============================================================ */
+
+@media (max-width:768px){
+
+    .history-header,
+    .history-footer{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:var(--space-2);
+
+    }
+
+}
