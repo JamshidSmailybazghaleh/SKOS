@@ -1,0 +1,200 @@
+/* ============================================================
+   SKOS Component Library
+   ------------------------------------------------------------
+   File      : progress.css
+   Version   : 1.0.0
+   Build     : BUILD-000507
+   Purpose   : Progress Component
+============================================================ */
+
+/* ============================================================
+   Progress Container
+============================================================ */
+
+.progress {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: var(--space-2);
+
+    width: 100%;
+
+}
+
+/* ============================================================
+   Progress Header
+============================================================ */
+
+.progress-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+.progress-title {
+
+    font-size: var(--font-size-sm);
+
+    font-weight: var(--font-weight-bold);
+
+    color: var(--text-primary);
+
+}
+
+.progress-value {
+
+    font-size: var(--font-size-sm);
+
+    font-weight: var(--font-weight-bold);
+
+    color: var(--brand-primary);
+
+}
+
+/* ============================================================
+   Progress Track
+============================================================ */
+
+.progress-track {
+
+    width: 100%;
+
+    height: 10px;
+
+    background: var(--border-light);
+
+    border-radius: var(--radius-round);
+
+    overflow: hidden;
+
+}
+
+/* ============================================================
+   Progress Fill
+============================================================ */
+
+.progress-fill {
+
+    width: 0%;
+
+    height: 100%;
+
+    background: var(--brand-primary);
+
+    transition: width .40s ease;
+
+}
+
+/* ============================================================
+   Colour Variants
+============================================================ */
+
+.progress-success .progress-fill {
+
+    background: var(--color-success);
+
+}
+
+.progress-warning .progress-fill {
+
+    background: var(--color-warning);
+
+}
+
+.progress-danger .progress-fill {
+
+    background: var(--color-danger);
+
+}
+
+.progress-info .progress-fill {
+
+    background: var(--brand-accent);
+
+}
+
+/* ============================================================
+   Sizes
+============================================================ */
+
+.progress-sm .progress-track {
+
+    height: 6px;
+
+}
+
+.progress-md .progress-track {
+
+    height: 10px;
+
+}
+
+.progress-lg .progress-track {
+
+    height: 16px;
+
+}
+
+/* ============================================================
+   Animated
+============================================================ */
+
+.progress-animated .progress-fill {
+
+    background-image:
+        linear-gradient(
+            45deg,
+            rgba(255,255,255,.18) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255,255,255,.18) 50%,
+            rgba(255,255,255,.18) 75%,
+            transparent 75%,
+            transparent
+        );
+
+    background-size: 20px 20px;
+
+    animation: progressMove 1s linear infinite;
+
+}
+
+@keyframes progressMove {
+
+    from {
+
+        background-position: 0 0;
+
+    }
+
+    to {
+
+        background-position: 20px 0;
+
+    }
+
+}
+
+/* ============================================================
+   Responsive
+============================================================ */
+
+@media (max-width:768px){
+
+    .progress-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:var(--space-1);
+
+    }
+
+}
