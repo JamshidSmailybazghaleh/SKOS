@@ -1,0 +1,241 @@
+/* ==========================================================
+   SKOS Mission Workspace
+   File      : workspace.css
+   Version   : 1.0.0
+   Build     : BUILD-000506
+   Purpose   : Main stylesheet
+========================================================== */
+
+/* ---------- Root ---------- */
+
+:root {
+
+    --background: #f4f6f9;
+
+    --panel: #ffffff;
+
+    --border: #d9dde3;
+
+    --primary: #1f4e79;
+
+    --secondary: #3b82f6;
+
+    --success: #16a34a;
+
+    --warning: #f59e0b;
+
+    --danger: #dc2626;
+
+    --text: #1f2937;
+
+    --muted: #6b7280;
+
+    --radius: 10px;
+
+    --shadow:
+        0 2px 6px rgba(0,0,0,.08);
+
+    --spacing: 16px;
+
+    --transition: .25s ease;
+
+}
+
+/* ---------- Reset ---------- */
+
+* {
+
+    margin: 0;
+
+    padding: 0;
+
+    box-sizing: border-box;
+
+}
+
+body {
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background: var(--background);
+
+    color: var(--text);
+
+    line-height: 1.5;
+
+}
+
+/* ---------- Header ---------- */
+
+.workspace-header {
+
+    background: var(--primary);
+
+    color: white;
+
+    padding: 20px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+#workspace-status {
+
+    background: var(--success);
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+}
+
+/* ---------- Main Layout ---------- */
+
+.workspace-layout {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: var(--spacing);
+
+    padding: var(--spacing);
+
+}
+
+/* ---------- Panels ---------- */
+
+.workspace-panel {
+
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    padding: var(--spacing);
+
+    box-shadow: var(--shadow);
+
+    min-height: 220px;
+
+}
+
+/* ---------- Cards ---------- */
+
+.mission-card,
+.task-card,
+.milestone-card,
+.operation-card,
+.progress-card,
+.history-card {
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    padding: 14px;
+
+    margin-bottom: 12px;
+
+    transition: var(--transition);
+
+    background: white;
+
+}
+
+.mission-card:hover,
+.task-card:hover,
+.milestone-card:hover,
+.operation-card:hover,
+.progress-card:hover,
+.history-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 4px 10px rgba(0,0,0,.12);
+
+}
+
+/* ---------- Titles ---------- */
+
+h1 {
+
+    font-size: 28px;
+
+}
+
+h2 {
+
+    color: var(--primary);
+
+    margin-bottom: 10px;
+
+}
+
+h3 {
+
+    color: var(--secondary);
+
+    margin-bottom: 8px;
+
+}
+
+p {
+
+    margin: 4px 0;
+
+}
+
+/* ---------- Footer ---------- */
+
+.workspace-footer {
+
+    margin-top: 20px;
+
+    padding: 16px;
+
+    text-align: center;
+
+    color: var(--muted);
+
+    border-top: 1px solid var(--border);
+
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+
+    .workspace-layout {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .workspace-header {
+
+        flex-direction: column;
+
+        gap: 10px;
+
+        text-align: center;
+
+    }
+
+}
