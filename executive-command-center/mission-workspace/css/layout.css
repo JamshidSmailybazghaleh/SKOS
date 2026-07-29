@@ -1,0 +1,194 @@
+/* ============================================================
+   SKOS Design System
+   ------------------------------------------------------------
+   File      : layout.css
+   Version   : 1.0.0
+   Build     : BUILD-000506
+   Purpose   : Workspace Layout System
+============================================================ */
+
+/* ============================================================
+   Page
+============================================================ */
+
+body {
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-height: 100vh;
+
+    background: var(--background-body);
+
+    color: var(--text-primary);
+
+    font-family: var(--font-family);
+
+}
+
+/* ============================================================
+   Header
+============================================================ */
+
+.workspace-header {
+
+    height: var(--header-height);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 0 var(--space-6);
+
+}
+
+/* ============================================================
+   Main Container
+============================================================ */
+
+.workspace-container {
+
+    width: 100%;
+
+    max-width: var(--content-width);
+
+    margin: 0 auto;
+
+    padding: var(--space-6);
+
+    flex: 1;
+
+}
+
+/* ============================================================
+   Dashboard Grid
+============================================================ */
+
+.workspace-layout {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: var(--panel-gap);
+
+    align-items: start;
+
+}
+
+/* ============================================================
+   Panels
+============================================================ */
+
+.workspace-panel {
+
+    min-height: 220px;
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+/* ============================================================
+   Footer
+============================================================ */
+
+.workspace-footer {
+
+    height: var(--footer-height);
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+}
+
+/* ============================================================
+   Utilities
+============================================================ */
+
+.full-width {
+
+    grid-column: 1 / -1;
+
+}
+
+.align-center {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+}
+
+.align-right {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+}
+
+.align-left {
+
+    display: flex;
+
+    justify-content: flex-start;
+
+}
+
+/* ============================================================
+   Responsive
+============================================================ */
+
+@media (max-width: 1200px) {
+
+    .workspace-layout {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    .workspace-container {
+
+        padding: var(--space-4);
+
+    }
+
+    .workspace-header {
+
+        flex-direction: column;
+
+        justify-content: center;
+
+        gap: var(--space-2);
+
+        height: auto;
+
+        padding: var(--space-4);
+
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .workspace-container {
+
+        padding: var(--space-3);
+
+    }
+
+}
