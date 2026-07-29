@@ -1,0 +1,252 @@
+/* ============================================================
+   SKOS Mission Workspace
+   ------------------------------------------------------------
+   File      : operation-board.css
+   Version   : 1.0.0
+   Build     : BUILD-000506
+   Purpose   : Operation Board Styles
+============================================================ */
+
+/* ============================================================
+   Operation Panel
+============================================================ */
+
+#operation-panel {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: var(--space-4);
+
+}
+
+/* ============================================================
+   Operation Card
+============================================================ */
+
+.operation-card {
+
+    background: var(--background-card);
+
+    border: 1px solid var(--border-color);
+
+    border-left: 6px solid var(--brand-accent);
+
+    border-radius: var(--radius-md);
+
+    padding: var(--space-4);
+
+    box-shadow: var(--shadow-sm);
+
+    transition: var(--transition-normal);
+
+}
+
+.operation-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: var(--shadow-md);
+
+}
+
+/* ============================================================
+   Header
+============================================================ */
+
+.operation-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: var(--space-3);
+
+}
+
+.operation-title {
+
+    font-size: var(--font-size-lg);
+
+    font-weight: var(--font-weight-bold);
+
+    color: var(--brand-primary);
+
+}
+
+.operation-id {
+
+    font-size: var(--font-size-xs);
+
+    color: var(--text-muted);
+
+}
+
+/* ============================================================
+   Details
+============================================================ */
+
+.operation-details {
+
+    display: grid;
+
+    grid-template-columns: repeat(2,1fr);
+
+    gap: var(--space-2);
+
+    margin-bottom: var(--space-3);
+
+}
+
+.operation-item {
+
+    font-size: var(--font-size-sm);
+
+    color: var(--text-primary);
+
+}
+
+.operation-item strong {
+
+    color: var(--text-secondary);
+
+}
+
+/* ============================================================
+   Progress
+============================================================ */
+
+.operation-progress {
+
+    margin-top: var(--space-4);
+
+}
+
+.operation-progress-track {
+
+    width: 100%;
+
+    height: 8px;
+
+    background: var(--border-light);
+
+    border-radius: var(--radius-round);
+
+    overflow: hidden;
+
+}
+
+.operation-progress-value {
+
+    height: 100%;
+
+    width: 0%;
+
+    background: var(--brand-accent);
+
+    transition: width .40s ease;
+
+}
+
+/* ============================================================
+   Health Indicator
+============================================================ */
+
+.operation-health {
+
+    display: inline-block;
+
+    padding: 4px 10px;
+
+    border-radius: var(--radius-round);
+
+    font-size: var(--font-size-xs);
+
+    font-weight: var(--font-weight-bold);
+
+}
+
+.health-good {
+
+    background: rgba(22,163,74,.15);
+
+    color: var(--color-success);
+
+}
+
+.health-warning {
+
+    background: rgba(245,158,11,.15);
+
+    color: var(--color-warning);
+
+}
+
+.health-critical {
+
+    background: rgba(220,38,38,.15);
+
+    color: var(--color-danger);
+
+}
+
+/* ============================================================
+   Operation Status
+============================================================ */
+
+.operation-running {
+
+    border-left-color: var(--brand-secondary);
+
+}
+
+.operation-completed {
+
+    border-left-color: var(--color-success);
+
+}
+
+.operation-waiting {
+
+    border-left-color: var(--color-warning);
+
+}
+
+.operation-paused {
+
+    border-left-color: var(--color-info);
+
+}
+
+.operation-failed {
+
+    border-left-color: var(--color-danger);
+
+}
+
+/* ============================================================
+   Responsive
+============================================================ */
+
+@media (max-width:768px){
+
+    .operation-details{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .operation-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:var(--space-2);
+
+    }
+
+}
