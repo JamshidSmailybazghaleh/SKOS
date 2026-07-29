@@ -1,0 +1,181 @@
+/* ============================================================
+   SKOS Mission Workspace
+   ------------------------------------------------------------
+   File      : responsive.css
+   Version   : 1.0.0
+   Build     : BUILD-000506
+   Purpose   : Responsive Layout
+============================================================ */
+
+/* ============================================================
+   Large Desktop
+============================================================ */
+
+@media (min-width:1600px){
+
+    .workspace-container{
+
+        max-width:1800px;
+
+    }
+
+}
+
+/* ============================================================
+   Desktop
+============================================================ */
+
+@media (max-width:1400px){
+
+    .workspace-layout{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+/* ============================================================
+   Tablet
+============================================================ */
+
+@media (max-width:1024px){
+
+    .workspace-layout{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .workspace-container{
+
+        padding:var(--space-5);
+
+    }
+
+}
+
+/* ============================================================
+   Mobile
+============================================================ */
+
+@media (max-width:768px){
+
+    .workspace-header{
+
+        flex-direction:column;
+
+        justify-content:center;
+
+        align-items:center;
+
+        gap:var(--space-2);
+
+        height:auto;
+
+        padding:var(--space-4);
+
+        text-align:center;
+
+    }
+
+    .workspace-container{
+
+        padding:var(--space-4);
+
+    }
+
+    .workspace-layout{
+
+        grid-template-columns:1fr;
+
+        gap:var(--space-4);
+
+    }
+
+    .workspace-panel{
+
+        min-height:auto;
+
+    }
+
+    .mission-details,
+    .task-details,
+    .milestone-details,
+    .operation-details,
+    .progress-stats{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+/* ============================================================
+   Small Mobile
+============================================================ */
+
+@media (max-width:480px){
+
+    h1{
+
+        font-size:24px;
+
+    }
+
+    h2{
+
+        font-size:20px;
+
+    }
+
+    h3{
+
+        font-size:18px;
+
+    }
+
+    .workspace-container{
+
+        padding:var(--space-3);
+
+    }
+
+    .mission-card,
+    .task-card,
+    .milestone-card,
+    .operation-card,
+    .progress-card,
+    .history-card{
+
+        padding:var(--space-3);
+
+    }
+
+    .progress-percentage{
+
+        font-size:30px;
+
+    }
+
+}
+
+/* ============================================================
+   Landscape Phone
+============================================================ */
+
+@media (max-height:500px) and (orientation:landscape){
+
+    .workspace-header{
+
+        padding:var(--space-2);
+
+    }
+
+    .workspace-layout{
+
+        gap:var(--space-3);
+
+    }
+
+}
