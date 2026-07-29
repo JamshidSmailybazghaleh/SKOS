@@ -1,55 +1,6 @@
 {
-  "version": "1.0.0",
-  "workspace": "Mission Workspace",
-  "organization": "SKOS",
-  "lastUpdated": "2026-07-29T20:47:00+03:30",
-  "missions": [
-    {
-      "id": "MISSION-000001",
-      "title": "Executive Command Center Launch",
-      "description": "Build, activate and verify the first operational Executive Command Center.",
-      "category": "Infrastructure",
-      "priority": "CRITICAL",
-      "status": "ACTIVE",
-      "progress": 15,
-
-      "owner": "SKOS Executive Management",
-      "workspace": "Mission Workspace",
-
-      "startDate": "2026-07-29",
-      "targetDate": null,
-      "completedDate": null,
-
-      "currentPhase": "Foundation",
-
-      "nextAction": "Create and activate Executive Command Center v0.1",
-
-      "deliverables": [
-        "Executive Command Center",
-        "Mission Register",
-        "Decision Center",
-        "Executive Log"
-      ],
-
-      "dependencies": [],
-
-      "relatedProducts": [
-        "Book-000001"
-      ],
-
-      "relatedOperations": [
-        "OP-000001",
-        "OP-000002"
-      ],
-
-      "successCriteria": [
-        "Executive Command Center is online",
-        "Mission Register is operational",
-        "Decision Center is operational",
-        "Executive Log is operational"
-      ],
-
-      "remarks": "First operational mission of SKOS."
-    }
-  ]
+  "id": "Mission-000001",
+  "title": "Executive Command Center Launch",
+  "status": "ACTIVE",
+  "progress": 12
 }
