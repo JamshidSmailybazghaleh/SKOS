@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-07-29T00:00:00Z",
+  "activeDecisions": [
+    {
+      "id": "DEC-000001",
+      "priority": "HIGH",
+      "title": "Approve English Edition",
+      "description": "Review and approve the complete English edition of Book-000001.",
+      "relatedMission": "Mission-000001",
+      "relatedProduct": "Book-000001",
+      "status": "OPEN",
+      "owner": "Executive Command Center",
+      "dueDate": null
+    },
+    {
+      "id": "DEC-000002",
+      "priority": "HIGH",
+      "title": "Approve Final Cover Design",
+      "description": "Confirm the final cover for the first published book.",
+      "relatedMission": "Mission-000001",
+      "relatedProduct": "Book-000001",
+      "status": "OPEN",
+      "owner": "Executive Command Center",
+      "dueDate": null
+    },
+    {
+      "id": "DEC-000003",
+      "priority": "MEDIUM",
+      "title": "Authorize Public Publication",
+      "description": "Approve public release after all quality checks are completed.",
+      "relatedMission": "Mission-000001",
+      "relatedProduct": "Book-000001",
+      "status": "WAITING",
+      "owner": "Executive Command Center",
+      "dueDate": null
+    }
+  ]
+}
