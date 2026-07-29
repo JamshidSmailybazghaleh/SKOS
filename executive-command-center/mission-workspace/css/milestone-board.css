@@ -1,0 +1,270 @@
+/* ============================================================
+   SKOS Mission Workspace
+   ------------------------------------------------------------
+   File      : milestone-board.css
+   Version   : 1.0.0
+   Build     : BUILD-000506
+   Purpose   : Milestone Board Styles
+============================================================ */
+
+/* ============================================================
+   Milestone Panel
+============================================================ */
+
+#milestone-panel {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: var(--space-4);
+
+}
+
+/* ============================================================
+   Milestone Card
+============================================================ */
+
+.milestone-card {
+
+    background: var(--background-card);
+
+    border: 1px solid var(--border-color);
+
+    border-left: 6px solid var(--brand-primary);
+
+    border-radius: var(--radius-md);
+
+    padding: var(--space-4);
+
+    box-shadow: var(--shadow-sm);
+
+    transition: var(--transition-normal);
+
+}
+
+.milestone-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: var(--shadow-md);
+
+}
+
+/* ============================================================
+   Header
+============================================================ */
+
+.milestone-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: var(--space-3);
+
+}
+
+.milestone-title {
+
+    font-size: var(--font-size-lg);
+
+    font-weight: var(--font-weight-bold);
+
+    color: var(--brand-primary);
+
+}
+
+.milestone-id {
+
+    font-size: var(--font-size-xs);
+
+    color: var(--text-muted);
+
+}
+
+/* ============================================================
+   Details
+============================================================ */
+
+.milestone-details {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: var(--space-2);
+
+    margin-bottom: var(--space-3);
+
+}
+
+.milestone-item {
+
+    font-size: var(--font-size-sm);
+
+    color: var(--text-primary);
+
+}
+
+.milestone-item strong {
+
+    color: var(--text-secondary);
+
+}
+
+/* ============================================================
+   Description
+============================================================ */
+
+.milestone-description {
+
+    margin-top: var(--space-3);
+
+    color: var(--text-secondary);
+
+    line-height: 1.6;
+
+}
+
+/* ============================================================
+   Progress
+============================================================ */
+
+.milestone-progress {
+
+    margin-top: var(--space-4);
+
+}
+
+.milestone-progress-track {
+
+    width: 100%;
+
+    height: 8px;
+
+    background: var(--border-light);
+
+    border-radius: var(--radius-round);
+
+    overflow: hidden;
+
+}
+
+.milestone-progress-value {
+
+    height: 100%;
+
+    background: var(--brand-primary);
+
+    width: 0%;
+
+    transition: width .4s ease;
+
+}
+
+/* ============================================================
+   Status Badges
+============================================================ */
+
+.milestone-status {
+
+    display: inline-block;
+
+    padding: 4px 10px;
+
+    border-radius: var(--radius-round);
+
+    font-size: var(--font-size-xs);
+
+    font-weight: var(--font-weight-bold);
+
+}
+
+.milestone-completed {
+
+    background: rgba(22,163,74,.15);
+
+    color: var(--color-success);
+
+}
+
+.milestone-running {
+
+    background: rgba(59,130,246,.15);
+
+    color: var(--brand-secondary);
+
+}
+
+.milestone-waiting {
+
+    background: rgba(245,158,11,.15);
+
+    color: var(--color-warning);
+
+}
+
+.milestone-review {
+
+    background: rgba(14,165,233,.15);
+
+    color: var(--color-info);
+
+}
+
+.milestone-failed {
+
+    background: rgba(220,38,38,.15);
+
+    color: var(--color-danger);
+
+}
+
+/* ============================================================
+   Priority Indicator
+============================================================ */
+
+.milestone-critical {
+
+    border-left-color: var(--color-danger);
+
+}
+
+.milestone-high {
+
+    border-left-color: var(--color-warning);
+
+}
+
+.milestone-normal {
+
+    border-left-color: var(--brand-primary);
+
+}
+
+/* ============================================================
+   Responsive
+============================================================ */
+
+@media (max-width:768px){
+
+    .milestone-details{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .milestone-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:var(--space-2);
+
+    }
+
+}
