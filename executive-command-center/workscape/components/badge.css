@@ -1,0 +1,158 @@
+/* ============================================================
+   SKOS Executive Command Center
+   ------------------------------------------------------------
+   Module    : WorkScape
+   Component : Badge
+   File      : badge.css
+   Version   : 1.0.0
+   Build     : BUILD-000529
+   Purpose   : Reusable Badge Component
+============================================================ */
+
+/* ============================================================
+   Base Badge
+============================================================ */
+
+.badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-height:24px;
+
+    padding:4px 10px;
+
+    border-radius:999px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    line-height:1;
+
+    white-space:nowrap;
+
+    user-select:none;
+
+}
+
+/* ============================================================
+   Primary
+============================================================ */
+
+.badge-primary{
+
+    background:var(--brand-primary);
+
+    color:#ffffff;
+
+}
+
+/* ============================================================
+   Success
+============================================================ */
+
+.badge-success{
+
+    background:var(--color-success);
+
+    color:#ffffff;
+
+}
+
+/* ============================================================
+   Warning
+============================================================ */
+
+.badge-warning{
+
+    background:var(--color-warning);
+
+    color:#ffffff;
+
+}
+
+/* ============================================================
+   Danger
+============================================================ */
+
+.badge-danger{
+
+    background:var(--color-danger);
+
+    color:#ffffff;
+
+}
+
+/* ============================================================
+   Info
+============================================================ */
+
+.badge-info{
+
+    background:var(--color-info);
+
+    color:#ffffff;
+
+}
+
+/* ============================================================
+   Neutral
+============================================================ */
+
+.badge-neutral{
+
+    background:var(--background-panel);
+
+    color:var(--text-primary);
+
+    border:1px solid var(--border-light);
+
+}
+
+/* ============================================================
+   Outline
+============================================================ */
+
+.badge-outline{
+
+    background:transparent;
+
+    border:1px solid var(--brand-primary);
+
+    color:var(--brand-primary);
+
+}
+
+/* ============================================================
+   Sizes
+============================================================ */
+
+.badge-sm{
+
+    font-size:11px;
+
+    padding:3px 8px;
+
+}
+
+.badge-lg{
+
+    font-size:13px;
+
+    padding:6px 14px;
+
+}
+
+/* ============================================================
+   Rounded Square
+============================================================ */
+
+.badge-square{
+
+    border-radius:6px;
+
+}
