@@ -1,0 +1,84 @@
+{
+  "version": "1.0.0",
+  "build": "BUILD-000521",
+
+  "navigation": {
+
+    "defaultRoute": "dashboard",
+
+    "routes": [
+
+      {
+        "id": "dashboard",
+        "title": "Dashboard",
+        "icon": "dashboard",
+        "path": "/dashboard",
+        "renderer": "DashboardRenderer",
+        "enabled": true,
+        "order": 1
+      },
+
+      {
+        "id": "missions",
+        "title": "Missions",
+        "icon": "flag",
+        "path": "/missions",
+        "renderer": "MissionRenderer",
+        "enabled": true,
+        "order": 2
+      },
+
+      {
+        "id": "tasks",
+        "title": "Tasks",
+        "icon": "checklist",
+        "path": "/tasks",
+        "renderer": "TaskRenderer",
+        "enabled": true,
+        "order": 3
+      },
+
+      {
+        "id": "milestones",
+        "title": "Milestones",
+        "icon": "milestone",
+        "path": "/milestones",
+        "renderer": "MilestoneRenderer",
+        "enabled": true,
+        "order": 4
+      },
+
+      {
+        "id": "operations",
+        "title": "Operations",
+        "icon": "settings",
+        "path": "/operations",
+        "renderer": "OperationRenderer",
+        "enabled": true,
+        "order": 5
+      },
+
+      {
+        "id": "progress",
+        "title": "Progress",
+        "icon": "chart-line",
+        "path": "/progress",
+        "renderer": "ProgressRenderer",
+        "enabled": true,
+        "order": 6
+      },
+
+      {
+        "id": "history",
+        "title": "History",
+        "icon": "history",
+        "path": "/history",
+        "renderer": "HistoryRenderer",
+        "enabled": true,
+        "order": 7
+      }
+
+    ]
+
+  }
+}
