@@ -1,0 +1,204 @@
+/* ============================================================
+   SKOS Executive Command Center
+   ------------------------------------------------------------
+   Module    : WorkScape
+   Component : Button
+   File      : button.css
+   Version   : 1.0.0
+   Build     : BUILD-000530
+   Purpose   : Reusable Button Component
+============================================================ */
+
+/* ============================================================
+   Base Button
+============================================================ */
+
+.button{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+    padding:10px 18px;
+
+    border:none;
+
+    border-radius:var(--radius-md);
+
+    cursor:pointer;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    transition:var(--transition-normal);
+
+    user-select:none;
+
+    text-decoration:none;
+
+}
+
+/* ============================================================
+   Primary
+============================================================ */
+
+.button-primary{
+
+    background:var(--brand-primary);
+
+    color:#ffffff;
+
+}
+
+.button-primary:hover{
+
+    filter:brightness(1.08);
+
+}
+
+/* ============================================================
+   Success
+============================================================ */
+
+.button-success{
+
+    background:var(--color-success);
+
+    color:#ffffff;
+
+}
+
+.button-success:hover{
+
+    filter:brightness(1.08);
+
+}
+
+/* ============================================================
+   Warning
+============================================================ */
+
+.button-warning{
+
+    background:var(--color-warning);
+
+    color:#ffffff;
+
+}
+
+.button-warning:hover{
+
+    filter:brightness(1.08);
+
+}
+
+/* ============================================================
+   Danger
+============================================================ */
+
+.button-danger{
+
+    background:var(--color-danger);
+
+    color:#ffffff;
+
+}
+
+.button-danger:hover{
+
+    filter:brightness(1.08);
+
+}
+
+/* ============================================================
+   Secondary
+============================================================ */
+
+.button-secondary{
+
+    background:var(--background-panel);
+
+    color:var(--text-primary);
+
+    border:1px solid var(--border-light);
+
+}
+
+.button-secondary:hover{
+
+    background:var(--background-card);
+
+}
+
+/* ============================================================
+   Outline
+============================================================ */
+
+.button-outline{
+
+    background:transparent;
+
+    color:var(--brand-primary);
+
+    border:1px solid var(--brand-primary);
+
+}
+
+.button-outline:hover{
+
+    background:var(--brand-primary);
+
+    color:#ffffff;
+
+}
+
+/* ============================================================
+   Sizes
+============================================================ */
+
+.button-sm{
+
+    padding:6px 12px;
+
+    font-size:12px;
+
+}
+
+.button-lg{
+
+    padding:14px 24px;
+
+    font-size:16px;
+
+}
+
+/* ============================================================
+   Full Width
+============================================================ */
+
+.button-block{
+
+    width:100%;
+
+}
+
+/* ============================================================
+   Disabled
+============================================================ */
+
+.button:disabled,
+
+.button-disabled{
+
+    opacity:.5;
+
+    cursor:not-allowed;
+
+    pointer-events:none;
+
+}
