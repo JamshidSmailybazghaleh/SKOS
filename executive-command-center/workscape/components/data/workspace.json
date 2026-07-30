@@ -1,0 +1,165 @@
+{
+    "workspace": {
+
+        "id": "ecc-workspace",
+
+        "name": "SKOS Executive Workspace",
+
+        "version": "1.0.0",
+
+        "type": "executive-command-center",
+
+        "description":
+            "Central operational workspace for SKOS ecosystem management.",
+
+
+        "layout": {
+
+            "mode": "dashboard",
+
+            "sidebar": true,
+
+            "topbar": true,
+
+            "responsive": true
+
+        },
+
+
+        "components": {
+
+
+            "dashboard": {
+
+                "enabled": true,
+
+                "path":
+                    "components/dashboard/",
+
+                "entry":
+                    "dashboard.html",
+
+                "controller":
+                    "dashboard.js",
+
+                "priority": 1
+
+            },
+
+
+            "missionBoard": {
+
+                "enabled": true,
+
+                "path":
+                    "components/mission-board/",
+
+                "entry":
+                    "mission-board.html",
+
+                "controller":
+                    "mission-board.js",
+
+                "priority": 2
+
+            },
+
+
+            "taskBoard": {
+
+                "enabled": true,
+
+                "path":
+                    "components/task-board/",
+
+                "entry":
+                    "task-board.html",
+
+                "controller":
+                    "task-board.js",
+
+                "priority": 3
+
+            },
+
+
+            "operationBoard": {
+
+                "enabled": true,
+
+                "path":
+                    "components/operation-board/",
+
+                "entry":
+                    "operation-board.html",
+
+                "controller":
+                    "operation-board.js",
+
+                "priority": 4
+
+            }
+
+        },
+
+
+        "state": {
+
+            "defaultView":
+                "dashboard",
+
+            "persistence":
+                true,
+
+            "autoSave":
+                true
+
+        },
+
+
+        "dataSources": {
+
+
+            "dashboard":
+                "dashboard.json",
+
+
+            "missions":
+                "missions.json",
+
+
+            "tasks":
+                "tasks.json",
+
+
+            "operations":
+                "operations.json"
+
+        },
+
+
+        "permissions": {
+
+            "view": true,
+
+            "edit": true,
+
+            "execute": true,
+
+            "admin": false
+
+        },
+
+
+        "logging": {
+
+            "enabled": true,
+
+            "level":
+                "info"
+
+        }
+
+    }
+
+}
