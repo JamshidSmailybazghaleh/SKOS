@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round">
+
+    <!-- Axes -->
+    <path d="M4 20H20"/>
+    <path d="M4 20V4"/>
+
+    <!-- Bars -->
+    <rect x="6" y="13" width="2.5" height="7" rx="0.5"/>
+    <rect x="11" y="10" width="2.5" height="10" rx="0.5"/>
+    <rect x="16" y="6" width="2.5" height="14" rx="0.5"/>
+
+    <!-- Trend Line -->
+    <path d="M7.2 12L12.2 9L17.2 5"/>
+
+</svg>
