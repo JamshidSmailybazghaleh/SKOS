@@ -1,0 +1,210 @@
+{
+    "analytics": {
+
+        "version": "1.0.0",
+
+        "lastUpdated":
+            "2026-07-31T00:00:00Z",
+
+
+        "overview": {
+
+            "systemHealth": 92,
+
+            "executionEfficiency": 84,
+
+            "knowledgeGrowth": 76,
+
+            "automationLevel": 35
+
+        },
+
+
+        "kpis": [
+
+            {
+
+                "id":
+                    "KPI-001",
+
+                "name":
+                    "Active Missions",
+
+                "value": 2,
+
+                "target": 5,
+
+                "unit":
+                    "count",
+
+                "trend":
+                    "up"
+
+            },
+
+
+            {
+
+                "id":
+                    "KPI-002",
+
+                "name":
+                    "Completed Tasks",
+
+                "value": 1,
+
+                "target": 10,
+
+                "unit":
+                    "count",
+
+                "trend":
+                    "up"
+
+            },
+
+
+            {
+
+                "id":
+                    "KPI-003",
+
+                "name":
+                    "Running Operations",
+
+                "value": 2,
+
+                "target": 8,
+
+                "unit":
+                    "count",
+
+                "trend":
+                    "stable"
+
+            },
+
+
+            {
+
+                "id":
+                    "KPI-004",
+
+                "name":
+                    "System Reliability",
+
+                "value": 98,
+
+                "target": 99,
+
+                "unit":
+                    "percent",
+
+                "trend":
+                    "stable"
+
+            }
+
+        ],
+
+
+        "performance": {
+
+
+            "missions": {
+
+                "total": 4,
+
+                "averageProgress": 55
+
+            },
+
+
+            "tasks": {
+
+                "total": 6,
+
+                "averageProgress": 52
+
+            },
+
+
+            "operations": {
+
+                "total": 5,
+
+                "successRate": 100
+
+            }
+
+        },
+
+
+        "timeline": [
+
+            {
+
+                "date":
+                    "2026-07-01",
+
+                "events": 12
+
+            },
+
+
+            {
+
+                "date":
+                    "2026-07-15",
+
+                "events": 24
+
+            },
+
+
+            {
+
+                "date":
+                    "2026-07-31",
+
+                "events": 41
+
+            }
+
+        ],
+
+
+        "alerts": [
+
+            {
+
+                "id":
+                    "ALERT-001",
+
+                "level":
+                    "info",
+
+                "message":
+                    "System operating normally."
+
+            },
+
+
+            {
+
+                "id":
+                    "ALERT-002",
+
+                "level":
+                    "warning",
+
+                "message":
+                    "Automation coverage requires improvement."
+
+            }
+
+        ]
+
+    }
+
+}
