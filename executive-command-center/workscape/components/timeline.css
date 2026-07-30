@@ -1,0 +1,188 @@
+/* ============================================================
+   SKOS Executive Command Center
+   ------------------------------------------------------------
+   Module    : WorkScape
+   Component : Timeline
+   File      : timeline.css
+   Version   : 1.0.0
+   Build     : BUILD-000532
+   Purpose   : Reusable Timeline Component
+============================================================ */
+
+/* ============================================================
+   Timeline Container
+============================================================ */
+
+.timeline{
+
+    position:relative;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+    padding-left:32px;
+
+}
+
+/* ============================================================
+   Vertical Line
+============================================================ */
+
+.timeline::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:12px;
+
+    top:0;
+
+    bottom:0;
+
+    width:2px;
+
+    background:var(--border-light);
+
+}
+
+/* ============================================================
+   Timeline Item
+============================================================ */
+
+.timeline-item{
+
+    position:relative;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+/* ============================================================
+   Timeline Marker
+============================================================ */
+
+.timeline-marker{
+
+    position:absolute;
+
+    left:-26px;
+
+    top:4px;
+
+    width:16px;
+
+    height:16px;
+
+    border-radius:50%;
+
+    background:var(--brand-primary);
+
+    border:3px solid var(--background-panel);
+
+}
+
+/* ============================================================
+   Timeline Content
+============================================================ */
+
+.timeline-content{
+
+    background:var(--background-card);
+
+    border:1px solid var(--border-light);
+
+    border-radius:var(--radius-md);
+
+    padding:16px;
+
+    box-shadow:var(--shadow-sm);
+
+}
+
+/* ============================================================
+   Timeline Title
+============================================================ */
+
+.timeline-title{
+
+    font-size:15px;
+
+    font-weight:600;
+
+    color:var(--text-primary);
+
+}
+
+/* ============================================================
+   Timeline Date
+============================================================ */
+
+.timeline-date{
+
+    font-size:12px;
+
+    color:var(--text-secondary);
+
+}
+
+/* ============================================================
+   Timeline Description
+============================================================ */
+
+.timeline-description{
+
+    font-size:14px;
+
+    color:var(--text-primary);
+
+    line-height:1.6;
+
+}
+
+/* ============================================================
+   Status Colors
+============================================================ */
+
+.timeline-success .timeline-marker{
+
+    background:var(--color-success);
+
+}
+
+.timeline-warning .timeline-marker{
+
+    background:var(--color-warning);
+
+}
+
+.timeline-danger .timeline-marker{
+
+    background:var(--color-danger);
+
+}
+
+.timeline-info .timeline-marker{
+
+    background:var(--color-info);
+
+}
+
+/* ============================================================
+   Hover
+============================================================ */
+
+.timeline-content:hover{
+
+    box-shadow:var(--shadow-md);
+
+    transition:var(--transition-normal);
+
+}
