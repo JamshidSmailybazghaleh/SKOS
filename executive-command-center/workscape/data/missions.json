@@ -1,0 +1,220 @@
+{
+    "missions": {
+
+        "version": "1.0.0",
+
+        "lastUpdated":
+            "2026-07-31T00:00:00Z",
+
+
+        "summary": {
+
+            "total": 4,
+
+            "active": 2,
+
+            "completed": 1,
+
+            "priority": 1
+
+        },
+
+
+        "items": [
+
+            {
+
+                "id":
+                    "MISSION-001",
+
+                "title":
+                    "Build SKOS Knowledge Infrastructure",
+
+                "description":
+                    "Establish the foundational knowledge operating system architecture.",
+
+
+                "status":
+                    "active",
+
+
+                "priority":
+                    "high",
+
+
+                "progress": 65,
+
+
+                "owner":
+                    "SKOS Core Team",
+
+
+                "created":
+                    "2026-07-01",
+
+
+                "deadline":
+                    "2026-12-31",
+
+
+                "tags": [
+
+                    "architecture",
+
+                    "knowledge",
+
+                    "foundation"
+
+                ]
+
+            },
+
+
+            {
+
+                "id":
+                    "MISSION-002",
+
+                "title":
+                    "Develop Executive Command Center",
+
+                "description":
+                    "Create operational dashboard and management interface.",
+
+
+                "status":
+                    "active",
+
+
+                "priority":
+                    "medium",
+
+
+                "progress": 45,
+
+
+                "owner":
+                    "Interface Team",
+
+
+                "created":
+                    "2026-07-15",
+
+
+                "deadline":
+                    "2026-10-30",
+
+
+                "tags": [
+
+                    "ui",
+
+                    "dashboard",
+
+                    "control-center"
+
+                ]
+
+            },
+
+
+            {
+
+                "id":
+                    "MISSION-003",
+
+                "title":
+                    "Create Digital Knowledge Library",
+
+                "description":
+                    "Organize publications, documents and intellectual assets.",
+
+
+                "status":
+                    "completed",
+
+
+                "priority":
+                    "high",
+
+
+                "progress": 100,
+
+
+                "owner":
+                    "Publication Team",
+
+
+                "created":
+                    "2026-05-01",
+
+
+                "deadline":
+                    "2026-07-15",
+
+
+                "tags": [
+
+                    "library",
+
+                    "publication",
+
+                    "archive"
+
+                ]
+
+            },
+
+
+            {
+
+                "id":
+                    "MISSION-004",
+
+                "title":
+                    "Commercial Product Activation",
+
+                "description":
+                    "Prepare knowledge products for sustainable revenue generation.",
+
+
+                "status":
+                    "planned",
+
+
+                "priority":
+                    "high",
+
+
+                "progress": 10,
+
+
+                "owner":
+                    "Business Team",
+
+
+                "created":
+                    "2026-07-20",
+
+
+                "deadline":
+                    "2027-01-01",
+
+
+                "tags": [
+
+                    "marketplace",
+
+                    "revenue",
+
+                    "products"
+
+                ]
+
+            }
+
+        ]
+
+    }
+
+}
