@@ -1,0 +1,62 @@
+{
+  "version": "1.0.0",
+  "build": "BUILD-000519",
+
+  "widgets": [
+
+    {
+      "id": "mission-board",
+      "title": "Mission Board",
+      "renderer": "MissionRenderer",
+      "container": "workspace-dashboard",
+      "enabled": true,
+      "order": 1
+    },
+
+    {
+      "id": "task-board",
+      "title": "Task Board",
+      "renderer": "TaskRenderer",
+      "container": "workspace-dashboard",
+      "enabled": true,
+      "order": 2
+    },
+
+    {
+      "id": "milestone-board",
+      "title": "Milestone Board",
+      "renderer": "MilestoneRenderer",
+      "container": "workspace-dashboard",
+      "enabled": true,
+      "order": 3
+    },
+
+    {
+      "id": "operation-board",
+      "title": "Operation Board",
+      "renderer": "OperationRenderer",
+      "container": "workspace-dashboard",
+      "enabled": true,
+      "order": 4
+    },
+
+    {
+      "id": "progress-board",
+      "title": "Progress Board",
+      "renderer": "ProgressRenderer",
+      "container": "workspace-dashboard",
+      "enabled": true,
+      "order": 5
+    },
+
+    {
+      "id": "history-board",
+      "title": "History Board",
+      "renderer": "HistoryRenderer",
+      "container": "workspace-dashboard",
+      "enabled": true,
+      "order": 6
+    }
+
+  ]
+}
