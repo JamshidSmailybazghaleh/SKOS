@@ -1,0 +1,309 @@
+/*
+==========================================================
+SKOS Executive Command Center
+Operation Board Component
+Version : 1.0.0
+==========================================================
+*/
+
+
+/* ==========================================
+   Operation Board
+========================================== */
+
+.operation-board{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+    width:100%;
+
+    padding:24px;
+
+    background:var(--surface-background);
+
+    color:var(--text-primary);
+
+}
+
+
+/* ==========================================
+   Header
+========================================== */
+
+.operation-board-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+}
+
+
+.operation-board-title{
+
+    margin:0;
+
+    font-size:28px;
+
+    font-weight:700;
+
+}
+
+
+.operation-board-subtitle{
+
+    margin-top:8px;
+
+    font-size:14px;
+
+    color:var(--text-secondary);
+
+}
+
+
+
+/* ==========================================
+   Summary Cards
+========================================== */
+
+.operation-summary{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(220px,1fr));
+
+    gap:20px;
+
+}
+
+
+.operation-card{
+
+    min-height:120px;
+
+    padding:20px;
+
+    border-radius:12px;
+
+    background:var(--surface-primary);
+
+    border:1px solid var(--border-color);
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.06);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+
+}
+
+
+.operation-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 6px 16px rgba(0,0,0,.10);
+
+}
+
+
+
+/* ==========================================
+   Workflow Area
+========================================== */
+
+.workflow-area{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+.operation-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:16px;
+
+    min-height:300px;
+
+    padding:20px;
+
+    border-radius:12px;
+
+    background:var(--surface-primary);
+
+    border:1px solid var(--border-color);
+
+}
+
+
+
+/* ==========================================
+   Operation Item
+========================================== */
+
+.operation-item{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:16px;
+
+    border-radius:10px;
+
+    background:var(--surface-secondary);
+
+    border:1px solid var(--border-color);
+
+}
+
+
+.operation-item:hover{
+
+    background:var(--surface-hover);
+
+}
+
+
+/* ==========================================
+   Status Indicators
+========================================== */
+
+.operation-running{
+
+    border-left:
+
+        4px solid #2563eb;
+
+}
+
+
+.operation-pending{
+
+    border-left:
+
+        4px solid #eab308;
+
+}
+
+
+.operation-completed{
+
+    border-left:
+
+        4px solid #16a34a;
+
+}
+
+
+.operation-failed{
+
+    border-left:
+
+        4px solid #dc2626;
+
+}
+
+
+
+/* ==========================================
+   Execution Monitor
+========================================== */
+
+.execution-monitor{
+
+    display:grid;
+
+    grid-template-columns:
+
+        repeat(2,1fr);
+
+    gap:20px;
+
+}
+
+
+.execution-panel{
+
+    min-height:180px;
+
+    padding:20px;
+
+    border-radius:12px;
+
+    background:var(--surface-primary);
+
+    border:1px solid var(--border-color);
+
+}
+
+
+
+/* ==========================================
+   Footer
+========================================== */
+
+.operation-board-footer{
+
+    padding-top:12px;
+
+    border-top:
+
+        1px solid var(--border-color);
+
+    color:var(--text-secondary);
+
+    font-size:12px;
+
+}
+
+
+
+/* ==========================================
+   Responsive
+========================================== */
+
+@media(max-width:1024px){
+
+    .execution-monitor{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+
+@media(max-width:768px){
+
+    .operation-board{
+
+        padding:16px;
+
+    }
+
+
+    .operation-board-title{
+
+        font-size:22px;
+
+    }
+
+}
