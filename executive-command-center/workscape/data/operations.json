@@ -1,0 +1,339 @@
+{
+    "operations": {
+
+        "version": "1.0.0",
+
+        "lastUpdated":
+            "2026-07-31T00:00:00Z",
+
+
+        "summary": {
+
+            "total": 5,
+
+            "running": 2,
+
+            "pending": 2,
+
+            "completed": 1,
+
+            "failed": 0
+
+        },
+
+
+        "items": [
+
+            {
+
+                "id":
+                    "OPERATION-001",
+
+                "taskId":
+                    "TASK-001",
+
+                "name":
+                    "Architecture Validation Process",
+
+
+                "description":
+                    "Validate SKOS architecture documents and subsystem relationships.",
+
+
+                "status":
+                    "running",
+
+
+                "priority":
+                    "high",
+
+
+                "progress": 75,
+
+
+                "type":
+                    "validation",
+
+
+                "executor":
+                    "architecture-engine",
+
+
+                "workflow":
+
+                [
+
+                    {
+
+                        "step": 1,
+
+                        "name":
+                            "Load Documents",
+
+                        "status":
+                            "completed"
+
+                    },
+
+                    {
+
+                        "step": 2,
+
+                        "name":
+                            "Validate Structure",
+
+                        "status":
+                            "running"
+
+                    },
+
+                    {
+
+                        "step": 3,
+
+                        "name":
+                            "Generate Report",
+
+                        "status":
+                            "pending"
+
+                    }
+
+                ],
+
+
+                "started":
+                    "2026-07-31T08:00:00Z",
+
+
+                "estimatedCompletion":
+                    "2026-07-31T12:00:00Z"
+
+
+            },
+
+
+            {
+
+                "id":
+                    "OPERATION-002",
+
+                "taskId":
+                    "TASK-002",
+
+                "name":
+                    "Component Integration Build",
+
+
+                "description":
+                    "Integrate WorkScape UI components.",
+
+
+                "status":
+                    "running",
+
+
+                "priority":
+                    "high",
+
+
+                "progress": 60,
+
+
+                "type":
+                    "build",
+
+
+                "executor":
+                    "frontend-engine",
+
+
+                "workflow":
+
+                [
+
+                    {
+
+                        "step":1,
+
+                        "name":
+                            "Load Components",
+
+                        "status":
+                            "completed"
+
+                    },
+
+                    {
+
+                        "step":2,
+
+                        "name":
+                            "Connect Controllers",
+
+                        "status":
+                            "running"
+
+                    }
+
+                ],
+
+
+                "started":
+                    "2026-07-31T09:00:00Z"
+
+
+            },
+
+
+            {
+
+                "id":
+                    "OPERATION-003",
+
+                "taskId":
+                    "TASK-003",
+
+                "name":
+                    "JSON Data Configuration",
+
+
+                "description":
+                    "Create and verify WorkScape data files.",
+
+
+                "status":
+                    "pending",
+
+
+                "priority":
+                    "medium",
+
+
+                "progress": 40,
+
+
+                "type":
+                    "configuration",
+
+
+                "executor":
+                    "data-engine",
+
+
+                "workflow":
+
+                [
+
+                    {
+
+                        "step":1,
+
+                        "name":
+                            "Create Schemas",
+
+                        "status":
+                            "completed"
+
+                    },
+
+                    {
+
+                        "step":2,
+
+                        "name":
+                            "Validate Data",
+
+                        "status":
+                            "pending"
+
+                    }
+
+                ]
+
+            },
+
+
+            {
+
+                "id":
+                    "OPERATION-004",
+
+                "taskId":
+                    "TASK-005",
+
+                "name":
+                    "Commercial Product Preparation",
+
+
+                "description":
+                    "Prepare first SKOS knowledge products.",
+
+
+                "status":
+                    "pending",
+
+
+                "priority":
+                    "high",
+
+
+                "progress": 15,
+
+
+                "type":
+                    "business",
+
+
+                "executor":
+                    "marketplace-engine"
+
+
+            },
+
+
+            {
+
+                "id":
+                    "OPERATION-005",
+
+                "taskId":
+                    "TASK-004",
+
+                "name":
+                    "Archive Synchronization",
+
+
+                "description":
+                    "Synchronize completed assets with digital archive.",
+
+
+                "status":
+                    "completed",
+
+
+                "priority":
+                    "low",
+
+
+                "progress":100,
+
+
+                "type":
+                    "archive",
+
+
+                "executor":
+                    "preservation-engine",
+
+
+                "completed":
+                    "2026-07-15T15:00:00Z"
+
+            }
+
+        ]
+
+    }
+
+}
