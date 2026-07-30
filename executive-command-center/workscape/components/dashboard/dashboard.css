@@ -1,0 +1,178 @@
+/*
+==========================================================
+SKOS Executive Command Center
+Dashboard Component
+Version : 1.0.0
+==========================================================
+*/
+
+/* ==========================================
+   Dashboard
+========================================== */
+
+.dashboard{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+    width:100%;
+
+    padding:24px;
+
+    background:var(--surface-background);
+
+    color:var(--text-primary);
+
+}
+
+/* ==========================================
+   Header
+========================================== */
+
+.dashboard-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+}
+
+.dashboard-title{
+
+    margin:0;
+
+    font-size:28px;
+
+    font-weight:700;
+
+}
+
+.dashboard-subtitle{
+
+    margin-top:8px;
+
+    font-size:14px;
+
+    color:var(--text-secondary);
+
+}
+
+/* ==========================================
+   Summary Cards
+========================================== */
+
+.dashboard-summary{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(240px,1fr));
+
+    gap:20px;
+
+}
+
+.dashboard-card{
+
+    min-height:120px;
+
+    padding:20px;
+
+    border-radius:12px;
+
+    background:var(--surface-primary);
+
+    border:1px solid var(--border-color);
+
+    box-shadow:0 2px 8px rgba(0,0,0,.06);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+
+}
+
+.dashboard-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 6px 16px rgba(0,0,0,.10);
+
+}
+
+/* ==========================================
+   Main Dashboard
+========================================== */
+
+.dashboard-main{
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr;
+
+    gap:24px;
+
+}
+
+.dashboard-column{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:20px;
+
+}
+
+/* ==========================================
+   Footer
+========================================== */
+
+.dashboard-footer{
+
+    padding-top:12px;
+
+    border-top:1px solid var(--border-color);
+
+    color:var(--text-secondary);
+
+    font-size:12px;
+
+}
+
+/* ==========================================
+   Responsive
+========================================== */
+
+@media (max-width:1024px){
+
+    .dashboard-main{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media (max-width:768px){
+
+    .dashboard{
+
+        padding:16px;
+
+        gap:16px;
+
+    }
+
+    .dashboard-title{
+
+        font-size:22px;
+
+    }
+
+}
