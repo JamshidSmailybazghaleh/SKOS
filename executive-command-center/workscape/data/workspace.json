@@ -1,0 +1,62 @@
+{
+  "workspaceId": "WS-000001",
+
+  "name": "WorkScape",
+
+  "displayName": "SKOS WorkScape",
+
+  "description": "Standard Operational Workspace for the Smaily Knowledge Operating System.",
+
+  "version": "1.0.0",
+
+  "build": "BUILD-000518",
+
+  "status": "ACTIVE",
+
+  "owner": "Executive Command Center",
+
+  "system": "SKOS",
+
+  "language": "en",
+
+  "theme": "default",
+
+  "defaultView": "dashboard",
+
+  "startupModule": "dashboard",
+
+  "navigation": {
+    "enabled": true,
+    "defaultRoute": "dashboard"
+  },
+
+  "modules": [
+    "dashboard",
+    "missions",
+    "tasks",
+    "operations",
+    "progress",
+    "history"
+  ],
+
+  "widgets": [
+    "mission-board",
+    "task-board",
+    "operation-board",
+    "progress-board",
+    "history-board"
+  ],
+
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true
+  },
+
+  "metadata": {
+    "createdBy": "SKOS",
+    "documentVersion": "1.0.0",
+    "lastUpdated": "2026-07-30",
+    "environment": "production"
+  }
+}
