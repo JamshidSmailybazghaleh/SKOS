@@ -1,0 +1,76 @@
+{
+  "version": "1.0.0",
+  "build": "BUILD-000520",
+
+  "dashboard": {
+
+    "id": "dashboard-main",
+
+    "title": "Executive Dashboard",
+
+    "layout": "grid",
+
+    "columns": 2,
+
+    "gap": "20px",
+
+    "widgets": [
+
+      {
+        "id": "mission-board",
+        "row": 1,
+        "column": 1,
+        "width": 1,
+        "height": 1,
+        "visible": true
+      },
+
+      {
+        "id": "task-board",
+        "row": 1,
+        "column": 2,
+        "width": 1,
+        "height": 1,
+        "visible": true
+      },
+
+      {
+        "id": "milestone-board",
+        "row": 2,
+        "column": 1,
+        "width": 1,
+        "height": 1,
+        "visible": true
+      },
+
+      {
+        "id": "operation-board",
+        "row": 2,
+        "column": 2,
+        "width": 1,
+        "height": 1,
+        "visible": true
+      },
+
+      {
+        "id": "progress-board",
+        "row": 3,
+        "column": 1,
+        "width": 1,
+        "height": 1,
+        "visible": true
+      },
+
+      {
+        "id": "history-board",
+        "row": 3,
+        "column": 2,
+        "width": 1,
+        "height": 1,
+        "visible": true
+      }
+
+    ]
+
+  }
+}
