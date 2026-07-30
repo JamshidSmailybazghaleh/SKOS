@@ -1,76 +1,221 @@
 {
-  "version": "1.0.0",
-  "build": "BUILD-000520",
+    "dashboard": {
 
-  "dashboard": {
+        "id": "main-dashboard",
 
-    "id": "dashboard-main",
+        "name": "SKOS Executive Dashboard",
 
-    "title": "Executive Dashboard",
+        "version": "1.0.0",
 
-    "layout": "grid",
+        "description":
+            "Executive overview dashboard for SKOS ecosystem status.",
 
-    "columns": 2,
 
-    "gap": "20px",
+        "refresh": {
 
-    "widgets": [
+            "enabled": true,
 
-      {
-        "id": "mission-board",
-        "row": 1,
-        "column": 1,
-        "width": 1,
-        "height": 1,
-        "visible": true
-      },
+            "interval": 30000
 
-      {
-        "id": "task-board",
-        "row": 1,
-        "column": 2,
-        "width": 1,
-        "height": 1,
-        "visible": true
-      },
+        },
 
-      {
-        "id": "milestone-board",
-        "row": 2,
-        "column": 1,
-        "width": 1,
-        "height": 1,
-        "visible": true
-      },
 
-      {
-        "id": "operation-board",
-        "row": 2,
-        "column": 2,
-        "width": 1,
-        "height": 1,
-        "visible": true
-      },
+        "widgets": [
 
-      {
-        "id": "progress-board",
-        "row": 3,
-        "column": 1,
-        "width": 1,
-        "height": 1,
-        "visible": true
-      },
+            {
 
-      {
-        "id": "history-board",
-        "row": 3,
-        "column": 2,
-        "width": 1,
-        "height": 1,
-        "visible": true
-      }
+                "id": "mission-summary",
 
-    ]
+                "type": "summary-card",
 
-  }
+                "title": "Mission",
+
+                "source":
+                    "missions.json",
+
+                "position": 1,
+
+                "enabled": true
+
+            },
+
+
+            {
+
+                "id": "task-summary",
+
+                "type": "summary-card",
+
+                "title": "Tasks",
+
+                "source":
+                    "tasks.json",
+
+                "position": 2,
+
+                "enabled": true
+
+            },
+
+
+            {
+
+                "id": "operation-summary",
+
+                "type": "summary-card",
+
+                "title": "Operations",
+
+                "source":
+                    "operations.json",
+
+                "position": 3,
+
+                "enabled": true
+
+            },
+
+
+            {
+
+                "id": "analytics-summary",
+
+                "type": "analytics-card",
+
+                "title": "Analytics",
+
+                "source":
+                    "analytics.json",
+
+                "position": 4,
+
+                "enabled": true
+
+            }
+
+        ],
+
+
+        "sections": {
+
+
+            "overview": {
+
+                "title":
+                    "Executive Overview",
+
+                "layout":
+                    "primary",
+
+                "widgets": [
+
+                    "mission-summary",
+
+                    "task-summary",
+
+                    "operation-summary"
+
+                ]
+
+            },
+
+
+            "monitoring": {
+
+                "title":
+                    "System Monitoring",
+
+                "layout":
+                    "secondary",
+
+                "widgets": [
+
+                    "analytics-summary"
+
+                ]
+
+            }
+
+        },
+
+
+        "metrics": {
+
+
+            "systemHealth": {
+
+                "enabled": true,
+
+                "label":
+                    "System Health",
+
+                "unit":
+                    "percent"
+
+            },
+
+
+            "activeMissions": {
+
+                "enabled": true,
+
+                "label":
+                    "Active Missions",
+
+                "unit":
+                    "count"
+
+            },
+
+
+            "activeTasks": {
+
+                "enabled": true,
+
+                "label":
+                    "Active Tasks",
+
+                "unit":
+                    "count"
+
+            },
+
+
+            "runningOperations": {
+
+                "enabled": true,
+
+                "label":
+                    "Running Operations",
+
+                "unit":
+                    "count"
+
+            }
+
+        },
+
+
+        "permissions": {
+
+            "view": true,
+
+            "edit": true,
+
+            "configure": false
+
+        },
+
+
+        "logging": {
+
+            "enabled": true,
+
+            "level":
+                "info"
+
+        }
+
+    }
+
 }
