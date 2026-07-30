@@ -1,0 +1,358 @@
+{
+    "tasks": {
+
+        "version": "1.0.0",
+
+        "lastUpdated":
+            "2026-07-31T00:00:00Z",
+
+
+        "summary": {
+
+            "total": 6,
+
+            "todo": 2,
+
+            "inProgress": 3,
+
+            "completed": 1,
+
+            "priority": 2
+
+        },
+
+
+        "items": [
+
+            {
+
+                "id":
+                    "TASK-001",
+
+                "missionId":
+                    "MISSION-001",
+
+                "title":
+                    "Finalize SKOS Core Architecture",
+
+                "description":
+                    "Complete architecture documents and core subsystem definitions.",
+
+
+                "status":
+                    "in-progress",
+
+
+                "priority":
+                    "high",
+
+
+                "progress": 70,
+
+
+                "owner":
+                    "Architecture Team",
+
+
+                "assignee":
+                    "System Architect",
+
+
+                "created":
+                    "2026-07-10",
+
+
+                "deadline":
+                    "2026-08-30",
+
+
+                "tags": [
+
+                    "architecture",
+
+                    "core",
+
+                    "design"
+
+                ]
+
+            },
+
+
+            {
+
+                "id":
+                    "TASK-002",
+
+                "missionId":
+                    "MISSION-002",
+
+                "title":
+                    "Complete WorkScape Components",
+
+                "description":
+                    "Develop dashboard, mission, task and operation interfaces.",
+
+
+                "status":
+                    "in-progress",
+
+
+                "priority":
+                    "high",
+
+
+                "progress": 80,
+
+
+                "owner":
+                    "Interface Team",
+
+
+                "assignee":
+                    "Frontend Developer",
+
+
+                "created":
+                    "2026-07-20",
+
+
+                "deadline":
+                    "2026-09-01",
+
+
+                "tags": [
+
+                    "frontend",
+
+                    "components",
+
+                    "workscape"
+
+                ]
+
+            },
+
+
+            {
+
+                "id":
+                    "TASK-003",
+
+                "missionId":
+                    "MISSION-002",
+
+                "title":
+                    "Create Data Layer Configuration",
+
+                "description":
+                    "Prepare JSON based configuration and data sources.",
+
+
+                "status":
+                    "in-progress",
+
+
+                "priority":
+                    "medium",
+
+
+                "progress": 50,
+
+
+                "owner":
+                    "Data Team",
+
+
+                "assignee":
+                    "Data Engineer",
+
+
+                "created":
+                    "2026-07-25",
+
+
+                "deadline":
+                    "2026-09-15",
+
+
+                "tags": [
+
+                    "json",
+
+                    "configuration",
+
+                    "data"
+
+                ]
+
+            },
+
+
+            {
+
+                "id":
+                    "TASK-004",
+
+                "missionId":
+                    "MISSION-003",
+
+                "title":
+                    "Archive Knowledge Assets",
+
+                "description":
+                    "Transfer completed works into digital archive.",
+
+
+                "status":
+                    "completed",
+
+
+                "priority":
+                    "medium",
+
+
+                "progress": 100,
+
+
+                "owner":
+                    "Library Team",
+
+
+                "assignee":
+                    "Archivist",
+
+
+                "created":
+                    "2026-06-01",
+
+
+                "deadline":
+                    "2026-07-15",
+
+
+                "tags": [
+
+                    "archive",
+
+                    "library"
+
+                ]
+
+            },
+
+
+            {
+
+                "id":
+                    "TASK-005",
+
+                "missionId":
+                    "MISSION-004",
+
+                "title":
+                    "Prepare First Commercial Products",
+
+                "description":
+                    "Select and package initial knowledge products.",
+
+
+                "status":
+                    "todo",
+
+
+                "priority":
+                    "high",
+
+
+                "progress": 15,
+
+
+                "owner":
+                    "Business Team",
+
+
+                "assignee":
+                    "Product Manager",
+
+
+                "created":
+                    "2026-07-30",
+
+
+                "deadline":
+                    "2026-10-01",
+
+
+                "tags": [
+
+                    "products",
+
+                    "market",
+
+                    "revenue"
+
+                ]
+
+            },
+
+
+            {
+
+                "id":
+                    "TASK-006",
+
+                "missionId":
+                    "MISSION-001",
+
+                "title":
+                    "Implement Repository Standards",
+
+                "description":
+                    "Create metadata, schema and versioning standards.",
+
+
+                "status":
+                    "todo",
+
+
+                "priority":
+                    "medium",
+
+
+                "progress": 0,
+
+
+                "owner":
+                    "Repository Team",
+
+
+                "assignee":
+                    "Developer",
+
+
+                "created":
+                    "2026-07-31",
+
+
+                "deadline":
+                    "2026-11-01",
+
+
+                "tags": [
+
+                    "repository",
+
+                    "metadata",
+
+                    "standard"
+
+                ]
+
+            }
+
+        ]
+
+    }
+
+}
