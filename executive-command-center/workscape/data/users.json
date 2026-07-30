@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "build": "BUILD-000524",
+
+  "users": [
+
+    {
+      "id": "USR-000001",
+      "username": "ceo",
+      "displayName": "Chief Executive Officer",
+      "role": "CEO",
+      "status": "active",
+      "priority": 1
+    },
+
+    {
+      "id": "USR-000002",
+      "username": "parsa",
+      "displayName": "Parsa",
+      "role": "Successor",
+      "status": "active",
+      "priority": 2
+    },
+
+    {
+      "id": "USR-000003",
+      "username": "skos",
+      "displayName": "SKOS Executive Manager",
+      "role": "Executive Manager",
+      "status": "active",
+      "priority": 3
+    },
+
+    {
+      "id": "USR-000004",
+      "username": "operator",
+      "displayName": "System Operator",
+      "role": "Operator",
+      "status": "active",
+      "priority": 4
+    },
+
+    {
+      "id": "USR-000005",
+      "username": "guest",
+      "displayName": "Guest User",
+      "role": "Guest",
+      "status": "inactive",
+      "priority": 99
+    }
+
+  ]
+}
