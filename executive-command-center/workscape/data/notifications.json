@@ -1,0 +1,61 @@
+{
+  "version": "1.0.0",
+  "build": "BUILD-000523",
+
+  "configuration": {
+    "enabled": true,
+    "maxVisible": 5,
+    "defaultDuration": 5000,
+    "allowSound": false,
+    "allowDesktop": true
+  },
+
+  "notifications": [
+
+    {
+      "id": "SYS-0001",
+      "type": "system",
+      "level": "info",
+      "title": "WorkScape Initialized",
+      "message": "WorkScape has been initialized successfully.",
+      "enabled": true
+    },
+
+    {
+      "id": "SYS-0002",
+      "type": "mission",
+      "level": "success",
+      "title": "Mission Completed",
+      "message": "Mission completed successfully.",
+      "enabled": true
+    },
+
+    {
+      "id": "SYS-0003",
+      "type": "task",
+      "level": "warning",
+      "title": "Pending Tasks",
+      "message": "One or more tasks require attention.",
+      "enabled": true
+    },
+
+    {
+      "id": "SYS-0004",
+      "type": "operation",
+      "level": "error",
+      "title": "Operation Failed",
+      "message": "Operation execution failed.",
+      "enabled": true
+    },
+
+    {
+      "id": "SYS-0005",
+      "type": "security",
+      "level": "critical",
+      "title": "Security Alert",
+      "message": "Security verification required.",
+      "enabled": true
+    }
+
+  ]
+}
