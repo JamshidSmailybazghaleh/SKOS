@@ -1,0 +1,50 @@
+{
+  "version": "1.0.0",
+  "build": "BUILD-000522",
+
+  "general": {
+    "workspaceName": "WorkScape",
+    "language": "en",
+    "theme": "default",
+    "timezone": "UTC",
+    "dateFormat": "YYYY-MM-DD",
+    "timeFormat": "24h"
+  },
+
+  "dashboard": {
+    "autoRefresh": true,
+    "refreshInterval": 60,
+    "showHeader": true,
+    "showFooter": true,
+    "showSidebar": true
+  },
+
+  "display": {
+    "animations": true,
+    "compactMode": false,
+    "cardsPerRow": 2,
+    "defaultZoom": 100
+  },
+
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "console": true
+  },
+
+  "notifications": {
+    "enabled": true,
+    "sound": false,
+    "desktop": true
+  },
+
+  "security": {
+    "sessionTimeout": 3600,
+    "autoLock": false
+  },
+
+  "developer": {
+    "debugMode": false,
+    "showPerformance": false
+  }
+}
