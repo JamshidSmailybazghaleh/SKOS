@@ -1,0 +1,57 @@
+{
+  "schema": "SKOS-Workspace-Metadata",
+
+  "workspaceId": "WS-000001",
+
+  "name": "WorkScape",
+
+  "displayName": "SKOS Executive WorkScape",
+
+  "description": "Operational workspace for the Executive Command Center.",
+
+  "system": {
+    "name": "SKOS",
+    "module": "Executive Command Center",
+    "component": "WorkScape"
+  },
+
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0,
+    "full": "1.0.0"
+  },
+
+  "build": {
+    "number": "BUILD-000526",
+    "status": "development",
+    "created": "2026-07-30"
+  },
+
+  "lifecycle": {
+    "stage": "Foundation",
+    "state": "Active"
+  },
+
+  "author": {
+    "organization": "SKOS",
+    "owner": "Executive Command Center"
+  },
+
+  "compatibility": {
+    "minimumVersion": "1.0.0",
+    "dataSchema": "1.0"
+  },
+
+  "documents": {
+    "readme": "../README.md",
+    "workspace": "workspace.json",
+    "widgets": "widgets.json",
+    "dashboard": "dashboard.json",
+    "navigation": "navigation.json",
+    "settings": "settings.json",
+    "notifications": "notifications.json",
+    "users": "users.json",
+    "permissions": "permissions.json"
+  }
+}
