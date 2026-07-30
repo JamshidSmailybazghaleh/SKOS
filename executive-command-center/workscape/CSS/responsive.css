@@ -1,0 +1,206 @@
+/* ============================================================
+   SKOS Executive Command Center
+   ------------------------------------------------------------
+   Module    : WorkScape
+   File      : responsive.css
+   Version   : 1.0.0
+   Build     : BUILD-000509
+   Purpose   : Responsive Layout System
+============================================================ */
+
+/* ============================================================
+   Large Desktop
+============================================================ */
+
+@media (min-width:1600px){
+
+    .workspace-container{
+
+        max-width:1800px;
+
+    }
+
+}
+
+/* ============================================================
+   Desktop
+============================================================ */
+
+@media (max-width:1400px){
+
+    .workspace-grid{
+
+        grid-template-columns:
+            repeat(2,minmax(380px,1fr));
+
+    }
+
+}
+
+/* ============================================================
+   Laptop
+============================================================ */
+
+@media (max-width:1200px){
+
+    .workspace-container{
+
+        padding:var(--space-5);
+
+    }
+
+}
+
+/* ============================================================
+   Tablet
+============================================================ */
+
+@media (max-width:1024px){
+
+    .workspace-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .workspace-row,
+
+    .workspace-row-between{
+
+        flex-wrap:wrap;
+
+    }
+
+}
+
+/* ============================================================
+   Mobile
+============================================================ */
+
+@media (max-width:768px){
+
+    #workspace-header{
+
+        flex-direction:column;
+
+        justify-content:center;
+
+        align-items:center;
+
+        text-align:center;
+
+        gap:var(--space-2);
+
+        height:auto;
+
+        padding:var(--space-4);
+
+    }
+
+    .workspace-container{
+
+        padding:var(--space-4);
+
+    }
+
+    .workspace-grid{
+
+        gap:var(--space-4);
+
+    }
+
+    .workspace-row,
+
+    .workspace-row-between{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:var(--space-3);
+
+    }
+
+}
+
+/* ============================================================
+   Small Mobile
+============================================================ */
+
+@media (max-width:480px){
+
+    h1{
+
+        font-size:24px;
+
+    }
+
+    h2{
+
+        font-size:20px;
+
+    }
+
+    h3{
+
+        font-size:18px;
+
+    }
+
+    .workspace-container{
+
+        padding:var(--space-3);
+
+    }
+
+}
+
+/* ============================================================
+   Landscape Phone
+============================================================ */
+
+@media (max-height:500px) and (orientation:landscape){
+
+    #workspace-header{
+
+        padding:var(--space-2);
+
+    }
+
+    .workspace-container{
+
+        padding:var(--space-3);
+
+    }
+
+}
+
+/* ============================================================
+   Print
+============================================================ */
+
+@media print{
+
+    #workspace-header,
+
+    #workspace-footer{
+
+        display:none;
+
+    }
+
+    body{
+
+        background:#ffffff;
+
+    }
+
+    .workspace-container{
+
+        max-width:100%;
+
+        padding:0;
+
+    }
+
+}
