@@ -1,0 +1,148 @@
+{
+  "version": "1.0.0",
+  "build": "BUILD-000525",
+
+  "roles": [
+
+    {
+      "role": "CEO",
+
+      "permissions": {
+
+        "workspace": {
+          "read": true,
+          "write": true,
+          "delete": true,
+          "execute": true
+        },
+
+        "missions": {
+          "create": true,
+          "update": true,
+          "delete": true,
+          "approve": true
+        },
+
+        "tasks": {
+          "create": true,
+          "update": true,
+          "delete": true,
+          "assign": true
+        },
+
+        "operations": {
+          "execute": true,
+          "cancel": true
+        },
+
+        "settings": {
+          "manage": true
+        }
+
+      }
+
+    },
+
+    {
+      "role": "Successor",
+
+      "permissions": {
+
+        "workspace": {
+          "read": true,
+          "write": true,
+          "execute": true
+        },
+
+        "missions": {
+          "create": true,
+          "update": true,
+          "approve": true
+        },
+
+        "tasks": {
+          "create": true,
+          "update": true,
+          "assign": true
+        },
+
+        "operations": {
+          "execute": true
+        },
+
+        "settings": {
+          "manage": false
+        }
+
+      }
+
+    },
+
+    {
+      "role": "Executive Manager",
+
+      "permissions": {
+
+        "workspace": {
+          "read": true,
+          "write": true
+        },
+
+        "missions": {
+          "create": true,
+          "update": true
+        },
+
+        "tasks": {
+          "create": true,
+          "update": true
+        },
+
+        "operations": {
+          "execute": true
+        }
+
+      }
+
+    },
+
+    {
+      "role": "Operator",
+
+      "permissions": {
+
+        "workspace": {
+          "read": true
+        },
+
+        "missions": {
+          "update": true
+        },
+
+        "tasks": {
+          "update": true
+        },
+
+        "operations": {
+          "execute": true
+        }
+
+      }
+
+    },
+
+    {
+      "role": "Guest",
+
+      "permissions": {
+
+        "workspace": {
+          "read": true
+        }
+
+      }
+
+    }
+
+  ]
+}
