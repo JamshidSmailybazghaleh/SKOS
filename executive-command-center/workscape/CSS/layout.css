@@ -1,0 +1,283 @@
+/* ============================================================
+   SKOS Executive Command Center
+   ------------------------------------------------------------
+   Module    : WorkScape
+   File      : layout.css
+   Version   : 1.0.0
+   Build     : BUILD-000509
+   Purpose   : Core Layout System
+============================================================ */
+
+/* ============================================================
+   Reset
+============================================================ */
+
+*,
+*::before,
+*::after{
+
+    box-sizing:border-box;
+
+    margin:0;
+
+    padding:0;
+
+}
+
+/* ============================================================
+   Root Layout
+============================================================ */
+
+html{
+
+    height:100%;
+
+}
+
+body{
+
+    min-height:100%;
+
+    font-family:var(--font-family);
+
+    background:var(--background-page);
+
+    color:var(--text-primary);
+
+    line-height:1.5;
+
+}
+
+/* ============================================================
+   Application
+============================================================ */
+
+#workspace-app{
+
+    display:flex;
+
+    flex-direction:column;
+
+    min-height:100vh;
+
+}
+
+/* ============================================================
+   Header
+============================================================ */
+
+#workspace-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    height:var(--header-height);
+
+    padding:0 var(--space-6);
+
+    background:var(--background-panel);
+
+    border-bottom:1px solid var(--border-color);
+
+}
+
+/* ============================================================
+   Main
+============================================================ */
+
+#workspace-main{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+/* ============================================================
+   Container
+============================================================ */
+
+.workspace-container{
+
+    width:100%;
+
+    max-width:var(--content-width);
+
+    margin:0 auto;
+
+    padding:var(--space-6);
+
+}
+
+/* ============================================================
+   Grid
+============================================================ */
+
+.workspace-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(420px,1fr));
+
+    gap:var(--space-5);
+
+}
+
+/* ============================================================
+   Sections
+============================================================ */
+
+.workspace-section{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:var(--space-4);
+
+}
+
+/* ============================================================
+   Rows
+============================================================ */
+
+.workspace-row{
+
+    display:flex;
+
+    gap:var(--space-4);
+
+    align-items:center;
+
+}
+
+.workspace-row-between{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:var(--space-4);
+
+}
+
+/* ============================================================
+   Utilities
+============================================================ */
+
+.flex{display:flex;}
+
+.column{flex-direction:column;}
+
+.row{flex-direction:row;}
+
+.wrap{flex-wrap:wrap;}
+
+.center{
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.full-width{
+
+    width:100%;
+
+}
+
+.hidden{
+
+    display:none !important;
+
+}
+
+/* ============================================================
+   Footer
+============================================================ */
+
+#workspace-footer{
+
+    margin-top:auto;
+
+    padding:var(--space-4);
+
+    border-top:1px solid var(--border-light);
+
+    background:var(--background-panel);
+
+}
+
+/* ============================================================
+   Responsive
+============================================================ */
+
+@media (max-width:1024px){
+
+    .workspace-container{
+
+        padding:var(--space-5);
+
+    }
+
+}
+
+@media (max-width:768px){
+
+    #workspace-header{
+
+        flex-direction:column;
+
+        justify-content:center;
+
+        height:auto;
+
+        padding:var(--space-4);
+
+        gap:var(--space-2);
+
+        text-align:center;
+
+    }
+
+    .workspace-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .workspace-row,
+
+    .workspace-row-between{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .workspace-container{
+
+        padding:var(--space-4);
+
+    }
+
+}
+
+@media (max-width:480px){
+
+    .workspace-container{
+
+        padding:var(--space-3);
+
+    }
+
+}
