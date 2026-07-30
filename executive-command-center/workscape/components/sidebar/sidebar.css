@@ -1,0 +1,183 @@
+/*
+==========================================================
+SKOS Executive Command Center
+WorkScape Sidebar Component
+Version : 1.0.0
+Component : Sidebar
+==========================================================
+*/
+
+/* ==========================================
+   Sidebar Container
+========================================== */
+
+.workspace-sidebar{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    width:260px;
+
+    min-width:260px;
+
+    height:100vh;
+
+    background:var(--surface-primary);
+
+    border-right:1px solid var(--border-color);
+
+    color:var(--text-primary);
+
+    overflow:hidden;
+
+}
+
+
+/* ==========================================
+   Brand
+========================================== */
+
+.sidebar-brand{
+
+    padding:24px;
+
+    border-bottom:1px solid var(--border-color);
+
+}
+
+.brand-title{
+
+    margin:0;
+
+    font-size:24px;
+
+    font-weight:700;
+
+}
+
+.brand-subtitle{
+
+    margin-top:8px;
+
+    font-size:13px;
+
+    color:var(--text-secondary);
+
+}
+
+
+/* ==========================================
+   Navigation
+========================================== */
+
+.sidebar-navigation{
+
+    flex:1;
+
+    padding:16px 0;
+
+    overflow-y:auto;
+
+}
+
+.sidebar-navigation ul{
+
+    margin:0;
+
+    padding:0;
+
+    list-style:none;
+
+}
+
+.sidebar-navigation li{
+
+    margin:4px 0;
+
+}
+
+.sidebar-navigation a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:12px 24px;
+
+    text-decoration:none;
+
+    color:var(--text-primary);
+
+    transition:background .2s ease;
+
+}
+
+.sidebar-navigation a:hover{
+
+    background:var(--surface-secondary);
+
+}
+
+.sidebar-navigation img{
+
+    width:20px;
+
+    height:20px;
+
+}
+
+
+/* ==========================================
+   Footer
+========================================== */
+
+.sidebar-footer{
+
+    padding:16px 24px;
+
+    border-top:1px solid var(--border-color);
+
+    color:var(--text-secondary);
+
+    font-size:12px;
+
+}
+
+
+/* ==========================================
+   Active Item
+========================================== */
+
+.sidebar-navigation a.active{
+
+    background:var(--accent-color);
+
+    color:#ffffff;
+
+    font-weight:600;
+
+}
+
+
+/* ==========================================
+   Scrollbar
+========================================== */
+
+.sidebar-navigation::-webkit-scrollbar{
+
+    width:6px;
+
+}
+
+.sidebar-navigation::-webkit-scrollbar-thumb{
+
+    background:var(--border-color);
+
+    border-radius:6px;
+
+}
