@@ -1,0 +1,49 @@
+{
+    "system": "SKOS",
+
+    "version": "1.0.0",
+
+    "build": "BUILD-000001",
+
+    "environment": "development",
+
+
+    "paths": {
+
+        "incoming":
+        "data/incoming/",
+
+        "repository":
+        "sdkc/repository/",
+
+        "logs":
+        "monitoring/logs/"
+
+    },
+
+
+    "engines": {
+
+        "intake":
+        true,
+
+        "metadata":
+        true,
+
+        "monitoring":
+        true
+
+    },
+
+
+    "monitoring": {
+
+        "enabled":
+        true,
+
+        "level":
+        "INFO"
+
+    }
+
+}
