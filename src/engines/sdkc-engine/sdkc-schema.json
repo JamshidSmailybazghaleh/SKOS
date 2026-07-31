@@ -1,0 +1,196 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+    "title": "SKOS SDKC Knowledge Object Schema",
+
+    "description":
+    "Schema definition for SKOS Digital Knowledge Core objects",
+
+    "type": "object",
+
+    "required": [
+        "objectId",
+        "metadata",
+        "manifest",
+        "storage",
+        "version",
+        "status"
+    ],
+
+
+    "properties": {
+
+
+        "objectId": {
+
+            "type": "string",
+
+            "description":
+            "Unique SKOS Knowledge Object Identifier"
+
+        },
+
+
+        "metadata": {
+
+            "type": "object",
+
+            "properties": {
+
+
+                "title": {
+
+                    "type": "string"
+
+                },
+
+
+                "author": {
+
+                    "type": "string"
+
+                },
+
+
+                "language": {
+
+                    "type": "string"
+
+                },
+
+
+                "format": {
+
+                    "type": "string"
+
+                },
+
+
+                "category": {
+
+                    "type": "string"
+
+                }
+
+
+            }
+
+        },
+
+
+        "manifest": {
+
+            "type": "object",
+
+            "properties": {
+
+
+                "build": {
+
+                    "type": "string"
+
+                },
+
+
+                "createdAt": {
+
+                    "type": "string"
+
+                },
+
+
+                "updatedAt": {
+
+                    "type": "string"
+
+                }
+
+
+            }
+
+        },
+
+
+        "storage": {
+
+            "type": "object",
+
+            "properties": {
+
+
+                "contentPath": {
+
+                    "type": "string"
+
+                },
+
+
+                "metadataFile": {
+
+                    "type": "string"
+
+                },
+
+
+                "historyFile": {
+
+                    "type": "string"
+
+                }
+
+
+            }
+
+        },
+
+
+        "version": {
+
+            "type": "object",
+
+            "properties": {
+
+
+                "current": {
+
+                    "type": "string"
+
+                },
+
+
+                "history": {
+
+                    "type": "array"
+
+                }
+
+
+            }
+
+        },
+
+
+        "status": {
+
+            "type": "string",
+
+            "enum": [
+
+                "CREATED",
+
+                "ACTIVE",
+
+                "UPDATED",
+
+                "ARCHIVED",
+
+                "DEPRECATED"
+
+            ]
+
+        }
+
+
+    }
+
+}
