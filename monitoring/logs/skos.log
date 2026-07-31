@@ -1,0 +1,23 @@
+{
+ "level":"INFO",
+ "message":"LOGGER_INITIALIZED",
+ "timestamp":"2026-07-31T..."
+}
+
+
+{
+ "level":"INFO",
+ "message":"INTAKE_STARTED",
+ "metadata":{
+   "file":"hekmat-noor.pdf"
+ }
+}
+
+
+{
+ "level":"ERROR",
+ "message":"INVALID_METADATA",
+ "metadata":{
+   "object":"SKOS-KO-000001"
+ }
+}
