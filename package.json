@@ -1,0 +1,73 @@
+{
+    "name": "skos",
+    "version": "1.0.0",
+    "description": "Smaily Knowledge Operating System",
+    "author": "Jamshid Smaily",
+    "license": "MIT",
+
+    "private": true,
+
+    "main": "src/core/skos-kernel.js",
+
+    "type": "commonjs",
+
+    "engines": {
+        "node": ">=20.0.0"
+    },
+
+    "scripts": {
+
+        "start": "node src/core/skos-kernel.js",
+
+        "test": "jest",
+
+        "test:watch": "jest --watch",
+
+        "test:coverage": "jest --coverage",
+
+        "lint": "eslint .",
+
+        "clean": "node scripts/clean.js"
+
+    },
+
+    "directories": {
+
+        "src": "src",
+
+        "test": "tests",
+
+        "config": "config",
+
+        "monitoring": "monitoring",
+
+        "sdkc": "sdkc"
+
+    },
+
+    "dependencies": {
+
+    },
+
+    "devDependencies": {
+
+        "jest": "^30.0.0",
+
+        "eslint": "^9.0.0"
+
+    },
+
+    "keywords": [
+
+        "SKOS",
+
+        "Knowledge",
+
+        "Repository",
+
+        "SDKC",
+
+        "Smaily"
+
+    ]
+}
