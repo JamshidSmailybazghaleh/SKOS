@@ -62,11 +62,9 @@ class SKOSKernel {
             engine
         );
 
-
         this.logEvent(
             `ENGINE_REGISTERED:${name}`
         );
-
 
         return true;
     }
