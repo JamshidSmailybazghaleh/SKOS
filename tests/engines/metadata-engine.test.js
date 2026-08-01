@@ -105,7 +105,7 @@ title:
 expect(
 engine.getStatus().records
 )
-toBe(
+.toBe(
 1
 );
 
