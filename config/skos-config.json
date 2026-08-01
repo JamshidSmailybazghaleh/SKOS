@@ -1,0 +1,39 @@
+{
+  "system": {
+    "name": "SKOS",
+    "full_name": "Smaily Knowledge Operating System",
+    "version": "1.0.0",
+    "build": "BUILD-000001",
+    "environment": "development"
+  },
+
+  "kernel": {
+    "enabled": true,
+    "auto_initialize": true
+  },
+
+  "repository": {
+    "type": "local",
+    "path": "sdkc/repository/objects"
+  },
+
+  "engines": {
+    "kernel": true,
+    "intake": true,
+    "metadata": true,
+    "sdkc": true,
+    "monitoring": true,
+    "version": true
+  },
+
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "path": "monitoring/logs/runtime/skos.log"
+  },
+
+  "testing": {
+    "framework": "jest",
+    "enabled": true
+  }
+}
