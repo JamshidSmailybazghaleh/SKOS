@@ -65,10 +65,10 @@ loader.load();
 
 
 expect(
-config.system
+ config.system.name
 )
 .toBe(
-"SKOS"
+ "SKOS"
 );
 
 
