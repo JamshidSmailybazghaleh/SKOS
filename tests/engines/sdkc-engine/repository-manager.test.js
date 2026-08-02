@@ -1,6 +1,6 @@
 const RepositoryManager =
 require(
-"../../src/engines/sdkc-engine/repository-manager"
+"../../../src/engines/sdkc-engine/repository-manager"
 );
 
 test(
