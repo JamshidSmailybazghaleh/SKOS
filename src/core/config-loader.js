@@ -135,11 +135,33 @@ class ConfigLoader {
 
         const requiredFields = [
 
-            "system",
-            "version",
-            "environment"
+    "system"
 
-        ];
+];
+
+
+if (!this.config.system.name) {
+
+    return false;
+
+}
+
+
+if (!this.config.system.version) {
+
+    return false;
+
+}
+
+
+if (!this.config.system.environment) {
+
+    return false;
+
+}
+
+
+return true;
 
 
 
