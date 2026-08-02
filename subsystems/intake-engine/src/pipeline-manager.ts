@@ -9,12 +9,11 @@
  *
  * Build     : BUILD-000005
  * Sprint    : Sprint 02
- * Version   : 0.1.1
+ * Version   : 0.1.0
  *
- * Status    : Monitoring Integrated
+ * Status    : Monitoring Hooks Integrated
  *
  * Copyright © Smaily Knowledge Foundation
- *
  * ==========================================================
  */
 
@@ -28,18 +27,21 @@ import {
 } from "./pipeline-step";
 
 
-import { SourceValidator } from "./source-validator";
+import { SourceValidator }
 
-import { FileTypeDetector } from "./file-type-detector";
+from "./source-validator";
+
+
+import { FileTypeDetector }
+
+from "./file-type-detector";
 
 
 
 export class PipelineManager {
 
 
-
     private readonly steps: PipelineStep[] = [];
-
 
 
     private monitoring: any;
@@ -53,9 +55,7 @@ export class PipelineManager {
     ) {
 
 
-        this.monitoring =
-
-            monitoring;
+        this.monitoring = monitoring;
 
 
         this.initialize();
@@ -68,7 +68,7 @@ export class PipelineManager {
 
 
     /**
-     * Initialize default pipeline
+     * Initialize default pipeline steps
      */
 
     private initialize(): void {
@@ -76,23 +76,14 @@ export class PipelineManager {
 
         this.register(
 
-            new SourceValidator(
-
-                this.monitoring
-
-            )
+            new SourceValidator()
 
         );
 
 
-
         this.register(
 
-            new FileTypeDetector(
-
-                this.monitoring
-
-            )
+            new FileTypeDetector()
 
         );
 
@@ -161,7 +152,6 @@ export class PipelineManager {
                 {
 
                     sourcePath:
-
                         context.sourcePath || null
 
                 }
@@ -184,9 +174,7 @@ export class PipelineManager {
 
         let current:
 
-            PipelineContext =
-
-            context;
+            PipelineContext = context;
 
 
 
@@ -195,15 +183,12 @@ export class PipelineManager {
         try {
 
 
-
             for (const step of this.steps) {
-
 
 
                 console.log(
                     "----------------------------------"
                 );
-
 
 
                 console.log(
@@ -242,12 +227,10 @@ export class PipelineManager {
                     {
 
                         sourceType:
-
                             current.sourceType || null,
 
 
                         language:
-
                             current.language || null
 
                     }
@@ -271,11 +254,11 @@ export class PipelineManager {
 
         }
 
-        catch(error) {
+        catch (error) {
 
 
 
-            const message =
+            const errorMessage =
 
                 error instanceof Error
 
@@ -302,7 +285,7 @@ export class PipelineManager {
 
                         error:
 
-                            message
+                            errorMessage
 
                     }
 
@@ -356,7 +339,7 @@ export class PipelineManager {
 
 
     /**
-     * Remove all steps
+     * Clear pipeline steps
      */
 
     public clear(): void {
@@ -372,7 +355,7 @@ export class PipelineManager {
 
 
     /**
-     * Pipeline step count
+     * Return pipeline step count
      */
 
     public count(): number {
