@@ -1,3 +1,10 @@
+/**
+ * SKOS History Manager Test
+ *
+ * TEST-ENG-HISTORY-001
+ */
+
+
 const HistoryManager =
 require(
 "../../../src/engines/sdkc-engine/history-manager"
@@ -7,6 +14,10 @@ require(
 test(
 "History event should register",
 ()=>{
+
+
+const history =
+new HistoryManager();
 
 
 const result =
