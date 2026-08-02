@@ -4,16 +4,12 @@
  * Smaily Knowledge Operating System
  * ==========================================================
  *
- * Engine    : Monitoring Engine
- * Module    : Runtime Monitoring
+ * Engine : Monitoring Engine
  *
- * File ID  : ENG-MON-001
+ * Build  : BUILD-000006
+ * Version: 1.1.0
  *
- * Build    : BUILD-000006
- * Sprint   : Sprint 02
- * Version  : 1.1.0
- *
- * Status   : Advanced Monitoring Enabled
+ * Status : Event Query Supported
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -48,34 +44,20 @@ class MonitoringEngine {
 
             objectsReceived: 0,
 
-
             pipelinesStarted: 0,
-
 
             pipelinesCompleted: 0,
 
-
             pipelinesFailed: 0,
 
+            sdkcObjectsStored: 0,
 
-            documentsParsed: 0,
+            sdkcObjectsRetrieved: 0,
 
-
-            metadataExtracted: 0,
-
-
-            knowledgeObjectsCreated: 0,
-
-
-            totalEvents: 0
+            sdkcObjectsRemoved: 0
 
 
         };
-
-
-
-        this.startTime =
-            null;
 
 
     }
@@ -83,20 +65,12 @@ class MonitoringEngine {
 
 
 
-    /**
-     * Initialize Monitoring Engine
-     */
 
     initialize() {
 
 
         this.status =
             "INITIALIZED";
-
-
-        this.startTime =
-            new Date();
-
 
 
         this.recordEvent(
@@ -106,12 +80,12 @@ class MonitoringEngine {
         );
 
 
-
         return {
 
 
             status:
                 this.status
+
 
         };
 
@@ -123,15 +97,11 @@ class MonitoringEngine {
 
 
 
-    /**
-     * Register Monitoring Event
-     */
-
     recordEvent(
 
         eventName,
 
-        details = {}
+        metadata = {}
 
     ) {
 
@@ -141,28 +111,25 @@ class MonitoringEngine {
 
 
             name:
+
                 eventName,
 
 
-            details,
+            metadata:
+
+                metadata,
 
 
             timestamp:
+
                 new Date()
+
 
         };
 
 
 
-        this.events.push(
-
-            event
-
-        );
-
-
-
-        this.metrics.totalEvents++;
+        this.events.push(event);
 
 
 
@@ -176,16 +143,33 @@ class MonitoringEngine {
 
 
 
-
     /**
-     * Update Metric Counter
+     * NEW
+     * Return monitoring history
      */
+
+
+    getEvents() {
+
+
+        return [
+
+            ...this.events
+
+        ];
+
+
+    }
+
+
+
+
+
+
 
     updateMetric(
 
-        metricName,
-
-        value = 1
+        metricName
 
     ) {
 
@@ -193,8 +177,7 @@ class MonitoringEngine {
 
         if (
 
-            typeof this.metrics[metricName]
-            !== "number"
+            !this.metrics[metricName]
 
         ) {
 
@@ -206,8 +189,7 @@ class MonitoringEngine {
 
 
 
-        this.metrics[metricName]
-            += value;
+        this.metrics[metricName]++;
 
 
 
@@ -222,162 +204,6 @@ class MonitoringEngine {
 
 
 
-    /**
-     * Increment received objects
-     */
-
-    objectReceived() {
-
-
-        this.updateMetric(
-
-            "objectsReceived"
-
-        );
-
-
-
-        this.recordEvent(
-
-            "OBJECT_RECEIVED"
-
-        );
-
-
-    }
-
-
-
-
-
-
-
-    /**
-     * Pipeline Started
-     */
-
-    pipelineStarted(
-
-        metadata = {}
-
-    ) {
-
-
-        this.updateMetric(
-
-            "pipelinesStarted"
-
-        );
-
-
-
-        this.recordEvent(
-
-            "INTAKE_PIPELINE_STARTED",
-
-            metadata
-
-        );
-
-
-    }
-
-
-
-
-
-
-
-    /**
-     * Pipeline Completed
-     */
-
-    pipelineCompleted(
-
-        metadata = {}
-
-    ) {
-
-
-        this.updateMetric(
-
-            "pipelinesCompleted"
-
-        );
-
-
-
-        this.recordEvent(
-
-            "INTAKE_PIPELINE_COMPLETED",
-
-            metadata
-
-        );
-
-
-    }
-
-
-
-
-
-
-
-    /**
-     * Pipeline Failed
-     */
-
-    pipelineFailed(
-
-        error
-
-    ) {
-
-
-        this.updateMetric(
-
-            "pipelinesFailed"
-
-        );
-
-
-
-        this.recordEvent(
-
-            "INTAKE_PIPELINE_FAILED",
-
-            {
-
-                error:
-
-                    error instanceof Error
-
-                    ?
-
-                    error.message
-
-                    :
-
-                    String(error)
-
-            }
-
-        );
-
-
-    }
-
-
-
-
-
-
-
-    /**
-     * Get Engine Status
-     */
-
     getStatus() {
 
 
@@ -385,18 +211,22 @@ class MonitoringEngine {
 
 
             name:
+
                 this.name,
 
 
             version:
+
                 this.version,
 
 
             status:
+
                 this.status,
 
 
             events:
+
                 this.events.length
 
 
@@ -411,9 +241,6 @@ class MonitoringEngine {
 
 
 
-    /**
-     * Health Report
-     */
 
     getHealth() {
 
@@ -422,23 +249,8 @@ class MonitoringEngine {
 
 
             status:
+
                 this.status,
-
-
-            uptime:
-
-                this.startTime
-
-                ?
-
-                Date.now()
-                -
-                this.startTime.getTime()
-
-                :
-
-                0,
-
 
 
             metrics:
@@ -457,10 +269,6 @@ class MonitoringEngine {
 
 
 
-    /**
-     * Monitoring Dashboard
-     */
-
     getDashboard() {
 
 
@@ -468,8 +276,8 @@ class MonitoringEngine {
 
 
             system:
-                "SKOS",
 
+                "SKOS",
 
 
             engine:
@@ -477,11 +285,9 @@ class MonitoringEngine {
                 this.name,
 
 
-
             version:
 
                 this.version,
-
 
 
             status:
@@ -489,11 +295,9 @@ class MonitoringEngine {
                 this.status,
 
 
-
             metrics:
 
                 this.metrics,
-
 
 
             events:
@@ -511,12 +315,11 @@ class MonitoringEngine {
 
 
 
-
-    /**
-     * Shutdown
-     */
-
     shutdown() {
+
+
+        this.status =
+            "SHUTDOWN";
 
 
         this.recordEvent(
@@ -526,16 +329,11 @@ class MonitoringEngine {
         );
 
 
-
-        this.status =
-            "SHUTDOWN";
-
-
-
         return true;
 
 
     }
+
 
 
 }
