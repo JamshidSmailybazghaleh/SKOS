@@ -10,10 +10,11 @@
  * Build      : BUILD-000363
  * Version    : 1.0.0
  *
- * Status     : Monitoring Integrated
- *
  * Mission:
- * Manage Knowledge Graph Nodes.
+ * Manage Knowledge Object nodes inside graph.
+ *
+ * Status:
+ * Monitoring Integrated
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -34,18 +35,6 @@ class GraphNodeManager {
             options.monitoring || null;
 
 
-        this.name =
-            "Graph Node Manager";
-
-
-        this.version =
-            "1.0.0";
-
-
-        this.status =
-            "CREATED";
-
-
     }
 
 
@@ -53,10 +42,6 @@ class GraphNodeManager {
 
 
     initialize() {
-
-
-        this.status =
-            "INITIALIZED";
 
 
         this.recordEvent(
@@ -74,45 +59,23 @@ class GraphNodeManager {
 
 
 
-    /**
-     * Create Node
-     */
-
-
-    addNode(node) {
+    addNode(object) {
 
 
         if (
 
-            !node ||
+            !object ||
 
-            !node.id
-
-        ) {
-
-            throw new Error(
-
-                "Node requires valid id."
-
-            );
-
-        }
-
-
-
-        if (
-
-            this.nodes.has(node.id)
+            !object.id
 
         ) {
 
 
             throw new Error(
 
-                "Node already exists."
+                "Node requires valid Knowledge Object id."
 
             );
-
 
         }
 
@@ -120,9 +83,9 @@ class GraphNodeManager {
 
         this.nodes.set(
 
-            node.id,
+            object.id,
 
-            node
+            object
 
         );
 
@@ -135,7 +98,8 @@ class GraphNodeManager {
             {
 
                 id:
-                    node.id
+
+                    object.id
 
             }
 
@@ -151,17 +115,12 @@ class GraphNodeManager {
 
 
 
-        return node;
+        return object;
 
     }
 
 
 
-
-
-    /**
-     * Get Node
-     */
 
 
     getNode(id) {
@@ -177,16 +136,10 @@ class GraphNodeManager {
 
         );
 
-
     }
 
 
 
-
-
-    /**
-     * Check Node Exists
-     */
 
 
     hasNode(id) {
@@ -194,28 +147,22 @@ class GraphNodeManager {
 
         return this.nodes.has(id);
 
-
     }
 
 
 
 
 
-    /**
-     * Remove Node
-     */
-
-
     removeNode(id) {
 
 
-        const result =
+        const exists =
 
             this.nodes.delete(id);
 
 
 
-        if (result) {
+        if (exists) {
 
 
             this.recordEvent(
@@ -241,8 +188,8 @@ class GraphNodeManager {
         }
 
 
-        return result;
 
+        return exists;
 
     }
 
@@ -250,12 +197,7 @@ class GraphNodeManager {
 
 
 
-    /**
-     * Return All Nodes
-     */
-
-
-    getNodes() {
+    getAllNodes() {
 
 
         return Array.from(
@@ -264,16 +206,10 @@ class GraphNodeManager {
 
         );
 
-
     }
 
 
 
-
-
-    /**
-     * Node Count
-     */
 
 
     count() {
@@ -281,23 +217,16 @@ class GraphNodeManager {
 
         return this.nodes.size;
 
-
     }
 
 
 
 
 
-    /**
-     * Clear Graph Nodes
-     */
-
-
     clear() {
 
 
         this.nodes.clear();
-
 
 
         this.recordEvent(
@@ -311,11 +240,6 @@ class GraphNodeManager {
 
 
 
-
-
-    /**
-     * Monitoring Event
-     */
 
 
     recordEvent(
@@ -342,7 +266,6 @@ class GraphNodeManager {
 
             );
 
-
         }
 
 
@@ -352,12 +275,11 @@ class GraphNodeManager {
 
 
 
-    /**
-     * Monitoring Metric
-     */
+    updateMetric(
 
+        name
 
-    updateMetric(name) {
+    ) {
 
 
         if (
@@ -373,38 +295,15 @@ class GraphNodeManager {
 
             );
 
-
         }
 
 
     }
 
 
-
-
-
-    shutdown() {
-
-
-        this.status =
-            "SHUTDOWN";
-
-
-        this.recordEvent(
-
-            "GRAPH_NODE_MANAGER_SHUTDOWN"
-
-        );
-
-
-        return true;
-
-
-    }
-
-
-
 }
+
+
 
 
 
