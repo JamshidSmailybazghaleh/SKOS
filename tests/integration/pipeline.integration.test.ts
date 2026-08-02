@@ -1,7 +1,7 @@
 /**
  * ==========================================================
  * SKOS
- * Integration Test
+ * Pipeline Integration Test
  * ==========================================================
  *
  * Build : BUILD-000035
@@ -9,19 +9,66 @@
  * ==========================================================
  */
 
-import { PipelineManager } from "../../subsystems/intake-engine/src/pipeline-manager";
 
-const manager = new PipelineManager();
+import { PipelineManager } 
+from "../../subsystems/intake-engine/src/pipeline-manager";
 
-manager.execute({
 
-    sourcePath: "sample.pdf",
 
-    rawContent: `
-This is a sample document.
+describe(
+    "SKOS Intake Pipeline Integration",
+    () => {
 
-This document is used only
-for pipeline integration testing.
-`
 
-});
+        test(
+            "Pipeline should process source document",
+            () => {
+
+
+                const manager =
+                    new PipelineManager();
+
+
+
+                const result =
+                    manager.execute({
+
+                        sourcePath:
+                            "sample.pdf",
+
+
+                        rawContent:
+                            `
+                            This is a sample document.
+
+                            This document is used only
+                            for pipeline integration testing.
+                            `
+
+                    });
+
+
+
+                expect(
+                    result.sourceType
+                )
+                .toBe(
+                    "pdf"
+                );
+
+
+
+                expect(
+                    result.rawContent
+                )
+                .toBeDefined();
+
+
+
+            }
+        );
+
+
+
+    }
+);
