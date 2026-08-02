@@ -15,14 +15,22 @@ class HistoryManager {
 
     constructor(repositoryManager) {
 
+    this.repository =
+        repositoryManager;
 
-        this.repository =
-            repositoryManager;
+    this.status =
+        "CREATED";
 
+}
 
-    }
+initialize(){
 
+    this.status =
+        "INITIALIZED";
 
+    return true;
+
+}
 
     getHistoryPath(objectId){
 
