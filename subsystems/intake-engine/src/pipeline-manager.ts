@@ -7,15 +7,16 @@
  * Subsystem : Intake Engine
  * Module    : Pipeline Manager
  *
- * Build     : BUILD-000030
+ * Build     : BUILD-000005
  * Sprint    : Sprint 02
- * Version   : 0.0.3
+ * Version   : 0.1.0
  *
- * Status    : Active
+ * Status    : Monitoring Integrated
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
  */
+
 
 import {
 
@@ -25,43 +26,80 @@ import {
 
 } from "./pipeline-step";
 
+
 import { SourceValidator } from "./source-validator";
 
 import { FileTypeDetector } from "./file-type-detector";
 
+
+
 export class PipelineManager {
+
 
     private readonly steps: PipelineStep[] = [];
 
-    constructor() {
+
+    private monitoring: any;
+
+
+
+    constructor(
+
+        monitoring: any = null
+
+    ) {
+
+
+        this.monitoring =
+            monitoring;
+
 
         this.initialize();
 
+
     }
+
+
 
     /**
      * Register default pipeline steps
      */
 
+
     private initialize(): void {
 
-        this.register(
-
-            new SourceValidator()
-
-        );
 
         this.register(
 
-            new FileTypeDetector()
+            new SourceValidator(
+
+                this.monitoring
+
+            )
 
         );
+
+
+
+        this.register(
+
+            new FileTypeDetector(
+
+                this.monitoring
+
+            )
+
+        );
+
 
     }
+
+
 
     /**
      * Register new pipeline step
      */
+
 
     public register(
 
@@ -69,13 +107,20 @@ export class PipelineManager {
 
     ): void {
 
+
         this.steps.push(step);
 
+
     }
+
+
+
+
 
     /**
      * Execute complete pipeline
      */
+
 
     public execute(
 
@@ -83,68 +128,230 @@ export class PipelineManager {
 
     ): PipelineContext {
 
-        console.log("==================================");
 
-        console.log("SKOS Intake Pipeline");
 
-        console.log("==================================");
+        console.log(
+            "=================================="
+        );
 
-        let current = context;
 
-        for (const step of this.steps) {
+        console.log(
+            "SKOS Intake Pipeline"
+        );
 
-            console.log("----------------------------------");
 
-            console.log(
+        console.log(
+            "=================================="
+        );
 
-                "Running:",
 
-                step.constructor.name
+
+        if (this.monitoring) {
+
+
+            this.monitoring.recordEvent(
+
+                "INTAKE_PIPELINE_STARTED",
+
+                {
+
+                    sourcePath:
+                        context.sourcePath || null
+
+                }
 
             );
 
-            current = step.execute(current);
+
+            this.monitoring.updateMetric(
+
+                "pipelinesStarted"
+
+            );
+
 
         }
 
-        console.log("----------------------------------");
 
-        console.log("Pipeline Completed");
 
-        console.log("==================================");
+        let current =
+            context;
+
+
+
+        try {
+
+
+            for (const step of this.steps) {
+
+
+                console.log(
+                    "----------------------------------"
+                );
+
+
+
+                console.log(
+
+                    "Running:",
+
+                    step.constructor.name
+
+                );
+
+
+
+                current =
+                    step.execute(current);
+
+
+            }
+
+
+
+            if (this.monitoring) {
+
+
+                this.monitoring.recordEvent(
+
+                    "INTAKE_PIPELINE_COMPLETED",
+
+                    {
+
+                        sourceType:
+                            current.sourceType || null
+
+                    }
+
+                );
+
+
+                this.monitoring.updateMetric(
+
+                    "pipelinesCompleted"
+
+                );
+
+
+            }
+
+
+
+        }
+
+
+        catch(error) {
+
+
+            if (this.monitoring) {
+
+
+                this.monitoring.recordEvent(
+
+                    "INTAKE_PIPELINE_FAILED",
+
+                    {
+
+                        error:
+                            error.message
+
+                    }
+
+                );
+
+
+                this.monitoring.updateMetric(
+
+                    "pipelinesFailed"
+
+                );
+
+
+            }
+
+
+            throw error;
+
+
+        }
+
+
+
+
+        console.log(
+            "----------------------------------"
+        );
+
+
+        console.log(
+            "Pipeline Completed"
+        );
+
+
+        console.log(
+            "=================================="
+        );
+
+
 
         return current;
 
+
     }
+
+
+
+
 
     /**
      * Remove all registered steps
      */
 
+
     public clear(): void {
+
 
         this.steps.length = 0;
 
+
     }
+
+
+
 
     /**
      * Number of registered steps
      */
 
+
     public count(): number {
+
 
         return this.steps.length;
 
+
     }
+
+
+
+
 
     /**
      * Return registered steps
      */
 
+
     public getSteps(): PipelineStep[] {
 
-        return [...this.steps];
+
+        return [
+
+            ...this.steps
+
+        ];
+
 
     }
+
 
 }
