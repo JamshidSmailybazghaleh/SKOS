@@ -2,15 +2,18 @@
  * SKOS Jest Configuration
  *
  * BUILD-000002
- * TEST-INFRA-001
+ * TEST-INFRA-002
  */
 
 module.exports = {
 
     testEnvironment: "node",
 
+    rootDir: ".",
+
     roots: [
-        "<rootDir>/tests"
+        "<rootDir>/tests",
+        "<rootDir>/src"
     ],
 
     testMatch: [
@@ -20,7 +23,7 @@ module.exports = {
 
     moduleDirectories: [
         "node_modules",
-        "src"
+        "<rootDir>/src"
     ],
 
     verbose: true
