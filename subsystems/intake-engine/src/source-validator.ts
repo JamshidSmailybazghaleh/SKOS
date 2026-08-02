@@ -7,15 +7,16 @@
  * Subsystem : Intake Engine
  * Module    : Source Validator
  *
- * Build     : BUILD-000005
+ * Build     : BUILD-000007.1
  * Sprint    : Sprint 02
- * Version   : 0.1.0
+ * Version   : 0.2.0
  *
- * Status    : Monitoring Enabled
+ * Status    : Monitoring Hook Integrated
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
  */
+
 
 import {
 
@@ -26,20 +27,31 @@ import {
 } from "./pipeline-step";
 
 
+
+
 export class SourceValidator implements PipelineStep {
+
 
 
     private monitoring: any = null;
 
 
+
     constructor(
+
         monitoring: any = null
+
     ) {
+
 
         this.monitoring =
             monitoring;
 
+
     }
+
+
+
 
 
     public execute(
@@ -49,122 +61,215 @@ export class SourceValidator implements PipelineStep {
     ): PipelineContext {
 
 
+
+        const startedAt =
+            new Date();
+
+
+
         console.log(
+
             "STEP 01 : Source Validation"
+
         );
 
 
-        if (
-            this.monitoring
-        ) {
+
+
+        if (this.monitoring) {
+
 
             this.monitoring.recordEvent(
 
-                "INTAKE_SOURCE_VALIDATION_STARTED",
+                "INTAKE_STEP_STARTED",
 
                 {
 
+                    step:
+                        "SourceValidator",
+
+
                     sourcePath:
-                        context.sourcePath
+                        context.sourcePath || null
+
 
                 }
 
             );
 
+
         }
 
 
-        if (
-            !context.sourcePath
-        ) {
 
 
-            if (this.monitoring) {
 
-                this.monitoring.recordEvent(
+        try {
 
-                    "INTAKE_SOURCE_VALIDATION_FAILED"
+
+
+            if (
+
+                !context.sourcePath
+
+            ) {
+
+
+                throw new Error(
+
+                    "Source path is empty."
 
                 );
 
-                this.monitoring.updateMetric(
-
-                    "validationFailed"
-
-                );
 
             }
 
 
-            throw new Error(
-                "Source path is empty."
-            );
-
-        }
 
 
-        if (
-            context.sourcePath.trim().length === 0
-        ) {
+
+            if (
+
+                context.sourcePath
+                    .trim()
+                    .length === 0
+
+            ) {
 
 
-            if (this.monitoring) {
+                throw new Error(
 
-                this.monitoring.recordEvent(
-
-                    "INTAKE_SOURCE_VALIDATION_FAILED"
+                    "Source path is invalid."
 
                 );
 
-                this.monitoring.updateMetric(
-
-                    "validationFailed"
-
-                );
 
             }
 
 
-            throw new Error(
-                "Source path is invalid."
+
+
+
+            if (this.monitoring) {
+
+
+                this.monitoring.recordEvent(
+
+                    "INTAKE_SOURCE_VALIDATION_COMPLETED",
+
+                    {
+
+                        step:
+                            "SourceValidator",
+
+
+                        sourcePath:
+                            context.sourcePath,
+
+
+                        duration:
+
+                            new Date().getTime()
+                            -
+                            startedAt.getTime()
+
+
+                    }
+
+                );
+
+
+
+                this.monitoring.updateMetric(
+
+                    "sourcesValidated"
+
+                );
+
+
+            }
+
+
+
+
+
+            console.log(
+
+                "Source validation passed."
+
             );
+
+
+
+            return context;
+
+
 
         }
 
 
-        if (
-            this.monitoring
-        ) {
+        catch(error) {
 
-            this.monitoring.recordEvent(
 
-                "INTAKE_SOURCE_VALIDATED",
 
-                {
+            const message =
 
-                    sourcePath:
-                        context.sourcePath
+                error instanceof Error
 
-                }
+                ?
 
-            );
+                error.message
 
-            this.monitoring.updateMetric(
+                :
 
-                "objectsValidated"
+                String(error);
 
-            );
+
+
+
+            if (this.monitoring) {
+
+
+                this.monitoring.recordEvent(
+
+                    "INTAKE_STEP_FAILED",
+
+                    {
+
+                        step:
+                            "SourceValidator",
+
+
+                        error:
+                            message
+
+
+                    }
+
+                );
+
+
+
+                this.monitoring.updateMetric(
+
+                    "sourceValidationFailed"
+
+                );
+
+
+            }
+
+
+
+            throw error;
+
 
         }
 
 
-        console.log(
-            "Source validation passed."
-        );
-
-
-        return context;
 
     }
+
+
 
 }
