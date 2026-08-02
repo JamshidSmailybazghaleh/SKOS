@@ -4,13 +4,6 @@
  * Smaily Knowledge Operating System
  * ==========================================================
  *
- * Build     : BUILD-000005
- * Version   : 0.1.2
- *
- * // BUILD-000005.1 VERIFIED - ERROR TYPE FIX APPLIED
- *
- * ==========================================================
- */
  * Subsystem : Intake Engine
  * Module    : Pipeline Manager
  *
@@ -21,6 +14,7 @@
  * Status    : Monitoring Integrated
  *
  * Copyright © Smaily Knowledge Foundation
+ *
  * ==========================================================
  */
 
