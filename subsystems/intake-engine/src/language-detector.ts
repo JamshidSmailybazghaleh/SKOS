@@ -7,24 +7,20 @@
  * Subsystem : Intake Engine
  * Module    : Language Detector
  *
- * Build     : BUILD-000005
+ * Build     : BUILD-000007.2
  * Sprint    : Sprint 02
- * Version   : 0.1.0
+ * Version   : 0.3.0
  *
- * Status    : Monitoring Integrated
+ * Status    : Monitoring Hook Integrated
+ *
+ * Copyright © Smaily Knowledge Foundation
  * ==========================================================
  */
 
-
 import {
-
     PipelineContext,
-
     PipelineStep
-
 } from "./pipeline-step";
-
-
 
 export enum LanguageCode {
 
@@ -38,55 +34,37 @@ export enum LanguageCode {
 
 }
 
-
-
-
-
 export class LanguageDetector implements PipelineStep {
 
-
-
-    private monitoring: any;
-
-
+    private monitoring: any = null;
 
     constructor(
-
         monitoring: any = null
-
     ) {
 
-        this.monitoring =
-            monitoring;
+        this.monitoring = monitoring;
 
     }
 
-
-
-
-
     public execute(
-
         context: PipelineContext
-
     ): PipelineContext {
 
-
+        const startedAt = new Date();
 
         console.log(
             "STEP 03 : Language Detection"
         );
 
-
-
         if (this.monitoring) {
-
 
             this.monitoring.recordEvent(
 
-                "INTAKE_LANGUAGE_DETECTION_STARTED",
+                "INTAKE_STEP_STARTED",
 
                 {
+
+                    step: "LanguageDetector",
 
                     sourcePath:
                         context.sourcePath || null
@@ -95,214 +73,125 @@ export class LanguageDetector implements PipelineStep {
 
             );
 
-
         }
-
-
 
         try {
 
-
             const value =
-
-                context.sourcePath || "";
-
-
-
-            let detectedLanguage =
-
-                LanguageCode.UNKNOWN;
-
-
-
-
+                context.rawContent ??
+                context.sourcePath ??
+                "";
 
             if (
-
-                !value ||
-
                 value.trim().length === 0
-
             ) {
 
-
-                detectedLanguage =
-
+                context.language =
                     LanguageCode.UNKNOWN;
 
-
             }
 
+            else if (/[آ-ی]/.test(value)) {
 
-
-            else if (
-
-                /[آ-ی]/.test(value)
-
-            ) {
-
-
-                detectedLanguage =
-
+                context.language =
                     LanguageCode.FA;
 
-
             }
 
+            else if (/[A-Za-z]/.test(value)) {
 
-
-            else if (
-
-                /[A-Za-z]/.test(value)
-
-            ) {
-
-
-                detectedLanguage =
-
+                context.language =
                     LanguageCode.EN;
 
-
             }
 
+            else if (/[\u0600-\u06FF]/.test(value)) {
 
-
-            else if (
-
-                /[\u0600-\u06FF]/.test(value)
-
-            ) {
-
-
-                detectedLanguage =
-
+                context.language =
                     LanguageCode.AR;
 
-
             }
 
+            else {
 
+                context.language =
+                    LanguageCode.UNKNOWN;
 
-
-
-            context.language =
-
-                detectedLanguage;
-
-
-
-
+            }
 
             if (this.monitoring) {
 
-
                 this.monitoring.recordEvent(
 
-                    "INTAKE_LANGUAGE_DETECTED",
+                    "INTAKE_LANGUAGE_DETECTION_COMPLETED",
 
                     {
 
-                        language:
+                        step:
+                            "LanguageDetector",
 
-                            detectedLanguage
+                        language:
+                            context.language,
+
+                        duration:
+                            new Date().getTime()
+                            -
+                            startedAt.getTime()
 
                     }
 
                 );
 
-
-
                 this.monitoring.updateMetric(
-
                     "languagesDetected"
-
                 );
-
-
-
-                if (
-
-                    detectedLanguage ===
-
-                    LanguageCode.UNKNOWN
-
-                ) {
-
-
-                    this.monitoring.updateMetric(
-
-                        "unknownLanguages"
-
-                    );
-
-
-                }
-
 
             }
 
-
-
-
-
             console.log(
-
                 "Detected Language:",
-
                 context.language
-
             );
-
-
 
             return context;
 
-
-
         }
 
+        catch (error) {
 
-
-        catch(error) {
-
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : String(error);
 
             if (this.monitoring) {
 
-
                 this.monitoring.recordEvent(
 
-                    "INTAKE_LANGUAGE_DETECTION_FAILED",
+                    "INTAKE_STEP_FAILED",
 
                     {
 
-                        error:
+                        step:
+                            "LanguageDetector",
 
-                            error.message
+                        error:
+                            message
 
                     }
 
                 );
 
-
-
                 this.monitoring.updateMetric(
-
                     "languageDetectionFailed"
-
                 );
-
 
             }
 
-
-
             throw error;
-
 
         }
 
-
     }
-
 
 }
