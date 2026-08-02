@@ -9,11 +9,12 @@
  *
  * Build     : BUILD-000030
  * Sprint    : Sprint 02
- * Version   : 0.0.2
+ * Version   : 0.0.3
  *
  * Status    : Active
  * ==========================================================
  */
+
 
 import {
 
@@ -22,6 +23,8 @@ import {
     PipelineStep
 
 } from "./pipeline-step";
+
+
 
 export enum SourceType {
 
@@ -41,7 +44,10 @@ export enum SourceType {
 
 }
 
+
+
 export class FileTypeDetector implements PipelineStep {
+
 
     public execute(
 
@@ -49,17 +55,57 @@ export class FileTypeDetector implements PipelineStep {
 
     ): PipelineContext {
 
-        console.log("STEP 02 : File Type Detection");
 
-        const path = context.sourcePath.toLowerCase();
+        console.log(
+            "STEP 02 : File Type Detection"
+        );
 
-        if (path.endsWith(".pdf")) {
 
-            context.sourceType = SourceType.PDF;
+        /**
+         * Safety check:
+         * Pipeline may receive rawContent
+         * without sourcePath.
+         */
+
+        if (!context.sourcePath) {
+
+
+            context.sourceType =
+                SourceType.UNKNOWN;
+
+
+            console.log(
+
+                "No source path provided."
+
+            );
+
+
+            return context;
 
         }
 
+
+
+        const path =
+
+            context.sourcePath
+                .toLowerCase();
+
+
+
+        if (path.endsWith(".pdf")) {
+
+
+            context.sourceType =
+                SourceType.PDF;
+
+
+        }
+
+
         else if (
+
 
             path.endsWith(".jpg") ||
 
@@ -69,65 +115,99 @@ export class FileTypeDetector implements PipelineStep {
 
             path.endsWith(".webp")
 
+
         ) {
 
-            context.sourceType = SourceType.IMAGE;
+
+            context.sourceType =
+                SourceType.IMAGE;
+
 
         }
 
+
         else if (
+
 
             path.endsWith(".mp3") ||
 
             path.endsWith(".wav")
 
+
         ) {
 
-            context.sourceType = SourceType.AUDIO;
+
+            context.sourceType =
+                SourceType.AUDIO;
+
 
         }
 
+
         else if (
+
 
             path.endsWith(".mp4") ||
 
             path.endsWith(".mkv")
 
+
         ) {
 
-            context.sourceType = SourceType.VIDEO;
+
+            context.sourceType =
+                SourceType.VIDEO;
+
 
         }
 
+
         else if (
+
 
             path.endsWith(".txt") ||
 
             path.endsWith(".md")
 
+
         ) {
 
-            context.sourceType = SourceType.TEXT;
+
+            context.sourceType =
+                SourceType.TEXT;
+
 
         }
 
+
         else if (
+
 
             path.endsWith(".html") ||
 
             path.endsWith(".htm")
 
+
         ) {
 
-            context.sourceType = SourceType.HTML;
+
+            context.sourceType =
+                SourceType.HTML;
+
 
         }
+
 
         else {
 
-            context.sourceType = SourceType.UNKNOWN;
+
+            context.sourceType =
+                SourceType.UNKNOWN;
+
 
         }
+
+
 
         console.log(
 
@@ -137,8 +217,12 @@ export class FileTypeDetector implements PipelineStep {
 
         );
 
+
+
         return context;
 
+
     }
+
 
 }
