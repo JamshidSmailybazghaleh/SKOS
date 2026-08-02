@@ -243,38 +243,44 @@ export class PipelineManager {
         catch(error) {
 
 
-            if (this.monitoring) {
+    if (this.monitoring) {
 
 
-                this.monitoring.recordEvent(
+        this.monitoring.recordEvent(
 
-                    "INTAKE_PIPELINE_FAILED",
+            "INTAKE_PIPELINE_FAILED",
 
-                    {
+            {
 
-                        error:
-                            error.message
+                error:
 
-                    }
+                    error instanceof Error
 
-                );
+                    ? error.message
 
-
-                this.monitoring.updateMetric(
-
-                    "pipelinesFailed"
-
-                );
-
+                    : String(error)
 
             }
 
+        );
 
-            throw error;
 
 
-        }
+        this.monitoring.updateMetric(
 
+            "pipelinesFailed"
+
+        );
+
+
+    }
+
+
+
+    throw error;
+
+
+}
 
 
 
