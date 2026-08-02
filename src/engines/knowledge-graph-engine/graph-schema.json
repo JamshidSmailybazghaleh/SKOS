@@ -1,0 +1,184 @@
+{
+    "schema": "SKOS Knowledge Graph Schema",
+
+    "version": "1.0.0",
+
+    "description":
+        "Defines standard structure for Knowledge Graph nodes and relationships.",
+
+
+    "node": {
+
+        "required": [
+
+            "id",
+
+            "type",
+
+            "createdAt"
+
+        ],
+
+
+        "properties": {
+
+
+            "id": {
+
+                "type": "string",
+
+                "description":
+                    "Unique Knowledge Object identifier"
+
+            },
+
+
+            "type": {
+
+                "type": "string",
+
+                "description":
+                    "Knowledge Object classification"
+
+            },
+
+
+            "title": {
+
+                "type": "string"
+
+            },
+
+
+            "content": {
+
+                "type": "string"
+
+            },
+
+
+            "metadata": {
+
+                "type": "object"
+
+            },
+
+
+            "createdAt": {
+
+                "type": "date"
+
+            }
+
+
+        }
+
+
+    },
+
+
+
+    "edge": {
+
+
+        "required": [
+
+            "id",
+
+            "from",
+
+            "to",
+
+            "type",
+
+            "createdAt"
+
+        ],
+
+
+        "properties": {
+
+
+            "id": {
+
+                "type": "string"
+
+            },
+
+
+            "from": {
+
+                "type": "string",
+
+                "description":
+                    "Source node id"
+
+            },
+
+
+            "to": {
+
+                "type": "string",
+
+                "description":
+                    "Target node id"
+
+            },
+
+
+            "type": {
+
+                "type": "string",
+
+                "description":
+                    "Relationship type"
+
+            },
+
+
+            "metadata": {
+
+                "type": "object"
+
+            },
+
+
+            "createdAt": {
+
+                "type": "date"
+
+            }
+
+
+        }
+
+
+    },
+
+
+    "relations": {
+
+
+        "allowedTypes": [
+
+            "IS_A",
+
+            "PART_OF",
+
+            "RELATED_TO",
+
+            "DERIVED_FROM",
+
+            "CAUSES",
+
+            "SUPPORTS",
+
+            "CONTRADICTS",
+
+            "REFERENCES"
+
+        ]
+
+    }
+
+}
