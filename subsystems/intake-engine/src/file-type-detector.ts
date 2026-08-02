@@ -7,11 +7,11 @@
  * Subsystem : Intake Engine
  * Module    : File Type Detector
  *
- * Build     : BUILD-000030
+ * Build     : BUILD-000005
  * Sprint    : Sprint 02
- * Version   : 0.0.3
+ * Version   : 0.1.0
  *
- * Status    : Active
+ * Status    : Monitoring Enabled
  * ==========================================================
  */
 
@@ -49,6 +49,23 @@ export enum SourceType {
 export class FileTypeDetector implements PipelineStep {
 
 
+    private monitoring: any = null;
+
+
+
+    constructor(
+
+        monitoring: any = null
+
+    ) {
+
+        this.monitoring =
+            monitoring;
+
+    }
+
+
+
     public execute(
 
         context: PipelineContext
@@ -56,9 +73,32 @@ export class FileTypeDetector implements PipelineStep {
     ): PipelineContext {
 
 
+
         console.log(
             "STEP 02 : File Type Detection"
         );
+
+
+
+        if (this.monitoring) {
+
+
+            this.monitoring.recordEvent(
+
+                "INTAKE_FILE_TYPE_DETECTION_STARTED",
+
+                {
+
+                    sourcePath:
+                        context.sourcePath || null
+
+                }
+
+            );
+
+
+        }
+
 
 
         /**
@@ -67,11 +107,41 @@ export class FileTypeDetector implements PipelineStep {
          * without sourcePath.
          */
 
+
         if (!context.sourcePath) {
 
 
             context.sourceType =
                 SourceType.UNKNOWN;
+
+
+
+            if (this.monitoring) {
+
+
+                this.monitoring.recordEvent(
+
+                    "INTAKE_FILE_TYPE_UNKNOWN",
+
+                    {
+
+                        reason:
+                            "NO_SOURCE_PATH"
+
+                    }
+
+                );
+
+
+                this.monitoring.updateMetric(
+
+                    "fileTypesUnknown"
+
+                );
+
+
+            }
+
 
 
             console.log(
@@ -81,23 +151,31 @@ export class FileTypeDetector implements PipelineStep {
             );
 
 
+
             return context;
+
 
         }
 
 
 
-        const path =
+
+        const filePath =
 
             context.sourcePath
                 .toLowerCase();
 
 
 
-        if (path.endsWith(".pdf")) {
+        let detectedType =
+            SourceType.UNKNOWN;
 
 
-            context.sourceType =
+
+        if (filePath.endsWith(".pdf")) {
+
+
+            detectedType =
                 SourceType.PDF;
 
 
@@ -107,19 +185,19 @@ export class FileTypeDetector implements PipelineStep {
         else if (
 
 
-            path.endsWith(".jpg") ||
+            filePath.endsWith(".jpg") ||
 
-            path.endsWith(".jpeg") ||
+            filePath.endsWith(".jpeg") ||
 
-            path.endsWith(".png") ||
+            filePath.endsWith(".png") ||
 
-            path.endsWith(".webp")
+            filePath.endsWith(".webp")
 
 
         ) {
 
 
-            context.sourceType =
+            detectedType =
                 SourceType.IMAGE;
 
 
@@ -129,15 +207,15 @@ export class FileTypeDetector implements PipelineStep {
         else if (
 
 
-            path.endsWith(".mp3") ||
+            filePath.endsWith(".mp3") ||
 
-            path.endsWith(".wav")
+            filePath.endsWith(".wav")
 
 
         ) {
 
 
-            context.sourceType =
+            detectedType =
                 SourceType.AUDIO;
 
 
@@ -147,15 +225,15 @@ export class FileTypeDetector implements PipelineStep {
         else if (
 
 
-            path.endsWith(".mp4") ||
+            filePath.endsWith(".mp4") ||
 
-            path.endsWith(".mkv")
+            filePath.endsWith(".mkv")
 
 
         ) {
 
 
-            context.sourceType =
+            detectedType =
                 SourceType.VIDEO;
 
 
@@ -165,15 +243,15 @@ export class FileTypeDetector implements PipelineStep {
         else if (
 
 
-            path.endsWith(".txt") ||
+            filePath.endsWith(".txt") ||
 
-            path.endsWith(".md")
+            filePath.endsWith(".md")
 
 
         ) {
 
 
-            context.sourceType =
+            detectedType =
                 SourceType.TEXT;
 
 
@@ -183,29 +261,76 @@ export class FileTypeDetector implements PipelineStep {
         else if (
 
 
-            path.endsWith(".html") ||
+            filePath.endsWith(".html") ||
 
-            path.endsWith(".htm")
+            filePath.endsWith(".htm")
 
 
         ) {
 
 
-            context.sourceType =
+            detectedType =
                 SourceType.HTML;
 
 
         }
 
 
-        else {
 
 
-            context.sourceType =
-                SourceType.UNKNOWN;
+        context.sourceType =
+            detectedType;
+
+
+
+        if (this.monitoring) {
+
+
+            this.monitoring.recordEvent(
+
+                "INTAKE_FILE_TYPE_DETECTED",
+
+                {
+
+                    sourceType:
+                        detectedType,
+
+                    sourcePath:
+                        context.sourcePath
+
+                }
+
+            );
+
+
+            this.monitoring.updateMetric(
+
+                "fileTypesDetected"
+
+            );
+
+
+
+            if (
+
+                detectedType ===
+                SourceType.UNKNOWN
+
+            ) {
+
+
+                this.monitoring.updateMetric(
+
+                    "fileTypesUnknown"
+
+                );
+
+
+            }
 
 
         }
+
 
 
 
