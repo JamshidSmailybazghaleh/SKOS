@@ -7,11 +7,11 @@
  * Subsystem : Intake Engine
  * Module    : Main Engine
  *
- * Build     : BUILD-000024
+ * Build     : BUILD-000005
  * Sprint    : Sprint 02
- * Version   : 0.0.1
+ * Version   : 0.1.0
  *
- * Status    : Active
+ * Status    : Monitoring Enabled
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -41,6 +41,19 @@ export class IntakeEngine {
 
     private parser = new DocumentParser();
 
+    private monitoring: any = null;
+
+    constructor(options: any = {}) {
+
+        this.monitoring =
+            options.monitoring || null;
+
+    }
+
+    /**
+     * Start Intake Engine
+     */
+
     public start(): void {
 
         console.log("==================================");
@@ -49,17 +62,68 @@ export class IntakeEngine {
         console.log("Status : READY");
         console.log("==================================");
 
+        if (this.monitoring) {
+
+            this.monitoring.recordEvent(
+                "INTAKE_ENGINE_INITIALIZED"
+            );
+
+        }
+
     }
 
-    public receive(request: IntakeRequest): IntakeResult {
+    /**
+     * Receive Source
+     */
+
+    public receive(
+        request: IntakeRequest
+    ): IntakeResult {
 
         console.log("Receiving source...");
 
-        const parsed = this.parser.parse(request.sourcePath);
+        if (this.monitoring) {
+
+            this.monitoring.recordEvent(
+
+                "INTAKE_OBJECT_RECEIVED",
+
+                {
+
+                    sourcePath:
+                        request.sourcePath,
+
+                    sourceType:
+                        request.sourceType
+
+                }
+
+            );
+
+            this.monitoring.updateMetric(
+                "objectsReceived"
+            );
+
+        }
+
+        const parsed =
+            this.parser.parse(
+                request.sourcePath
+            );
 
         console.log("Parsed Document");
 
         console.log(parsed);
+
+        if (this.monitoring) {
+
+            this.monitoring.recordEvent(
+
+                "INTAKE_DOCUMENT_PARSED"
+
+            );
+
+        }
 
         return {
 
@@ -68,6 +132,22 @@ export class IntakeEngine {
             message: "Source accepted."
 
         };
+
+    }
+
+    /**
+     * Shutdown
+     */
+
+    public shutdown(): void {
+
+        if (this.monitoring) {
+
+            this.monitoring.recordEvent(
+                "INTAKE_ENGINE_SHUTDOWN"
+            );
+
+        }
 
     }
 
