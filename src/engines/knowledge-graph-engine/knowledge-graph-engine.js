@@ -7,14 +7,14 @@
  * Engine     : Knowledge Graph Engine
  * File       : knowledge-graph-engine.js
  *
- * Build      : BUILD-000362
- * Version    : 1.0.0
+ * Build      : BUILD-000363
+ * Version    : 1.1.0
  *
- * Status     : Monitoring Integrated
+ * Status     : Production Ready
  *
  * Mission:
- * Create and manage relationships between
- * Knowledge Objects.
+ * Create, manage and analyze relationships
+ * between Knowledge Objects.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -32,7 +32,7 @@ class KnowledgeGraphEngine {
 
 
         this.version =
-            "1.0.0";
+            "1.1.0";
 
 
         this.status =
@@ -49,6 +49,24 @@ class KnowledgeGraphEngine {
 
         this.edges =
             [];
+
+
+        this.events =
+            [];
+
+
+        this.metrics = {
+
+            nodesCreated: 0,
+
+            nodesRemoved: 0,
+
+            relationsCreated: 0,
+
+            relationsRemoved: 0
+
+        };
+
 
     }
 
@@ -78,18 +96,65 @@ class KnowledgeGraphEngine {
 
 
 
-    /**
-     * Add Knowledge Object Node
-     */
+    execute(operation, payload = {}) {
+
+
+        switch(operation) {
+
+
+            case "ADD_NODE":
+
+                return this.addNode(payload);
+
+
+            case "ADD_RELATION":
+
+                return this.addRelation(
+
+                    payload.from,
+
+                    payload.to,
+
+                    payload.type,
+
+                    payload.metadata
+
+                );
+
+
+            case "GET_GRAPH":
+
+                return this.getGraph();
+
+
+            default:
+
+                throw new Error(
+
+                    "Unknown graph operation."
+
+                );
+
+
+        }
+
+    }
+
+
+
 
 
     addNode(object) {
 
 
-        if (
+        if(
+
             !object ||
+
             !object.id
+
         ) {
+
 
             throw new Error(
 
@@ -97,7 +162,9 @@ class KnowledgeGraphEngine {
 
             );
 
+
         }
+
 
 
         this.nodes.set(
@@ -109,19 +176,6 @@ class KnowledgeGraphEngine {
         );
 
 
-        this.recordEvent(
-
-            "GRAPH_NODE_ADDED",
-
-            {
-
-                id:
-                    object.id
-
-            }
-
-        );
-
 
         this.updateMetric(
 
@@ -130,17 +184,29 @@ class KnowledgeGraphEngine {
         );
 
 
+
+        this.recordEvent(
+
+            "GRAPH_NODE_ADDED",
+
+            {
+
+                id:
+
+                    object.id
+
+            }
+
+        );
+
+
+
         return object;
 
     }
 
 
 
-
-
-    /**
-     * Remove Node
-     */
 
 
     removeNode(id) {
@@ -152,7 +218,29 @@ class KnowledgeGraphEngine {
 
 
 
-        if (removed) {
+        if(removed) {
+
+
+            this.edges =
+
+                this.edges.filter(
+
+                    edge =>
+
+                        edge.from !== id &&
+
+                        edge.to !== id
+
+                );
+
+
+
+            this.updateMetric(
+
+                "nodesRemoved"
+
+            );
+
 
 
             this.recordEvent(
@@ -167,14 +255,8 @@ class KnowledgeGraphEngine {
 
             );
 
-
-            this.updateMetric(
-
-                "nodesRemoved"
-
-            );
-
         }
+
 
 
         return removed;
@@ -183,11 +265,6 @@ class KnowledgeGraphEngine {
 
 
 
-
-
-    /**
-     * Create Relationship
-     */
 
 
     addRelation(
@@ -203,7 +280,7 @@ class KnowledgeGraphEngine {
     ) {
 
 
-        if (
+        if(
 
             !this.nodes.has(from) ||
 
@@ -211,9 +288,39 @@ class KnowledgeGraphEngine {
 
         ) {
 
+
             throw new Error(
 
                 "Both nodes must exist."
+
+            );
+
+        }
+
+
+
+        const exists =
+
+            this.edges.some(
+
+                edge =>
+
+                    edge.from === from &&
+
+                    edge.to === to &&
+
+                    edge.type === type
+
+            );
+
+
+
+        if(exists) {
+
+
+            throw new Error(
+
+                "Relation already exists."
 
             );
 
@@ -226,19 +333,17 @@ class KnowledgeGraphEngine {
 
             from,
 
-
             to,
 
-
             type,
-
 
             metadata,
 
 
             createdAt:
 
-                new Date()
+                new Date().toISOString()
+
 
         };
 
@@ -247,6 +352,14 @@ class KnowledgeGraphEngine {
         this.edges.push(
 
             relation
+
+        );
+
+
+
+        this.updateMetric(
+
+            "relationsCreated"
 
         );
 
@@ -261,12 +374,6 @@ class KnowledgeGraphEngine {
         );
 
 
-        this.updateMetric(
-
-            "relationsCreated"
-
-        );
-
 
         return relation;
 
@@ -274,11 +381,6 @@ class KnowledgeGraphEngine {
 
 
 
-
-
-    /**
-     * Get Node
-     */
 
 
     getNode(id) {
@@ -300,11 +402,6 @@ class KnowledgeGraphEngine {
 
 
 
-    /**
-     * Get Relations of Node
-     */
-
-
     getRelations(id) {
 
 
@@ -324,11 +421,6 @@ class KnowledgeGraphEngine {
 
 
 
-    /**
-     * Return Complete Graph
-     */
-
-
     getGraph() {
 
 
@@ -346,7 +438,11 @@ class KnowledgeGraphEngine {
 
             edges:
 
-                this.edges
+                [
+
+                    ...this.edges
+
+                ]
 
         };
 
@@ -356,9 +452,57 @@ class KnowledgeGraphEngine {
 
 
 
-    /**
-     * Graph Statistics
-     */
+    clearGraph() {
+
+
+        this.nodes.clear();
+
+
+        this.edges = [];
+
+
+        this.recordEvent(
+
+            "GRAPH_CLEARED"
+
+        );
+
+
+    }
+
+
+
+
+
+    getEvents() {
+
+
+        return [
+
+            ...this.events
+
+        ];
+
+    }
+
+
+
+
+
+    getMetrics() {
+
+
+        return {
+
+
+            ...this.metrics
+
+        };
+
+    }
+
+
+
 
 
     getStatus() {
@@ -389,7 +533,12 @@ class KnowledgeGraphEngine {
 
             relations:
 
-                this.edges.length
+                this.edges.length,
+
+
+            metrics:
+
+                this.metrics
 
 
         };
@@ -398,11 +547,6 @@ class KnowledgeGraphEngine {
 
 
 
-
-
-    /**
-     * Monitoring Event
-     */
 
 
     recordEvent(
@@ -414,11 +558,31 @@ class KnowledgeGraphEngine {
     ) {
 
 
-        if (
+        const event = {
 
-            this.monitoring
 
-        ) {
+            name,
+
+            metadata,
+
+
+            timestamp:
+
+                new Date().toISOString()
+
+        };
+
+
+
+        this.events.push(
+
+            event
+
+        );
+
+
+
+        if(this.monitoring) {
 
 
             this.monitoring.recordEvent(
@@ -438,23 +602,27 @@ class KnowledgeGraphEngine {
 
 
 
-    /**
-     * Monitoring Metric
-     */
+    updateMetric(name) {
 
 
-    updateMetric(
+        if(
 
-        name
-
-    ) {
-
-
-        if (
-
-            this.monitoring
+            !this.metrics[name]
 
         ) {
+
+
+            this.metrics[name] = 0;
+
+        }
+
+
+
+        this.metrics[name]++;
+
+
+
+        if(this.monitoring) {
 
 
             this.monitoring.updateMetric(
