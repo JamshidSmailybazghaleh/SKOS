@@ -1,94 +1,216 @@
 /**
+ * ==========================================================
  * SKOS Monitoring Engine
  *
- * ENG-MON-001
- * BUILD-000001
+ * Engine ID : ENG-MON-001
+ * Build     : BUILD-000003
+ * Version   : 1.1.0
+ *
+ * Purpose:
+ * Central Monitoring and Observability Engine
+ * for Smaily Knowledge Operating System
+ *
+ * Status:
+ * Active
+ * ==========================================================
  */
 
 
 class MonitoringEngine {
 
 
-    constructor() {
+    constructor(options = {}) {
+
 
         this.name =
             "Monitoring Engine";
 
+
         this.version =
-            "1.0.0";
+            "1.1.0";
 
 
         this.status =
             "CREATED";
 
 
+        this.startTime =
+            null;
+
+
+        this.logger =
+            options.logger || null;
+
+
+
+        /**
+         * Event Registry
+         */
+
         this.events = [];
 
 
+
+        /**
+         * SKOS Core Metrics
+         */
+
         this.metrics = {
 
-            objectsReceived: 0
+
+            objectsReceived: 0,
+
+
+            objectsValidated: 0,
+
+
+            objectsStored: 0,
+
+
+            metadataGenerated: 0,
+
+
+            versionsCreated: 0,
+
+
+            eventsRecorded: 0,
+
+
+            errors: 0
+
 
         };
+
 
     }
 
 
 
+
+
+    /**
+     * Initialize Monitoring Engine
+     */
+
     initialize() {
+
 
         this.status =
             "INITIALIZED";
 
 
+        this.startTime =
+            new Date();
+
+
+
+        this.recordEvent(
+            "MONITORING_ENGINE_INITIALIZED"
+        );
+
+
+
         return {
+
 
             status:
                 this.status
 
+
         };
+
 
     }
 
 
 
-    recordEvent(eventName) {
 
 
-        this.events.push({
+    /**
+     * Register Monitoring Event
+     */
+
+    recordEvent(
+        eventName,
+        details = {}
+    ) {
+
+
+
+        const event = {
+
 
             name:
                 eventName,
 
+
+            details:
+                details,
+
+
             timestamp:
                 new Date()
 
-        });
+
+        };
 
 
-        return true;
+
+        this.events.push(event);
+
+
+
+        this.updateMetric(
+            "eventsRecorded"
+        );
+
+
+
+        this.log(
+            eventName,
+            details
+        );
+
+
+
+        return event;
+
 
     }
 
 
 
 
-    updateMetric(metricName) {
+
+    /**
+     * Update Metric Counter
+     */
+
+    updateMetric(
+        metricName
+    ) {
+
 
 
         if (
-            !this.metrics[metricName]
+            typeof this.metrics[metricName]
+            !== "number"
         ) {
+
 
             this.metrics[metricName] = 0;
 
+
         }
+
 
 
         this.metrics[metricName]++;
 
 
+
         return this.metrics[metricName];
+
 
     }
 
@@ -96,10 +218,55 @@ class MonitoringEngine {
 
 
 
+    /**
+     * Register Error
+     */
+
+    recordError(
+        error,
+        details = {}
+    ) {
+
+
+        this.updateMetric(
+            "errors"
+        );
+
+
+
+        return this.recordEvent(
+
+            "ERROR",
+
+            {
+
+                message:
+                    error.message ||
+                    error,
+
+
+                details
+
+            }
+
+        );
+
+
+    }
+
+
+
+
+
+    /**
+     * Return Engine Status
+     */
+
     getStatus() {
 
 
         return {
+
 
             name:
                 this.name,
@@ -113,30 +280,50 @@ class MonitoringEngine {
                 this.status,
 
 
+            uptime:
+                this.getUptime(),
+
+
             events:
                 this.events.length
 
+
         };
+
 
     }
 
 
 
 
+
+    /**
+     * Health Information
+     */
 
     getHealth() {
 
 
         return {
 
+
             status:
                 this.status,
 
 
+            healthy:
+                this.status ===
+                "INITIALIZED",
+
+
             metrics:
-                this.metrics
+                {
+                    ...this.metrics
+                }
+
 
         };
+
 
     }
 
@@ -144,27 +331,156 @@ class MonitoringEngine {
 
 
 
+    /**
+     * Dashboard Data
+     */
+
     getDashboard() {
 
 
         return {
 
+
             system:
                 "SKOS",
+
+
+            engine:
+                this.name,
+
+
+            version:
+                this.version,
 
 
             status:
                 this.status,
 
 
+            uptime:
+                this.getUptime(),
+
+
             metrics:
-                this.metrics,
+                {
+                    ...this.metrics
+                },
 
 
             events:
                 this.events.length
 
+
         };
+
+
+    }
+
+
+
+
+
+    /**
+     * Return Event History
+     */
+
+    getEvents() {
+
+
+        return [
+
+            ...this.events
+
+        ];
+
+
+    }
+
+
+
+
+
+    /**
+     * Calculate Uptime
+     */
+
+    getUptime() {
+
+
+        if (!this.startTime) {
+
+            return 0;
+
+        }
+
+
+
+        return (
+
+            new Date()
+            -
+            this.startTime
+
+        );
+
+
+    }
+
+
+
+
+
+    /**
+     * Logger Integration
+     */
+
+    log(
+        message,
+        metadata = {}
+    ) {
+
+
+        if (this.logger) {
+
+
+            this.logger.info(
+
+                message,
+
+                metadata
+
+            );
+
+
+        }
+
+
+    }
+
+
+
+
+
+    /**
+     * Shutdown Engine
+     */
+
+    shutdown() {
+
+
+        this.status =
+            "SHUTDOWN";
+
+
+
+        this.recordEvent(
+            "MONITORING_ENGINE_SHUTDOWN"
+        );
+
+
+
+        return true;
+
 
     }
 
