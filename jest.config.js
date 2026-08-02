@@ -2,7 +2,7 @@
  * SKOS Jest Configuration
  *
  * BUILD-000002
- * TEST-INFRA-002
+ * TEST-INFRA-003
  */
 
 module.exports = {
@@ -25,6 +25,15 @@ module.exports = {
         "node_modules",
         "<rootDir>/src"
     ],
+
+    transform: {
+
+        "^.+\\.tsx?$": [
+            "ts-jest",
+            {}
+        ]
+
+    },
 
     verbose: true
 
