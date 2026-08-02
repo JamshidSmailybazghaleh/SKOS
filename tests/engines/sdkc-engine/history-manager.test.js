@@ -11,13 +11,31 @@ require(
 );
 
 
+const RepositoryManager =
+require(
+"../../../src/engines/sdkc-engine/repository-manager"
+);
+
+
+
 test(
 "History event should register",
 ()=>{
 
 
+const repository =
+new RepositoryManager();
+
+
+repository.initialize();
+
+
+
 const history =
-new HistoryManager();
+new HistoryManager(
+    repository
+);
+
 
 
 const result =
@@ -28,6 +46,7 @@ history.addEvent(
 "TEST_EVENT"
 
 );
+
 
 
 expect(
