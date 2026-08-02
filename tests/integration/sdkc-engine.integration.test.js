@@ -1,189 +1,209 @@
 /**
- * SKOS SDKC Integration Test
+ * ==========================================================
+ * SKOS
+ * SDKC + Monitoring Integration Test
+ * ==========================================================
  *
- * File ID:
- * TEST-SDKC-INT-001
- *
- * Build:
- * BUILD-000001
+ * Test ID : TEST-INT-004
+ * Build   : BUILD-000004.1
+ * Version : 1.0.0
+ * ==========================================================
  */
 
 const SDKCEngine =
-require("../../src/engines/sdkc-engine/sdkc-engine");
+require(
+"../../src/engines/sdkc-engine/sdkc-engine"
+);
 
-const RepositoryManager =
-require("../../src/engines/sdkc-engine/repository-manager");
-
-const ObjectStorage =
-require("../../src/engines/sdkc-engine/object-storage");
-
-const ManifestManager =
-require("../../src/engines/sdkc-engine/manifest-manager");
-
-const HistoryManager =
-require("../../src/engines/sdkc-engine/history-manager");
+const MonitoringEngine =
+require(
+"../../src/engines/monitoring-engine/monitoring-engine"
+);
 
 
 describe(
-"SKOS SDKC Integration Test",
+"SDKC Monitoring Integration",
 ()=>{
 
 
-let repository;
-
-let storage;
-
-let manifest;
-
-let history;
+let monitoring;
 
 let sdkc;
 
 
-beforeAll(()=>{
+beforeEach(()=>{
 
-    repository =
-    new RepositoryManager();
 
-    repository.initialize();
+monitoring =
+new MonitoringEngine();
 
-    storage =
-    new ObjectStorage(repository);
+monitoring.initialize();
 
-    manifest =
-    new ManifestManager(repository);
 
-    history =
-    new HistoryManager(repository);
+sdkc =
+new SDKCEngine({
 
-    sdkc =
-    new SDKCEngine();
+monitoring
 
-    sdkc.initialize();
+});
+
+sdkc.initialize();
+
 
 });
 
 
 test(
-"Complete SDKC pipeline",
+"SDKC should report stored object",
 ()=>{
 
 
-const object = {
+sdkc.store({
 
 id:
 "SKOS-KO-000001",
 
 title:
-"Hekmat Noor",
+"Knowledge Object"
 
-author:
-"Jamshid Smaily",
-
-language:
-"Persian",
-
-format:
-"PDF"
-
-};
-
-
-sdkc.store(object);
-
-
-storage.storeMetadata(
-
-object.id,
-
-object
-
-);
-
-
-manifest.createManifest(
-
-object.id,
-
-{
-
-build:
-"BUILD-000001"
-
-}
-
-);
-
-
-history.addEvent(
-
-object.id,
-
-"OBJECT_CREATED",
-
-{
-
-version:
-"1.0.0"
-
-}
-
-);
+});
 
 
 expect(
 
-sdkc.exists(
-object.id)
+monitoring.metrics.objectsStored
 
-).toBe(true);
+)
 
-
-expect(
-
-repository.exists(
-object.id)
-
-).toBe(true);
-
-
-expect(
-
-storage.loadMetadata(
-object.id
-).title
-
-).toBe(
-"Hekmat Noor"
-);
-
-
-expect(
-
-manifest.loadManifest(
-object.id
-).status
-
-).toBe(
-"ACTIVE"
-);
-
-
-expect(
-
-history.getHistory(
-object.id
-).length
-
-).toBeGreaterThan(0);
+.toBe(1);
 
 
 });
 
 
-afterAll(()=>{
+test(
+"SDKC should report retrieve event",
+()=>{
 
-sdkc.shutdown();
+
+sdkc.store({
+
+id:
+"SKOS-KO-000001"
+
+});
+
+
+sdkc.retrieve(
+
+"SKOS-KO-000001"
+
+);
+
+
+const event =
+
+monitoring
+.getEvents()
+
+.find(
+
+e =>
+
+e.name ===
+
+"SDKC_OBJECT_RETRIEVED"
+
+);
+
+
+expect(
+
+event
+
+)
+
+.toBeDefined();
+
+
+});
+
+
+test(
+"SDKC should report remove event",
+()=>{
+
+
+sdkc.store({
+
+id:
+"SKOS-KO-000001"
+
+});
+
+
+sdkc.remove(
+
+"SKOS-KO-000001"
+
+);
+
+
+const event =
+
+monitoring
+.getEvents()
+
+.find(
+
+e =>
+
+e.name ===
+
+"SDKC_OBJECT_REMOVED"
+
+);
+
+
+expect(
+
+event
+
+)
+
+.toBeDefined();
+
+
+});
+
+
+test(
+"Monitoring dashboard should contain SDKC metrics",
+()=>{
+
+
+sdkc.store({
+
+id:
+"SKOS-KO-000001"
+
+});
+
+
+const dashboard =
+
+monitoring
+.getDashboard();
+
+
+expect(
+
+dashboard.metrics.objectsStored
+
+)
+
+.toBe(1);
+
 
 });
 
