@@ -9,7 +9,7 @@
  *
  * Build     : BUILD-000005
  * Sprint    : Sprint 02
- * Version   : 0.1.0
+ * Version   : 0.1.1
  *
  * Status    : Monitoring Integrated
  *
@@ -36,7 +36,9 @@ import { FileTypeDetector } from "./file-type-detector";
 export class PipelineManager {
 
 
+
     private readonly steps: PipelineStep[] = [];
+
 
 
     private monitoring: any;
@@ -51,6 +53,7 @@ export class PipelineManager {
 
 
         this.monitoring =
+
             monitoring;
 
 
@@ -61,10 +64,11 @@ export class PipelineManager {
 
 
 
-    /**
-     * Register default pipeline steps
-     */
 
+
+    /**
+     * Initialize default pipeline
+     */
 
     private initialize(): void {
 
@@ -96,10 +100,11 @@ export class PipelineManager {
 
 
 
-    /**
-     * Register new pipeline step
-     */
 
+
+    /**
+     * Register pipeline step
+     */
 
     public register(
 
@@ -118,9 +123,8 @@ export class PipelineManager {
 
 
     /**
-     * Execute complete pipeline
+     * Execute pipeline
      */
-
 
     public execute(
 
@@ -156,6 +160,7 @@ export class PipelineManager {
                 {
 
                     sourcePath:
+
                         context.sourcePath || null
 
                 }
@@ -174,15 +179,24 @@ export class PipelineManager {
 
 
 
-        let current =
+
+
+        let current:
+
+            PipelineContext =
+
             context;
+
+
 
 
 
         try {
 
 
+
             for (const step of this.steps) {
+
 
 
                 console.log(
@@ -202,10 +216,18 @@ export class PipelineManager {
 
 
                 current =
-                    step.execute(current);
+
+                    step.execute(
+
+                        current
+
+                    );
+
 
 
             }
+
+
 
 
 
@@ -219,11 +241,18 @@ export class PipelineManager {
                     {
 
                         sourceType:
-                            current.sourceType || null
+
+                            current.sourceType || null,
+
+
+                        language:
+
+                            current.language || null
 
                     }
 
                 );
+
 
 
                 this.monitoring.updateMetric(
@@ -237,50 +266,66 @@ export class PipelineManager {
 
 
 
-        }
 
+
+        }
 
         catch(error) {
 
 
-    if (this.monitoring) {
+
+            const message =
+
+                error instanceof Error
+
+                ?
+
+                error.message
+
+                :
+
+                String(error);
 
 
-        this.monitoring.recordEvent(
 
-            "INTAKE_PIPELINE_FAILED",
 
-            {
 
-                error:
+            if (this.monitoring) {
 
-                    error instanceof Error
 
-                    ? error.message
+                this.monitoring.recordEvent(
 
-                    : String(error)
+                    "INTAKE_PIPELINE_FAILED",
+
+                    {
+
+                        error:
+
+                            message
+
+                    }
+
+                );
+
+
+
+                this.monitoring.updateMetric(
+
+                    "pipelinesFailed"
+
+                );
+
 
             }
 
-        );
 
 
-
-        this.monitoring.updateMetric(
-
-            "pipelinesFailed"
-
-        );
+            throw error;
 
 
-    }
+        }
 
 
-
-    throw error;
-
-
-}
 
 
 
@@ -310,9 +355,8 @@ export class PipelineManager {
 
 
     /**
-     * Remove all registered steps
+     * Remove all steps
      */
-
 
     public clear(): void {
 
@@ -325,10 +369,10 @@ export class PipelineManager {
 
 
 
-    /**
-     * Number of registered steps
-     */
 
+    /**
+     * Pipeline step count
+     */
 
     public count(): number {
 
@@ -343,11 +387,12 @@ export class PipelineManager {
 
 
     /**
-     * Return registered steps
+     * Get registered steps
      */
 
+    public getSteps():
 
-    public getSteps(): PipelineStep[] {
+        PipelineStep[] {
 
 
         return [
