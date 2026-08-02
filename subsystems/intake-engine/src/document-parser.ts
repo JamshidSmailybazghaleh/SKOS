@@ -7,14 +7,15 @@
  * Subsystem : Intake Engine
  * Module    : Document Parser
  *
- * Build     : BUILD-000005
+ * Build     : BUILD-000007.3
  * Sprint    : Sprint 02
- * Version   : 0.1.0
+ * Version   : 0.3.0
  *
- * Status    : Monitoring Integrated
+ * Status    : Monitoring Hook Integrated
+ *
+ * Copyright © Smaily Knowledge Foundation
  * ==========================================================
  */
-
 
 import {
 
@@ -28,16 +29,11 @@ import {
 
 export interface ParsedDocument {
 
-
     raw: string;
-
 
     paragraphs: string[];
 
-
 }
-
-
 
 
 
@@ -45,7 +41,7 @@ export class DocumentParser implements PipelineStep {
 
 
 
-    private monitoring: any;
+    private monitoring: any = null;
 
 
 
@@ -55,14 +51,9 @@ export class DocumentParser implements PipelineStep {
 
     ) {
 
-
-        this.monitoring =
-            monitoring;
-
+        this.monitoring = monitoring;
 
     }
-
-
 
 
 
@@ -73,28 +64,32 @@ export class DocumentParser implements PipelineStep {
     ): PipelineContext {
 
 
+
+        const startedAt = new Date();
+
+
+
         console.log(
+
             "STEP 04 : Document Parsing"
+
         );
 
 
 
         if (this.monitoring) {
 
-
             this.monitoring.recordEvent(
 
-                "INTAKE_DOCUMENT_PARSING_STARTED",
+                "INTAKE_STEP_STARTED",
 
                 {
 
-                    sourcePath:
-                        context.sourcePath || null
+                    step: "DocumentParser"
 
                 }
 
             );
-
 
         }
 
@@ -103,48 +98,45 @@ export class DocumentParser implements PipelineStep {
         try {
 
 
+
             const text =
 
                 context.rawContent ?? "";
 
 
 
-            const paragraphs = text
+            const paragraphs =
 
-                .split(/\n\s*\n/)
+                text
 
-                .map(
+                    .split(/\n\s*\n/)
 
-                    p => p.trim()
+                    .map(
 
-                )
+                        p => p.trim()
 
-                .filter(
+                    )
 
-                    p => p.length > 0
+                    .filter(
 
-                );
+                        p => p.length > 0
 
-
+                    );
 
 
 
             context.parsedDocument = {
 
-
                 raw: text,
 
-
                 paragraphs
-
 
             };
 
 
 
-
-
             if (this.monitoring) {
+
 
 
                 this.monitoring.recordEvent(
@@ -153,9 +145,28 @@ export class DocumentParser implements PipelineStep {
 
                     {
 
+                        step:
+
+                            "DocumentParser",
+
+
                         paragraphs:
 
-                            paragraphs.length
+                            paragraphs.length,
+
+
+                        characters:
+
+                            text.length,
+
+
+                        duration:
+
+                            new Date().getTime()
+
+                            -
+
+                            startedAt.getTime()
 
                     }
 
@@ -170,9 +181,16 @@ export class DocumentParser implements PipelineStep {
                 );
 
 
+
+                this.monitoring.updateMetric(
+
+                    "paragraphsParsed"
+
+                );
+
+
+
             }
-
-
 
 
 
@@ -190,21 +208,42 @@ export class DocumentParser implements PipelineStep {
 
         }
 
+        catch (error) {
 
-        catch(error) {
+
+
+            const message =
+
+                error instanceof Error
+
+                    ?
+
+                    error.message
+
+                    :
+
+                    String(error);
+
 
 
             if (this.monitoring) {
 
 
+
                 this.monitoring.recordEvent(
 
-                    "INTAKE_DOCUMENT_PARSING_FAILED",
+                    "INTAKE_STEP_FAILED",
 
                     {
 
+                        step:
+
+                            "DocumentParser",
+
+
                         error:
-                            error.message
+
+                            message
 
                     }
 
@@ -219,17 +258,15 @@ export class DocumentParser implements PipelineStep {
                 );
 
 
+
             }
 
 
 
             throw error;
 
-
         }
 
-
     }
-
 
 }
