@@ -7,18 +7,24 @@
  * Subsystem : Intake Engine
  * Module    : Language Detector
  *
- * Build     : BUILD-000032
+ * Build     : BUILD-000005
  * Sprint    : Sprint 02
- * Version   : 0.0.2
+ * Version   : 0.1.0
  *
- * Status    : Active
+ * Status    : Monitoring Integrated
  * ==========================================================
  */
 
+
 import {
+
     PipelineContext,
+
     PipelineStep
+
 } from "./pipeline-step";
+
+
 
 export enum LanguageCode {
 
@@ -32,55 +38,271 @@ export enum LanguageCode {
 
 }
 
+
+
+
+
 export class LanguageDetector implements PipelineStep {
 
+
+
+    private monitoring: any;
+
+
+
+    constructor(
+
+        monitoring: any = null
+
+    ) {
+
+        this.monitoring =
+            monitoring;
+
+    }
+
+
+
+
+
     public execute(
+
         context: PipelineContext
+
     ): PipelineContext {
 
-        console.log("STEP 03 : Language Detection");
 
-        const value = context.sourcePath;
 
-        if (!value || value.trim().length === 0) {
+        console.log(
+            "STEP 03 : Language Detection"
+        );
 
-            context.language = LanguageCode.UNKNOWN;
+
+
+        if (this.monitoring) {
+
+
+            this.monitoring.recordEvent(
+
+                "INTAKE_LANGUAGE_DETECTION_STARTED",
+
+                {
+
+                    sourcePath:
+                        context.sourcePath || null
+
+                }
+
+            );
+
+
+        }
+
+
+
+        try {
+
+
+            const value =
+
+                context.sourcePath || "";
+
+
+
+            let detectedLanguage =
+
+                LanguageCode.UNKNOWN;
+
+
+
+
+
+            if (
+
+                !value ||
+
+                value.trim().length === 0
+
+            ) {
+
+
+                detectedLanguage =
+
+                    LanguageCode.UNKNOWN;
+
+
+            }
+
+
+
+            else if (
+
+                /[آ-ی]/.test(value)
+
+            ) {
+
+
+                detectedLanguage =
+
+                    LanguageCode.FA;
+
+
+            }
+
+
+
+            else if (
+
+                /[A-Za-z]/.test(value)
+
+            ) {
+
+
+                detectedLanguage =
+
+                    LanguageCode.EN;
+
+
+            }
+
+
+
+            else if (
+
+                /[\u0600-\u06FF]/.test(value)
+
+            ) {
+
+
+                detectedLanguage =
+
+                    LanguageCode.AR;
+
+
+            }
+
+
+
+
+
+            context.language =
+
+                detectedLanguage;
+
+
+
+
+
+            if (this.monitoring) {
+
+
+                this.monitoring.recordEvent(
+
+                    "INTAKE_LANGUAGE_DETECTED",
+
+                    {
+
+                        language:
+
+                            detectedLanguage
+
+                    }
+
+                );
+
+
+
+                this.monitoring.updateMetric(
+
+                    "languagesDetected"
+
+                );
+
+
+
+                if (
+
+                    detectedLanguage ===
+
+                    LanguageCode.UNKNOWN
+
+                ) {
+
+
+                    this.monitoring.updateMetric(
+
+                        "unknownLanguages"
+
+                    );
+
+
+                }
+
+
+            }
+
+
+
+
+
+            console.log(
+
+                "Detected Language:",
+
+                context.language
+
+            );
+
+
 
             return context;
 
-        }
 
-        if (/[آ-ی]/.test(value)) {
-
-            context.language = LanguageCode.FA;
 
         }
 
-        else if (/[A-Za-z]/.test(value)) {
 
-            context.language = LanguageCode.EN;
+
+        catch(error) {
+
+
+            if (this.monitoring) {
+
+
+                this.monitoring.recordEvent(
+
+                    "INTAKE_LANGUAGE_DETECTION_FAILED",
+
+                    {
+
+                        error:
+
+                            error.message
+
+                    }
+
+                );
+
+
+
+                this.monitoring.updateMetric(
+
+                    "languageDetectionFailed"
+
+                );
+
+
+            }
+
+
+
+            throw error;
+
 
         }
 
-        else if (/[\u0600-\u06FF]/.test(value)) {
-
-            context.language = LanguageCode.AR;
-
-        }
-
-        else {
-
-            context.language = LanguageCode.UNKNOWN;
-
-        }
-
-        console.log(
-            "Detected Language:",
-            context.language
-        );
-
-        return context;
 
     }
+
 
 }
