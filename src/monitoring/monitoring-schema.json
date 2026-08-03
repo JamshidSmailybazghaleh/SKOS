@@ -1,0 +1,379 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "title": "SKOS Monitoring Schema",
+
+  "description":
+    "Standard schema for SKOS monitoring, events, metrics, health states, performance records and alerts.",
+
+  "version": "1.0.0",
+
+  "build":
+    "BUILD-000444",
+
+
+  "type": "object",
+
+
+  "properties": {
+
+
+    "event": {
+
+      "type": "object",
+
+      "description":
+        "System and engine event records",
+
+      "properties": {
+
+        "id": {
+          "type": "string"
+        },
+
+        "name": {
+          "type": "string"
+        },
+
+        "source": {
+          "type": "string"
+        },
+
+        "category": {
+
+          "type": "string",
+
+          "enum": [
+
+            "SYSTEM",
+            "ENGINE",
+            "KNOWLEDGE",
+            "SECURITY",
+            "AI",
+            "USER",
+            "INTEGRATION"
+
+          ]
+
+        },
+
+        "metadata": {
+
+          "type": "object"
+
+        },
+
+        "timestamp": {
+
+          "type": "string",
+
+          "format": "date-time"
+
+        }
+
+      },
+
+      "required": [
+
+        "id",
+        "name",
+        "source",
+        "timestamp"
+
+      ]
+
+    },
+
+
+
+    "metric": {
+
+      "type": "object",
+
+      "description":
+        "Operational performance metrics",
+
+      "properties": {
+
+
+        "name": {
+
+          "type": "string"
+
+        },
+
+
+        "value": {
+
+          "type": "number"
+
+        },
+
+
+        "unit": {
+
+          "type": "string"
+
+        },
+
+
+        "type": {
+
+          "type": "string",
+
+          "enum": [
+
+            "COUNTER",
+            "GAUGE",
+            "HISTOGRAM",
+            "RATE"
+
+          ]
+
+        },
+
+
+        "timestamp": {
+
+          "type": "string",
+
+          "format": "date-time"
+
+        }
+
+
+      },
+
+      "required": [
+
+        "name",
+        "value",
+        "timestamp"
+
+      ]
+
+    },
+
+
+
+    "health": {
+
+      "type": "object",
+
+      "description":
+        "Component health status record",
+
+      "properties": {
+
+
+        "componentId": {
+
+          "type": "string"
+
+        },
+
+
+        "state": {
+
+          "type": "string",
+
+          "enum": [
+
+            "HEALTHY",
+            "WARNING",
+            "DEGRADED",
+            "FAILED",
+            "OFFLINE",
+            "UNKNOWN"
+
+          ]
+
+        },
+
+
+        "details": {
+
+          "type": "object"
+
+        },
+
+
+        "lastCheck": {
+
+          "type": "string",
+
+          "format": "date-time"
+
+        }
+
+
+      },
+
+      "required": [
+
+        "componentId",
+        "state",
+        "lastCheck"
+
+      ]
+
+    },
+
+
+
+    "performance": {
+
+      "type": "object",
+
+      "description":
+        "Runtime performance measurement",
+
+      "properties": {
+
+
+        "operationId": {
+
+          "type": "string"
+
+        },
+
+
+        "durationMs": {
+
+          "type": "number"
+
+        },
+
+
+        "throughput": {
+
+          "type": "number"
+
+        },
+
+
+        "timestamp": {
+
+          "type": "string",
+
+          "format": "date-time"
+
+        }
+
+
+      },
+
+      "required": [
+
+        "operationId",
+        "durationMs"
+
+      ]
+
+    },
+
+
+
+    "alert": {
+
+      "type": "object",
+
+      "description":
+        "Operational alert lifecycle",
+
+      "properties": {
+
+
+        "id": {
+
+          "type": "string"
+
+        },
+
+
+        "severity": {
+
+          "type": "string",
+
+          "enum": [
+
+            "INFO",
+            "WARNING",
+            "ERROR",
+            "CRITICAL",
+            "EMERGENCY"
+
+          ]
+
+        },
+
+
+        "message": {
+
+          "type": "string"
+
+        },
+
+
+        "source": {
+
+          "type": "string"
+
+        },
+
+
+        "status": {
+
+          "type": "string",
+
+          "enum": [
+
+            "OPEN",
+            "ACKNOWLEDGED",
+            "RESOLVED"
+
+          ]
+
+        },
+
+
+        "createdAt": {
+
+          "type": "string",
+
+          "format": "date-time"
+
+        },
+
+
+        "resolvedAt": {
+
+          "type":
+
+            [
+
+              "string",
+              "null"
+
+            ]
+
+        }
+
+
+      },
+
+      "required": [
+
+        "id",
+        "severity",
+        "message",
+        "status"
+
+      ]
+
+    }
+
+
+  }
+
+}
