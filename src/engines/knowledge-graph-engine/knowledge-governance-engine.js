@@ -7,12 +7,12 @@
  * Engine      : Knowledge Graph Engine
  * File        : knowledge-governance-engine.js
  *
- * Build       : BUILD-000402
+ * Build       : BUILD-000429
  * Version     : 1.0.0
  *
  * Mission:
- * Manage knowledge policies, lifecycle rules,
- * permissions and governance decisions.
+ * Manage governance rules, ownership, lifecycle,
+ * stewardship and decision authority of knowledge assets.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -41,17 +41,20 @@ class KnowledgeGovernanceEngine {
             options.monitoring || null;
 
 
+        this.governanceRecords =
+            new Map();
+
+
         this.policies =
             new Map();
 
 
-        this.permissions =
-            new Map();
+        this.decisions =
+            [];
 
 
-        this.lifecycle =
-            new Map();
-
+        this.history =
+            [];
 
     }
 
@@ -82,11 +85,114 @@ class KnowledgeGovernanceEngine {
 
 
     /**
-     * Register governance policy
+     * Register governance record
      */
 
 
-    addPolicy(
+    registerGovernance(
+
+        knowledgeId,
+
+        data = {}
+
+    ) {
+
+
+        if (
+
+            !knowledgeId
+
+        ) {
+
+
+            throw new Error(
+
+                "Knowledge id required."
+
+            );
+
+        }
+
+
+
+        const record = {
+
+
+            knowledgeId,
+
+
+            owner:
+
+                data.owner || null,
+
+
+            steward:
+
+                data.steward || null,
+
+
+            classification:
+
+                data.classification || "PUBLIC",
+
+
+            lifecycle:
+
+                data.lifecycle || "ACTIVE",
+
+
+            reviewCycle:
+
+                data.reviewCycle || "STANDARD",
+
+
+            status:
+
+                "GOVERNED",
+
+
+            createdAt:
+
+                new Date()
+
+        };
+
+
+
+        this.governanceRecords.set(
+
+            knowledgeId,
+
+            record
+
+        );
+
+
+
+        this.addHistory(
+
+            "GOVERNANCE_REGISTERED",
+
+            record
+
+        );
+
+
+
+        return record;
+
+    }
+
+
+
+
+
+    /**
+     * Create governance policy
+     */
+
+
+    createPolicy(
 
         policyId,
 
@@ -104,7 +210,7 @@ class KnowledgeGovernanceEngine {
 
             throw new Error(
 
-                "Policy id required."
+                "Governance policy id required."
 
             );
 
@@ -127,7 +233,7 @@ class KnowledgeGovernanceEngine {
 
             rules:
 
-                policy.rules || {},
+                policy.rules || [],
 
 
             enabled:
@@ -153,7 +259,7 @@ class KnowledgeGovernanceEngine {
 
 
 
-        this.recordEvent(
+        this.addHistory(
 
             "GOVERNANCE_POLICY_CREATED",
 
@@ -176,156 +282,24 @@ class KnowledgeGovernanceEngine {
 
 
     /**
-     * Remove policy
+     * Assign knowledge owner
      */
 
 
-    removePolicy(
+    assignOwner(
 
-        policyId
+        knowledgeId,
+
+        owner
 
     ) {
 
 
-        return this.policies.delete(
+        const record =
 
-            policyId
+            this.governanceRecords.get(
 
-        );
-
-    }
-
-
-
-
-
-    /**
-     * Get policy
-     */
-
-
-    getPolicy(
-
-        policyId
-
-    ) {
-
-
-        return (
-
-            this.policies.get(
-
-                policyId
-
-            )
-
-            ||
-
-            null
-
-        );
-
-    }
-
-
-
-
-
-    /**
-     * Register knowledge permission
-     */
-
-
-    setPermission(
-
-        objectId,
-
-        permission
-
-    ) {
-
-
-        const record = {
-
-
-            objectId,
-
-
-            read:
-
-                permission.read !== false,
-
-
-            write:
-
-                permission.write || false,
-
-
-            publish:
-
-                permission.publish || false,
-
-
-            owner:
-
-                permission.owner || "SYSTEM"
-
-
-        };
-
-
-
-        this.permissions.set(
-
-            objectId,
-
-            record
-
-        );
-
-
-
-        this.recordEvent(
-
-            "KNOWLEDGE_PERMISSION_UPDATED",
-
-            {
-
-                objectId
-
-            }
-
-        );
-
-
-
-        return record;
-
-    }
-
-
-
-
-
-    /**
-     * Check permission
-     */
-
-
-    checkPermission(
-
-        objectId,
-
-        action
-
-    ) {
-
-
-        const permission =
-
-            this.permissions.get(
-
-                objectId
+                knowledgeId
 
             );
 
@@ -333,80 +307,28 @@ class KnowledgeGovernanceEngine {
 
         if (
 
-            !permission
+            record
 
         ) {
 
 
-            return false;
+            record.owner =
+
+                owner;
 
         }
 
 
 
-        return (
+        this.addHistory(
 
-            permission[action] === true
-
-        );
-
-    }
-
-
-
-
-
-    /**
-     * Update knowledge lifecycle state
-     */
-
-
-    updateLifecycle(
-
-        objectId,
-
-        state
-
-    ) {
-
-
-        const record = {
-
-
-            objectId,
-
-
-            state,
-
-
-            updatedAt:
-
-                new Date()
-
-        };
-
-
-
-        this.lifecycle.set(
-
-            objectId,
-
-            record
-
-        );
-
-
-
-        this.recordEvent(
-
-            "KNOWLEDGE_LIFECYCLE_UPDATED",
+            "KNOWLEDGE_OWNER_ASSIGNED",
 
             {
 
-                objectId,
+                knowledgeId,
 
-
-                state
+                owner
 
             }
 
@@ -423,30 +345,61 @@ class KnowledgeGovernanceEngine {
 
 
     /**
-     * Get lifecycle
+     * Assign steward
      */
 
 
-    getLifecycle(
+    assignSteward(
 
-        objectId
+        knowledgeId,
+
+        steward
 
     ) {
 
 
-        return (
+        const record =
 
-            this.lifecycle.get(
+            this.governanceRecords.get(
 
-                objectId
+                knowledgeId
 
-            )
+            );
 
-            ||
 
-            null
+
+        if (
+
+            record
+
+        ) {
+
+
+            record.steward =
+
+                steward;
+
+        }
+
+
+
+        this.addHistory(
+
+            "KNOWLEDGE_STEWARD_ASSIGNED",
+
+            {
+
+                knowledgeId,
+
+                steward
+
+            }
 
         );
+
+
+
+        return record;
 
     }
 
@@ -455,48 +408,106 @@ class KnowledgeGovernanceEngine {
 
 
     /**
-     * Governance decision gate
+     * Update lifecycle state
      */
 
 
-    approveAction(
+    updateLifecycle(
 
-        objectId,
+        knowledgeId,
 
-        action,
-
-        context = {}
+        lifecycle
 
     ) {
 
 
-        const permission =
+        const record =
 
-            this.checkPermission(
+            this.governanceRecords.get(
 
-                objectId,
-
-                action
+                knowledgeId
 
             );
 
 
 
-        const decision = {
+        if (
+
+            record
+
+        ) {
 
 
-            objectId,
+            record.lifecycle =
+
+                lifecycle;
+
+        }
 
 
-            action,
+
+        this.addHistory(
+
+            "LIFECYCLE_UPDATED",
+
+            {
+
+                knowledgeId,
+
+                lifecycle
+
+            }
+
+        );
 
 
-            approved:
 
-                permission,
+        return record;
+
+    }
 
 
-            context,
+
+
+
+    /**
+     * Make governance decision
+     */
+
+
+    recordDecision(
+
+        decision
+
+    ) {
+
+
+        const record = {
+
+
+            id:
+
+                decision.id || crypto.randomUUID(),
+
+
+            knowledgeId:
+
+                decision.knowledgeId,
+
+
+            actor:
+
+                decision.actor,
+
+
+            action:
+
+                decision.action,
+
+
+            reason:
+
+                decision.reason || null,
 
 
             timestamp:
@@ -507,17 +518,25 @@ class KnowledgeGovernanceEngine {
 
 
 
-        this.recordEvent(
+        this.decisions.push(
 
-            "GOVERNANCE_DECISION",
-
-            decision
+            record
 
         );
 
 
 
-        return decision;
+        this.addHistory(
+
+            "GOVERNANCE_DECISION_RECORDED",
+
+            record
+
+        );
+
+
+
+        return record;
 
     }
 
@@ -525,45 +544,59 @@ class KnowledgeGovernanceEngine {
 
 
 
-    /**
-     * Registry status
-     */
+    getGovernance(
+
+        knowledgeId
+
+    ) {
 
 
-    getRegistry() {
+        return this.governanceRecords.get(
+
+            knowledgeId
+
+        );
+
+    }
 
 
-        return {
 
 
-            policies:
 
-                Array.from(
-
-                    this.policies.values()
-
-                ),
+    getRecords() {
 
 
-            permissions:
+        return Array.from(
 
-                Array.from(
+            this.governanceRecords.values()
 
-                    this.permissions.values()
+        );
 
-                ),
-
-
-            lifecycle:
-
-                Array.from(
-
-                    this.lifecycle.values()
-
-                )
+    }
 
 
-        };
+
+
+
+    getPolicies() {
+
+
+        return Array.from(
+
+            this.policies.values()
+
+        );
+
+    }
+
+
+
+
+
+    getDecisions() {
+
+
+        return this.decisions;
 
     }
 
@@ -579,7 +612,18 @@ class KnowledgeGovernanceEngine {
     getStatistics() {
 
 
+        const records =
+
+            this.getRecords();
+
+
+
         return {
+
+
+            governedObjects:
+
+                records.length,
 
 
             policies:
@@ -587,14 +631,20 @@ class KnowledgeGovernanceEngine {
                 this.policies.size,
 
 
-            permissions:
+            decisions:
 
-                this.permissions.size,
+                this.decisions.length,
 
 
-            lifecycleRecords:
+            active:
 
-                this.lifecycle.size
+                records.filter(
+
+                    item =>
+
+                        item.status === "GOVERNED"
+
+                ).length
 
 
         };
@@ -626,17 +676,70 @@ class KnowledgeGovernanceEngine {
                 this.status,
 
 
+            records:
+
+                this.governanceRecords.size,
+
+
             policies:
 
                 this.policies.size,
 
 
-            permissions:
+            decisions:
 
-                this.permissions.size
+                this.decisions.length
 
 
         };
+
+    }
+
+
+
+
+
+    addHistory(
+
+        event,
+
+        data = {}
+
+    ) {
+
+
+        const record = {
+
+
+            event,
+
+
+            data,
+
+
+            timestamp:
+
+                new Date()
+
+        };
+
+
+
+        this.history.push(
+
+            record
+
+        );
+
+
+
+        this.recordEvent(
+
+            event,
+
+            data
+
+        );
 
     }
 
