@@ -7,13 +7,13 @@
  * Engine      : Knowledge Graph Engine
  * File        : knowledge-trust-engine.js
  *
- * Build       : BUILD-000396
+ * Build       : BUILD-000425
  * Version     : 1.0.0
  *
  * Mission:
- * Evaluate and manage trust level of
- * Knowledge Objects using provenance,
- * evidence and validation signals.
+ * Evaluate and manage trust levels of knowledge objects
+ * based on provenance, verification, quality signals,
+ * and confidence indicators.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -45,6 +45,14 @@ class KnowledgeTrustEngine {
         this.trustRecords =
             new Map();
 
+
+        this.evaluations =
+            [];
+
+
+        this.history =
+            [];
+
     }
 
 
@@ -74,29 +82,29 @@ class KnowledgeTrustEngine {
 
 
     /**
-     * Evaluate knowledge trust
+     * Create trust record
      */
 
 
-    evaluate(
+    createTrustRecord(
 
-        objectId,
+        knowledgeId,
 
-        signals = {}
+        data = {}
 
     ) {
 
 
         if (
 
-            !objectId
+            !knowledgeId
 
         ) {
 
 
             throw new Error(
 
-                "Knowledge Object id required."
+                "Knowledge id required."
 
             );
 
@@ -104,42 +112,43 @@ class KnowledgeTrustEngine {
 
 
 
-        const score =
-
-            this.calculateScore(
-
-                signals
-
-            );
-
-
-
-        const level =
-
-            this.getTrustLevel(
-
-                score
-
-            );
-
-
-
         const record = {
 
 
-            objectId,
+            knowledgeId,
 
 
-            score,
+            provenanceScore:
+
+                data.provenanceScore || 0,
 
 
-            level,
+            qualityScore:
+
+                data.qualityScore || 0,
 
 
-            signals,
+            verificationScore:
+
+                data.verificationScore || 0,
 
 
-            updatedAt:
+            confidence:
+
+                data.confidence || 0,
+
+
+            trustScore:
+
+                0,
+
+
+            level:
+
+                "UNKNOWN",
+
+
+            createdAt:
 
                 new Date()
 
@@ -149,7 +158,7 @@ class KnowledgeTrustEngine {
 
         this.trustRecords.set(
 
-            objectId,
+            knowledgeId,
 
             record
 
@@ -157,26 +166,19 @@ class KnowledgeTrustEngine {
 
 
 
-        this.recordEvent(
+        this.calculateTrust(
 
-            "KNOWLEDGE_TRUST_EVALUATED",
-
-            {
-
-                objectId,
-
-
-                score
-
-            }
+            knowledgeId
 
         );
 
 
 
-        this.updateMetric(
+        this.addHistory(
 
-            "trustEvaluations"
+            "TRUST_RECORD_CREATED",
+
+            record
 
         );
 
@@ -192,169 +194,21 @@ class KnowledgeTrustEngine {
 
     /**
      * Calculate trust score
-     *
-     * Formula:
-     * Provenance 40%
-     * Evidence   30%
-     * Validation 30%
      */
 
 
-    calculateScore(
+    calculateTrust(
 
-        signals
-
-    ) {
-
-
-        const provenance =
-
-            signals.provenance || 0;
-
-
-
-        const evidence =
-
-            signals.evidence || 0;
-
-
-
-        const validation =
-
-            signals.validation || 0;
-
-
-
-        return Number(
-
-            (
-
-                provenance * 0.4 +
-
-                evidence * 0.3 +
-
-                validation * 0.3
-
-            ).toFixed(2)
-
-        );
-
-    }
-
-
-
-
-
-    /**
-     * Trust classification
-     */
-
-
-    getTrustLevel(
-
-        score
-
-    ) {
-
-
-        if (
-
-            score >= 0.85
-
-        ) {
-
-
-            return "HIGH";
-
-        }
-
-
-
-        if (
-
-            score >= 0.60
-
-        ) {
-
-
-            return "MEDIUM";
-
-        }
-
-
-
-        if (
-
-            score >= 0.30
-
-        ) {
-
-
-            return "LOW";
-
-        }
-
-
-
-        return "UNTRUSTED";
-
-    }
-
-
-
-
-
-    /**
-     * Retrieve trust record
-     */
-
-
-    getTrust(
-
-        objectId
-
-    ) {
-
-
-        return (
-
-            this.trustRecords.get(
-
-                objectId
-
-            )
-
-            ||
-
-            null
-
-        );
-
-    }
-
-
-
-
-
-    /**
-     * Check trusted knowledge
-     */
-
-
-    isTrusted(
-
-        objectId,
-
-        threshold = 0.85
+        knowledgeId
 
     ) {
 
 
         const record =
 
-            this.getTrust(
+            this.trustRecords.get(
 
-                objectId
+                knowledgeId
 
             );
 
@@ -367,17 +221,93 @@ class KnowledgeTrustEngine {
         ) {
 
 
-            return false;
+            return null;
 
         }
 
 
 
-        return (
+        record.trustScore =
 
-            record.score >= threshold
+
+            (
+
+                record.provenanceScore *
+
+                0.35
+
+            )
+
+            +
+
+            (
+
+                record.qualityScore *
+
+                0.30
+
+            )
+
+            +
+
+            (
+
+                record.verificationScore *
+
+                0.25
+
+            )
+
+            +
+
+            (
+
+                record.confidence *
+
+                0.10
+
+            );
+
+
+
+        record.level =
+
+            this.getTrustLevel(
+
+                record.trustScore
+
+            );
+
+
+
+        this.evaluations.push(
+
+            {
+
+                knowledgeId,
+
+
+                score:
+
+                    record.trustScore,
+
+
+                level:
+
+                    record.level,
+
+
+                timestamp:
+
+                    new Date()
+
+            }
 
         );
+
+
+
+        return record;
 
     }
 
@@ -386,20 +316,162 @@ class KnowledgeTrustEngine {
 
 
     /**
-     * Remove trust record
+     * Determine trust level
      */
 
 
-    removeTrust(
+    getTrustLevel(
 
-        objectId
+        score
 
     ) {
 
 
-        return this.trustRecords.delete(
+        if (
 
-            objectId
+            score >= 90
+
+        ) {
+
+
+            return "VERY_HIGH";
+
+        }
+
+
+        if (
+
+            score >= 75
+
+        ) {
+
+
+            return "HIGH";
+
+        }
+
+
+        if (
+
+            score >= 50
+
+        ) {
+
+
+            return "MEDIUM";
+
+        }
+
+
+        if (
+
+            score >= 25
+
+        ) {
+
+
+            return "LOW";
+
+        }
+
+
+        return "UNTRUSTED";
+
+    }
+
+
+
+
+
+    /**
+     * Update trust signals
+     */
+
+
+    updateSignals(
+
+        knowledgeId,
+
+        signals
+
+    ) {
+
+
+        const record =
+
+            this.trustRecords.get(
+
+                knowledgeId
+
+            );
+
+
+
+        if (
+
+            record
+
+        ) {
+
+
+            Object.assign(
+
+                record,
+
+                signals
+
+            );
+
+
+            this.calculateTrust(
+
+                knowledgeId
+
+            );
+
+        }
+
+
+
+        this.addHistory(
+
+            "TRUST_SIGNALS_UPDATED",
+
+            {
+
+                knowledgeId,
+
+                signals
+
+            }
+
+        );
+
+
+
+        return record;
+
+    }
+
+
+
+
+
+    /**
+     * Get trust record
+     */
+
+
+    getTrustRecord(
+
+        knowledgeId
+
+    ) {
+
+
+        return this.trustRecords.get(
+
+            knowledgeId
 
         );
 
@@ -409,12 +481,7 @@ class KnowledgeTrustEngine {
 
 
 
-    /**
-     * Return complete trust registry
-     */
-
-
-    getRegistry() {
+    getTrustRecords() {
 
 
         return Array.from(
@@ -422,6 +489,17 @@ class KnowledgeTrustEngine {
             this.trustRecords.values()
 
         );
+
+    }
+
+
+
+
+
+    getEvaluations() {
+
+
+        return this.evaluations;
 
     }
 
@@ -439,16 +517,27 @@ class KnowledgeTrustEngine {
 
         const records =
 
-            this.getRegistry();
+            this.getTrustRecords();
 
 
 
         return {
 
 
-            total:
+            knowledgeObjects:
 
                 records.length,
+
+
+            veryHigh:
+
+                records.filter(
+
+                    item =>
+
+                        item.level === "VERY_HIGH"
+
+                ).length,
 
 
             high:
@@ -480,6 +569,17 @@ class KnowledgeTrustEngine {
                     item =>
 
                         item.level === "LOW"
+
+                ).length,
+
+
+            untrusted:
+
+                records.filter(
+
+                    item =>
+
+                        item.level === "UNTRUSTED"
 
                 ).length
 
@@ -515,10 +615,62 @@ class KnowledgeTrustEngine {
 
             records:
 
-                this.trustRecords.size
+                this.trustRecords.size,
+
+
+            evaluations:
+
+                this.evaluations.length
 
 
         };
+
+    }
+
+
+
+
+
+    addHistory(
+
+        event,
+
+        data = {}
+
+    ) {
+
+
+        const record = {
+
+
+            event,
+
+
+            data,
+
+
+            timestamp:
+
+                new Date()
+
+        };
+
+
+        this.history.push(
+
+            record
+
+        );
+
+
+
+        this.recordEvent(
+
+            event,
+
+            data
+
+        );
 
     }
 
