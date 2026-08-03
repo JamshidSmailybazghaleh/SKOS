@@ -7,7 +7,7 @@
  * Test      : Knowledge Governance Engine
  * File      : knowledge-governance-engine.test.js
  *
- * Build     : BUILD-000403
+ * Build     : BUILD-000430
  * Version   : 1.0.0
  *
  * Copyright © Smaily Knowledge Foundation
@@ -88,33 +88,32 @@ describe(
 
         test(
 
-            "Should create governance policy",
+            "Should register knowledge governance",
 
             () => {
 
 
-                const policy =
+                const record =
 
-                    engine.addPolicy(
+                    engine.registerGovernance(
 
-                        "POLICY-001",
+                        "KNOWLEDGE-001",
 
                         {
 
-                            name:
+                            owner:
 
-                                "Publication Policy",
+                                "USER-001",
 
 
-                            rules:
+                            steward:
 
-                                {
+                                "TEAM-AI",
 
-                                    approvalRequired:
 
-                                        true
+                            classification:
 
-                                }
+                                "PRIVATE"
 
                         }
 
@@ -124,11 +123,11 @@ describe(
 
                 expect(
 
-                    policy.id
+                    record.knowledgeId
 
                 ).toBe(
 
-                    "POLICY-001"
+                    "KNOWLEDGE-001"
 
                 );
 
@@ -136,17 +135,13 @@ describe(
 
                 expect(
 
-                    policy.enabled
+                    record.status
 
-                ).toBe(true);
+                ).toBe(
 
+                    "GOVERNED"
 
-
-                expect(
-
-                    policy.rules.approvalRequired
-
-                ).toBe(true);
+                );
 
 
             }
@@ -159,7 +154,7 @@ describe(
 
         test(
 
-            "Should reject invalid policy id",
+            "Should reject invalid knowledge id",
 
             () => {
 
@@ -168,7 +163,7 @@ describe(
 
                     () =>
 
-                        engine.addPolicy(
+                        engine.registerGovernance(
 
                             null,
 
@@ -189,66 +184,14 @@ describe(
 
         test(
 
-            "Should retrieve policy",
+            "Should assign knowledge owner",
 
             () => {
 
 
-                engine.addPolicy(
+                engine.registerGovernance(
 
-                    "POLICY-002",
-
-                    {
-
-                        name:
-
-                            "AI Usage Policy"
-
-                    }
-
-                );
-
-
-
-                const result =
-
-                    engine.getPolicy(
-
-                        "POLICY-002"
-
-                    );
-
-
-
-                expect(
-
-                    result.name
-
-                ).toBe(
-
-                    "AI Usage Policy"
-
-                );
-
-
-            }
-
-        );
-
-
-
-
-
-        test(
-
-            "Should remove policy",
-
-            () => {
-
-
-                engine.addPolicy(
-
-                    "POLICY-003",
+                    "KNOWLEDGE-002",
 
                     {}
 
@@ -256,72 +199,13 @@ describe(
 
 
 
-                expect(
+                const record =
 
-                    engine.removePolicy(
+                    engine.assignOwner(
 
-                        "POLICY-003"
+                        "KNOWLEDGE-002",
 
-                    )
-
-                ).toBe(true);
-
-
-
-                expect(
-
-                    engine.getPolicy(
-
-                        "POLICY-003"
-
-                    )
-
-                ).toBeNull();
-
-
-            }
-
-        );
-
-
-
-
-
-        test(
-
-            "Should set knowledge permission",
-
-            () => {
-
-
-                const permission =
-
-                    engine.setPermission(
-
-                        "OBJ-001",
-
-                        {
-
-                            read:
-
-                                true,
-
-
-                            write:
-
-                                true,
-
-
-                            publish:
-
-                                false,
-
-
-                            owner:
-
-                                "EDITORIAL-BOARD"
-
-                        }
+                        "OWNER-001"
 
                     );
 
@@ -329,23 +213,11 @@ describe(
 
                 expect(
 
-                    permission.objectId
+                    record.owner
 
                 ).toBe(
 
-                    "OBJ-001"
-
-                );
-
-
-
-                expect(
-
-                    permission.owner
-
-                ).toBe(
-
-                    "EDITORIAL-BOARD"
+                    "OWNER-001"
 
                 );
 
@@ -360,71 +232,42 @@ describe(
 
         test(
 
-            "Should check allowed permission",
+            "Should assign knowledge steward",
 
             () => {
 
 
-                engine.setPermission(
+                engine.registerGovernance(
 
-                    "OBJ-002",
+                    "KNOWLEDGE-003",
 
-                    {
-
-                        read:
-
-                            true,
-
-
-                        publish:
-
-                            true
-
-                    }
+                    {}
 
                 );
 
 
 
-                expect(
+                const record =
 
-                    engine.checkPermission(
+                    engine.assignSteward(
 
-                        "OBJ-002",
+                        "KNOWLEDGE-003",
 
-                        "publish"
+                        "STEWARD-001"
 
-                    )
+                    );
 
-                ).toBe(true);
-
-
-            }
-
-        );
-
-
-
-
-
-        test(
-
-            "Should reject unknown permission",
-
-            () => {
 
 
                 expect(
 
-                    engine.checkPermission(
+                    record.steward
 
-                        "UNKNOWN",
+                ).toBe(
 
-                        "publish"
+                    "STEWARD-001"
 
-                    )
-
-                ).toBe(false);
+                );
 
 
             }
@@ -442,13 +285,23 @@ describe(
             () => {
 
 
-                const lifecycle =
+                engine.registerGovernance(
+
+                    "KNOWLEDGE-004",
+
+                    {}
+
+                );
+
+
+
+                const record =
 
                     engine.updateLifecycle(
 
-                        "OBJ-003",
+                        "KNOWLEDGE-004",
 
-                        "PUBLISHED"
+                        "ARCHIVED"
 
                     );
 
@@ -456,23 +309,11 @@ describe(
 
                 expect(
 
-                    lifecycle.objectId
+                    record.lifecycle
 
                 ).toBe(
 
-                    "OBJ-003"
-
-                );
-
-
-
-                expect(
-
-                    lifecycle.state
-
-                ).toBe(
-
-                    "PUBLISHED"
+                    "ARCHIVED"
 
                 );
 
@@ -487,26 +328,33 @@ describe(
 
         test(
 
-            "Should retrieve lifecycle state",
+            "Should create governance policy",
 
             () => {
 
 
-                engine.updateLifecycle(
+                const policy =
 
-                    "OBJ-004",
+                    engine.createPolicy(
 
-                    "REVIEW"
+                        "GOV-POLICY-001",
 
-                );
+                        {
+
+                            name:
+
+                                "Knowledge Review Policy",
 
 
+                            rules:
 
-                const result =
+                                [
 
-                    engine.getLifecycle(
+                                    "REVIEW_REQUIRED"
 
-                        "OBJ-004"
+                                ]
+
+                        }
 
                     );
 
@@ -514,13 +362,21 @@ describe(
 
                 expect(
 
-                    result.state
+                    policy.id
 
                 ).toBe(
 
-                    "REVIEW"
+                    "GOV-POLICY-001"
 
                 );
+
+
+
+                expect(
+
+                    policy.enabled
+
+                ).toBe(true);
 
 
             }
@@ -533,34 +389,72 @@ describe(
 
         test(
 
-            "Should approve authorized governance action",
+            "Should reject invalid governance policy",
 
             () => {
 
 
-                engine.setPermission(
+                expect(
 
-                    "OBJ-005",
+                    () =>
 
-                    {
+                        engine.createPolicy(
 
-                        publish:
+                            null,
 
-                            true
+                            {}
 
-                    }
+                        )
 
-                );
+                ).toThrow();
 
+
+            }
+
+        );
+
+
+
+
+
+        test(
+
+            "Should record governance decision",
+
+            () => {
 
 
                 const decision =
 
-                    engine.approveAction(
+                    engine.recordDecision(
 
-                        "OBJ-005",
+                        {
 
-                        "publish"
+                            id:
+
+                                "DECISION-001",
+
+
+                            knowledgeId:
+
+                                "KNOWLEDGE-005",
+
+
+                            actor:
+
+                                "ADMIN",
+
+
+                            action:
+
+                                "APPROVE",
+
+
+                            reason:
+
+                                "Validated"
+
+                        }
 
                     );
 
@@ -568,9 +462,13 @@ describe(
 
                 expect(
 
-                    decision.approved
+                    decision.id
 
-                ).toBe(true);
+                ).toBe(
+
+                    "DECISION-001"
+
+                );
 
 
 
@@ -580,7 +478,7 @@ describe(
 
                 ).toBe(
 
-                    "publish"
+                    "APPROVE"
 
                 );
 
@@ -595,34 +493,26 @@ describe(
 
         test(
 
-            "Should reject unauthorized governance action",
+            "Should retrieve governance record",
 
             () => {
 
 
-                engine.setPermission(
+                engine.registerGovernance(
 
-                    "OBJ-006",
+                    "KNOWLEDGE-006",
 
-                    {
-
-                        publish:
-
-                            false
-
-                    }
+                    {}
 
                 );
 
 
 
-                const decision =
+                const record =
 
-                    engine.approveAction(
+                    engine.getGovernance(
 
-                        "OBJ-006",
-
-                        "publish"
+                        "KNOWLEDGE-006"
 
                     );
 
@@ -630,9 +520,13 @@ describe(
 
                 expect(
 
-                    decision.approved
+                    record.knowledgeId
 
-                ).toBe(false);
+                ).toBe(
+
+                    "KNOWLEDGE-006"
+
+                );
 
 
             }
@@ -645,29 +539,102 @@ describe(
 
         test(
 
-            "Should return governance registry",
+            "Should retrieve governance records",
 
             () => {
 
 
-                engine.addPolicy(
+                engine.registerGovernance(
 
-                    "POLICY-004",
+                    "KNOWLEDGE-007",
 
                     {}
 
                 );
 
 
-                engine.setPermission(
 
-                    "OBJ-007",
+                engine.registerGovernance(
+
+                    "KNOWLEDGE-008",
+
+                    {}
+
+                );
+
+
+
+                expect(
+
+                    engine.getRecords().length
+
+                ).toBe(2);
+
+
+            }
+
+        );
+
+
+
+
+
+        test(
+
+            "Should retrieve policies",
+
+            () => {
+
+
+                engine.createPolicy(
+
+                    "POLICY-001",
+
+                    {}
+
+                );
+
+
+
+                expect(
+
+                    engine.getPolicies().length
+
+                ).toBe(1);
+
+
+            }
+
+        );
+
+
+
+
+
+        test(
+
+            "Should retrieve decisions",
+
+            () => {
+
+
+                engine.recordDecision(
 
                     {
 
-                        read:
+                        knowledgeId:
 
-                            true
+                            "KNOWLEDGE-009",
+
+
+                        actor:
+
+                            "SYSTEM",
+
+
+                        action:
+
+                            "UPDATE"
 
                     }
 
@@ -675,23 +642,9 @@ describe(
 
 
 
-                const registry =
-
-                    engine.getRegistry();
-
-
-
                 expect(
 
-                    registry.policies.length
-
-                ).toBe(1);
-
-
-
-                expect(
-
-                    registry.permissions.length
+                    engine.getDecisions().length
 
                 ).toBe(1);
 
@@ -711,9 +664,9 @@ describe(
             () => {
 
 
-                engine.addPolicy(
+                engine.registerGovernance(
 
-                    "POLICY-005",
+                    "KNOWLEDGE-010",
 
                     {}
 
@@ -721,27 +674,25 @@ describe(
 
 
 
-                engine.setPermission(
+                engine.createPolicy(
 
-                    "OBJ-008",
+                    "POLICY-010",
 
-                    {
-
-                        read:
-
-                            true
-
-                    }
+                    {}
 
                 );
 
 
 
-                engine.updateLifecycle(
+                engine.recordDecision(
 
-                    "OBJ-008",
+                    {
 
-                    "ACTIVE"
+                        knowledgeId:
+
+                            "KNOWLEDGE-010"
+
+                    }
 
                 );
 
@@ -755,6 +706,14 @@ describe(
 
                 expect(
 
+                    stats.governedObjects
+
+                ).toBe(1);
+
+
+
+                expect(
+
                     stats.policies
 
                 ).toBe(1);
@@ -763,15 +722,7 @@ describe(
 
                 expect(
 
-                    stats.permissions
-
-                ).toBe(1);
-
-
-
-                expect(
-
-                    stats.lifecycleRecords
+                    stats.decisions
 
                 ).toBe(1);
 
@@ -818,14 +769,6 @@ describe(
                     "1.0.0"
 
                 );
-
-
-
-                expect(
-
-                    status.policies
-
-                ).toBe(0);
 
 
             }
