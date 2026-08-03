@@ -7,18 +7,13 @@
  * Engine      : Knowledge Graph Engine
  * File        : knowledge-assurance-engine.js
  *
- * Build       : BUILD-000400
+ * Build       : BUILD-000428
  * Version     : 1.0.0
  *
  * Mission:
- * Provide final assurance decision for
- * Knowledge Objects before publication
- * or AI consumption.
- *
- * Combines:
- * - Provenance
- * - Trust
- * - Quality
+ * Provide assurance evaluation for knowledge objects
+ * through validation, reliability, completeness,
+ * and operational readiness indicators.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -47,12 +42,16 @@ class KnowledgeAssuranceEngine {
             options.monitoring || null;
 
 
-        this.records =
+        this.assuranceRecords =
             new Map();
 
 
-        this.counter =
-            0;
+        this.assessments =
+            [];
+
+
+        this.history =
+            [];
 
     }
 
@@ -83,29 +82,29 @@ class KnowledgeAssuranceEngine {
 
 
     /**
-     * Run assurance evaluation
+     * Create assurance record
      */
 
 
-   assure(
+    createAssuranceRecord(
 
-        objectId,
+        knowledgeId,
 
-        input = {}
+        data = {}
 
     ) {
 
 
         if (
 
-            !objectId
+            !knowledgeId
 
         ) {
 
 
             throw new Error(
 
-                "Knowledge Object id required."
+                "Knowledge id required."
 
             );
 
@@ -113,76 +112,45 @@ class KnowledgeAssuranceEngine {
 
 
 
-        const trust =
-
-            input.trust || 0;
-
-
-
-        const quality =
-
-            input.quality || 0;
-
-
-
-        const provenance =
-
-            input.provenance || 0;
-
-
-
-        const score =
-
-            this.calculateAssuranceScore(
-
-                trust,
-
-                quality,
-
-                provenance
-
-            );
-
-
-
-        const decision =
-
-            this.getDecision(
-
-                score
-
-            );
-
-
-
-        this.counter++;
-
-
-
         const record = {
 
 
-            id:
-
-                `ASSURANCE-${this.counter}`,
+            knowledgeId,
 
 
-            objectId,
+            validation:
+
+                data.validation || 0,
 
 
-            trust,
+            reliability:
+
+                data.reliability || 0,
 
 
-            quality,
+            completeness:
+
+                data.completeness || 0,
 
 
-            provenance,
+            operationalReadiness:
+
+                data.operationalReadiness || 0,
 
 
-            score,
+            auditStatus:
+
+                data.auditStatus || "PENDING",
 
 
-            decision,
+            assuranceScore:
+
+                0,
+
+
+            level:
+
+                "UNKNOWN",
 
 
             createdAt:
@@ -193,9 +161,9 @@ class KnowledgeAssuranceEngine {
 
 
 
-        this.records.set(
+        this.assuranceRecords.set(
 
-            objectId,
+            knowledgeId,
 
             record
 
@@ -203,25 +171,19 @@ class KnowledgeAssuranceEngine {
 
 
 
-        this.recordEvent(
+        this.calculateAssurance(
 
-            "KNOWLEDGE_ASSURANCE_COMPLETED",
-
-            {
-
-                objectId,
-
-                decision
-
-            }
+            knowledgeId
 
         );
 
 
 
-        this.updateMetric(
+        this.addHistory(
 
-            "assuranceEvaluations"
+            "ASSURANCE_RECORD_CREATED",
+
+            record
 
         );
 
@@ -236,153 +198,22 @@ class KnowledgeAssuranceEngine {
 
 
     /**
-     * Assurance formula
-     *
-     * Trust        40%
-     * Quality      40%
-     * Provenance   20%
+     * Calculate assurance score
      */
 
 
-    calculateAssuranceScore(
+    calculateAssurance(
 
-        trust,
-
-        quality,
-
-        provenance
-
-    ) {
-
-
-        return Number(
-
-            (
-
-                trust * 0.40 +
-
-                quality * 0.40 +
-
-                provenance * 0.20
-
-            ).toFixed(2)
-
-        );
-
-    }
-
-
-
-
-
-    /**
-     * Final knowledge decision
-     */
-
-
-    getDecision(
-
-        score
-
-    ) {
-
-
-        if (
-
-            score >= 0.85
-
-        ) {
-
-
-            return "APPROVED";
-
-        }
-
-
-
-        if (
-
-            score >= 0.65
-
-        ) {
-
-
-            return "CONDITIONAL";
-
-        }
-
-
-
-        if (
-
-            score >= 0.40
-
-        ) {
-
-
-            return "REVIEW_REQUIRED";
-
-        }
-
-
-
-        return "REJECTED";
-
-    }
-
-
-
-
-
-    /**
-     * Retrieve assurance result
-     */
-
-
-    getAssurance(
-
-        objectId
-
-    ) {
-
-
-        return (
-
-            this.records.get(
-
-                objectId
-
-            )
-
-            ||
-
-            null
-
-        );
-
-    }
-
-
-
-
-
-    /**
-     * Check publication permission
-     */
-
-
-    canPublish(
-
-        objectId
+        knowledgeId
 
     ) {
 
 
         const record =
 
-            this.getAssurance(
+            this.assuranceRecords.get(
 
-                objectId
+                knowledgeId
 
             );
 
@@ -395,17 +226,93 @@ class KnowledgeAssuranceEngine {
         ) {
 
 
-            return false;
+            return null;
 
         }
 
 
 
-        return (
+        record.assuranceScore =
 
-            record.decision === "APPROVED"
+
+            (
+
+                record.validation *
+
+                0.30
+
+            )
+
+            +
+
+            (
+
+                record.reliability *
+
+                0.30
+
+            )
+
+            +
+
+            (
+
+                record.completeness *
+
+                0.20
+
+            )
+
+            +
+
+            (
+
+                record.operationalReadiness *
+
+                0.20
+
+            );
+
+
+
+        record.level =
+
+            this.getAssuranceLevel(
+
+                record.assuranceScore
+
+            );
+
+
+
+        this.assessments.push(
+
+            {
+
+                knowledgeId,
+
+
+                score:
+
+                    record.assuranceScore,
+
+
+                level:
+
+                    record.level,
+
+
+                timestamp:
+
+                    new Date()
+
+            }
 
         );
+
+
+
+        return record;
 
     }
 
@@ -414,20 +321,234 @@ class KnowledgeAssuranceEngine {
 
 
     /**
-     * Remove assurance record
+     * Determine assurance level
      */
 
 
-    removeAssurance(
+    getAssuranceLevel(
 
-        objectId
+        score
 
     ) {
 
 
-        return this.records.delete(
+        if (
 
-            objectId
+            score >= 90
+
+        ) {
+
+
+            return "CERTIFIED";
+
+        }
+
+
+        if (
+
+            score >= 75
+
+        ) {
+
+
+            return "ASSURED";
+
+        }
+
+
+        if (
+
+            score >= 50
+
+        ) {
+
+
+            return "CONDITIONALLY_ASSURED";
+
+        }
+
+
+        if (
+
+            score >= 25
+
+        ) {
+
+
+            return "REVIEW_REQUIRED";
+
+        }
+
+
+
+        return "NOT_ASSURED";
+
+    }
+
+
+
+
+
+    /**
+     * Update assurance indicators
+     */
+
+
+    updateIndicators(
+
+        knowledgeId,
+
+        indicators
+
+    ) {
+
+
+        const record =
+
+            this.assuranceRecords.get(
+
+                knowledgeId
+
+            );
+
+
+
+        if (
+
+            record
+
+        ) {
+
+
+            Object.assign(
+
+                record,
+
+                indicators
+
+            );
+
+
+
+            this.calculateAssurance(
+
+                knowledgeId
+
+            );
+
+        }
+
+
+
+        this.addHistory(
+
+            "ASSURANCE_INDICATORS_UPDATED",
+
+            {
+
+                knowledgeId,
+
+                indicators
+
+            }
+
+        );
+
+
+
+        return record;
+
+    }
+
+
+
+
+
+    /**
+     * Approve knowledge object
+     */
+
+
+    certify(
+
+        knowledgeId
+
+    ) {
+
+
+        const record =
+
+            this.assuranceRecords.get(
+
+                knowledgeId
+
+            );
+
+
+
+        if (
+
+            record
+
+        ) {
+
+
+            record.auditStatus =
+
+                "CERTIFIED";
+
+
+            record.assuranceScore =
+
+                Math.max(
+
+                    record.assuranceScore,
+
+                    90
+
+                );
+
+
+            record.level =
+
+                "CERTIFIED";
+
+        }
+
+
+
+        this.addHistory(
+
+            "KNOWLEDGE_CERTIFIED",
+
+            {
+
+                knowledgeId
+
+            }
+
+        );
+
+
+
+        return record;
+
+    }
+
+
+
+
+
+    getAssuranceRecord(
+
+        knowledgeId
+
+    ) {
+
+
+        return this.assuranceRecords.get(
+
+            knowledgeId
 
         );
 
@@ -437,19 +558,25 @@ class KnowledgeAssuranceEngine {
 
 
 
-    /**
-     * Return registry
-     */
-
-
-    getRegistry() {
+    getRecords() {
 
 
         return Array.from(
 
-            this.records.values()
+            this.assuranceRecords.values()
 
         );
+
+    }
+
+
+
+
+
+    getAssessments() {
+
+
+        return this.assessments;
 
     }
 
@@ -467,25 +594,36 @@ class KnowledgeAssuranceEngine {
 
         const records =
 
-            this.getRegistry();
+            this.getRecords();
 
 
 
         return {
 
 
-            total:
+            knowledgeObjects:
 
                 records.length,
 
 
-            approved:
+            certified:
 
                 records.filter(
 
                     item =>
 
-                        item.decision === "APPROVED"
+                        item.level === "CERTIFIED"
+
+                ).length,
+
+
+            assured:
+
+                records.filter(
+
+                    item =>
+
+                        item.level === "ASSURED"
 
                 ).length,
 
@@ -496,48 +634,34 @@ class KnowledgeAssuranceEngine {
 
                     item =>
 
-                        item.decision === "CONDITIONAL"
+                        item.level === "CONDITIONALLY_ASSURED"
 
                 ).length,
 
 
-            review:
+            reviewRequired:
 
                 records.filter(
 
                     item =>
 
-                        item.decision === "REVIEW_REQUIRED"
+                        item.level === "REVIEW_REQUIRED"
 
                 ).length,
 
 
-            rejected:
+            notAssured:
 
                 records.filter(
 
                     item =>
 
-                        item.decision === "REJECTED"
+                        item.level === "NOT_ASSURED"
 
                 ).length
 
 
         };
-
-    }
-
-
-
-
-
-    clearRegistry() {
-
-
-        this.records.clear();
-
-
-        return true;
 
     }
 
@@ -568,10 +692,63 @@ class KnowledgeAssuranceEngine {
 
             records:
 
-                this.records.size
+                this.assuranceRecords.size,
+
+
+            assessments:
+
+                this.assessments.length
 
 
         };
+
+    }
+
+
+
+
+
+    addHistory(
+
+        event,
+
+        data = {}
+
+    ) {
+
+
+        const record = {
+
+
+            event,
+
+
+            data,
+
+
+            timestamp:
+
+                new Date()
+
+        };
+
+
+
+        this.history.push(
+
+            record
+
+        );
+
+
+
+        this.recordEvent(
+
+            event,
+
+            data
+
+        );
 
     }
 
