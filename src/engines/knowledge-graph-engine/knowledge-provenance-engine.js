@@ -7,12 +7,12 @@
  * Engine      : Knowledge Graph Engine
  * File        : knowledge-provenance-engine.js
  *
- * Build       : BUILD-000394
+ * Build       : BUILD-000424
  * Version     : 1.0.0
  *
  * Mission:
- * Track origin, ownership, validation,
- * trust and evidence of Knowledge Objects.
+ * Track origin, ownership, transformation history,
+ * and lifecycle provenance of knowledge objects.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -42,11 +42,15 @@ class KnowledgeProvenanceEngine {
 
 
         this.records =
+            new Map();
+
+
+        this.lineage =
             [];
 
 
-        this.counter =
-            0;
+        this.history =
+            [];
 
     }
 
@@ -77,33 +81,29 @@ class KnowledgeProvenanceEngine {
 
 
     /**
-     * Register knowledge provenance
+     * Register knowledge origin
      */
 
 
-    registerProvenance(
+    registerOrigin(
 
-        objectId,
+        knowledgeId,
 
-        source,
-
-        evidence = {},
-
-        metadata = {}
+        origin
 
     ) {
 
 
         if (
 
-            !objectId
+            !knowledgeId
 
         ) {
 
 
             throw new Error(
 
-                "Knowledge Object id required."
+                "Knowledge id required."
 
             );
 
@@ -111,49 +111,48 @@ class KnowledgeProvenanceEngine {
 
 
 
-        this.counter++;
-
-
-
         const record = {
 
 
-            id:
-
-                `PROVENANCE-${this.counter}`,
+            knowledgeId,
 
 
-            objectId,
+            source:
+
+                origin.source || "UNKNOWN",
 
 
-            source,
+            creator:
+
+                origin.creator || null,
 
 
-            evidence,
+            type:
 
-
-            metadata,
-
-
-            trustScore:
-
-                0,
-
-
-            validations:
-
-                [],
+                origin.type || "DOCUMENT",
 
 
             createdAt:
 
-                new Date()
+                origin.createdAt || new Date(),
+
+
+            version:
+
+                origin.version || "1.0.0",
+
+
+            verified:
+
+                false
 
         };
 
 
 
-        this.records.push(
+        this.records.set(
+
+            knowledgeId,
 
             record
 
@@ -161,25 +160,11 @@ class KnowledgeProvenanceEngine {
 
 
 
-        this.recordEvent(
+        this.addHistory(
 
-            "PROVENANCE_CREATED",
+            "ORIGIN_REGISTERED",
 
-            {
-
-                id:
-
-                    record.id
-
-            }
-
-        );
-
-
-
-        this.updateMetric(
-
-            "provenanceCreated"
+            record
 
         );
 
@@ -194,26 +179,22 @@ class KnowledgeProvenanceEngine {
 
 
     /**
-     * Add validation evidence
+     * Verify provenance
      */
 
 
-    addValidation(
+    verifyProvenance(
 
-        provenanceId,
-
-        validation
+        knowledgeId
 
     ) {
 
 
         const record =
 
-            this.records.find(
+            this.records.get(
 
-                item =>
-
-                    item.id === provenanceId
+                knowledgeId
 
             );
 
@@ -221,37 +202,77 @@ class KnowledgeProvenanceEngine {
 
         if (
 
-            !record
+            record
 
         ) {
 
 
-            throw new Error(
-
-                "Provenance record not found."
-
-            );
+            record.verified = true;
 
         }
 
 
 
-        const item = {
+        this.addHistory(
+
+            "PROVENANCE_VERIFIED",
+
+            {
+
+                knowledgeId
+
+            }
+
+        );
 
 
-            validator:
 
-                validation.validator || "SYSTEM",
+        return record;
 
-
-            result:
-
-                validation.result || "UNKNOWN",
+    }
 
 
-            details:
 
-                validation.details || {},
+
+
+    /**
+     * Add transformation lineage
+     */
+
+
+    addTransformation(
+
+        knowledgeId,
+
+        transformation
+
+    ) {
+
+
+        const event = {
+
+
+            knowledgeId,
+
+
+            action:
+
+                transformation.action || "UPDATE",
+
+
+            actor:
+
+                transformation.actor || null,
+
+
+            previousVersion:
+
+                transformation.previousVersion || null,
+
+
+            newVersion:
+
+                transformation.newVersion || null,
 
 
             timestamp:
@@ -262,37 +283,25 @@ class KnowledgeProvenanceEngine {
 
 
 
-        record.validations.push(
+        this.lineage.push(
 
-            item
-
-        );
-
-
-
-        this.calculateTrustScore(
-
-            record
+            event
 
         );
 
 
 
-        this.recordEvent(
+        this.addHistory(
 
-            "PROVENANCE_VALIDATED",
+            "TRANSFORMATION_RECORDED",
 
-            {
-
-                provenanceId
-
-            }
+            event
 
         );
 
 
 
-        return item;
+        return event;
 
     }
 
@@ -301,92 +310,22 @@ class KnowledgeProvenanceEngine {
 
 
     /**
-     * Calculate trust score
+     * Get knowledge lineage
      */
 
 
-    calculateTrustScore(
+    getLineage(
 
-        record
+        knowledgeId
 
     ) {
 
 
-        const validations =
+        return this.lineage.filter(
 
-            record.validations.length;
+            item =>
 
-
-
-        if (
-
-            validations === 0
-
-        ) {
-
-
-            record.trustScore = 0;
-
-
-            return 0;
-
-        }
-
-
-
-        const approved =
-
-            record.validations.filter(
-
-                item =>
-
-                    item.result === "APPROVED"
-
-            ).length;
-
-
-
-        record.trustScore =
-
-            approved /
-
-            validations;
-
-
-
-        return record.trustScore;
-
-    }
-
-
-
-
-
-    /**
-     * Get provenance
-     */
-
-
-    getProvenance(
-
-        objectId
-
-    ) {
-
-
-        return (
-
-            this.records.find(
-
-                item =>
-
-                    item.objectId === objectId
-
-            )
-
-            ||
-
-            null
+                item.knowledgeId === knowledgeId
 
         );
 
@@ -397,22 +336,24 @@ class KnowledgeProvenanceEngine {
 
 
     /**
-     * Check trust
+     * Update provenance record
      */
 
 
-    getTrustScore(
+    updateProvenance(
 
-        objectId
+        knowledgeId,
+
+        updates
 
     ) {
 
 
         const record =
 
-            this.getProvenance(
+            this.records.get(
 
-                objectId
+                knowledgeId
 
             );
 
@@ -420,18 +361,40 @@ class KnowledgeProvenanceEngine {
 
         if (
 
-            !record
+            record
 
         ) {
 
 
-            return 0;
+            Object.assign(
+
+                record,
+
+                updates
+
+            );
 
         }
 
 
 
-        return record.trustScore;
+        this.addHistory(
+
+            "PROVENANCE_UPDATED",
+
+            {
+
+                knowledgeId,
+
+                updates
+
+            }
+
+        );
+
+
+
+        return record;
 
     }
 
@@ -439,15 +402,44 @@ class KnowledgeProvenanceEngine {
 
 
 
-    /**
-     * Complete provenance registry
-     */
+    getRecord(
+
+        knowledgeId
+
+    ) {
 
 
-    getRegistry() {
+        return this.records.get(
+
+            knowledgeId
+
+        );
+
+    }
 
 
-        return this.records;
+
+
+
+    getRecords() {
+
+
+        return Array.from(
+
+            this.records.values()
+
+        );
+
+    }
+
+
+
+
+
+    getHistory() {
+
+
+        return this.history;
 
     }
 
@@ -466,43 +458,37 @@ class KnowledgeProvenanceEngine {
         return {
 
 
-            records:
+            knowledgeObjects:
 
-                this.records.length,
+                this.records.size,
 
 
-            validations:
+            verified:
 
-                this.records.reduce(
+                this.getRecords()
 
-                    (sum, item) =>
+                    .filter(
 
-                        sum +
+                        item =>
 
-                        item.validations.length,
+                            item.verified
 
-                    0
+                    )
 
-                )
+                    .length,
+
+
+            lineageEvents:
+
+                this.lineage.length,
+
+
+            historyEvents:
+
+                this.history.length
+
 
         };
-
-    }
-
-
-
-
-
-    clearRegistry() {
-
-
-        this.records = [];
-
-
-        this.counter = 0;
-
-
-        return true;
 
     }
 
@@ -533,10 +519,63 @@ class KnowledgeProvenanceEngine {
 
             records:
 
-                this.records.length
+                this.records.size,
+
+
+            lineage:
+
+                this.lineage.length
 
 
         };
+
+    }
+
+
+
+
+
+    addHistory(
+
+        event,
+
+        data = {}
+
+    ) {
+
+
+        const record = {
+
+
+            event,
+
+
+            data,
+
+
+            timestamp:
+
+                new Date()
+
+        };
+
+
+
+        this.history.push(
+
+            record
+
+        );
+
+
+
+        this.recordEvent(
+
+            event,
+
+            data
+
+        );
 
     }
 
