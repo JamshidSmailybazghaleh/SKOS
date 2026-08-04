@@ -7,66 +7,182 @@
  * Component : Monitoring Runtime
  * File      : monitoring-runtime.js
  *
- * Build     : BUILD-000800.4
- * Version   : 1.0.0
+ * Build     : BUILD-000808.2
+ * Version   : 2.0.0
+ *
+ * Mission:
+ * Unified monitoring orchestration layer
+ * for SKOS operational intelligence.
+ *
  * ==========================================================
  */
 
+
 class MonitoringRuntime {
 
-    constructor() {
+
+    constructor(options = {}) {
+
 
         this.name =
             "SKOS Monitoring Runtime";
 
+
         this.version =
-            "1.0.0";
+            "2.0.0";
+
 
         this.status =
-            "INITIALIZED";
+            "CREATED";
 
-        this.monitors = [];
 
-        this.metrics = {};
+        // Legacy monitor registry
 
-        this.events = [];
+        this.monitors =
+            [];
 
-        this.startedAt = null;
+
+
+        // Runtime storage
+
+        this.metrics =
+            {};
+
+        this.events =
+            [];
+
+        this.history =
+            [];
+
+        this.startedAt =
+            null;
+
+
+
+        // SKOS Monitoring Services
+
+        this.metricsCollector =
+            options.metricsCollector || null;
+
+
+        this.healthMonitor =
+            options.healthMonitor || null;
+
+
+        this.alertManager =
+            options.alertManager || null;
+
+
+        this.communicationAdapter =
+            options.communicationAdapter || null;
+
 
     }
 
 
-    registerMonitor(monitor) {
 
-        if (!monitor) {
 
-            throw new Error(
-                "Monitor is required."
-            );
 
-        }
+    initialize() {
 
-        this.monitors.push(monitor);
+
+        this.status =
+            "INITIALIZED";
+
+
+        this.recordEvent({
+
+            type:
+                "MONITORING_INITIALIZED",
+
+            timestamp:
+                new Date()
+
+        });
+
 
         return true;
 
     }
 
 
+
+
+
+    registerMonitor(
+
+        monitor
+
+    ) {
+
+
+        if (!monitor) {
+
+
+            throw new Error(
+
+                "Monitor is required."
+
+            );
+
+        }
+
+
+
+        this.monitors.push(
+
+            monitor
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
     async start() {
+
+
+        if (
+
+            this.status === "CREATED"
+
+        ) {
+
+
+            this.initialize();
+
+        }
+
+
 
         this.status =
             "STARTING";
+
 
         this.startedAt =
             new Date();
 
 
-        for (const monitor of this.monitors) {
+
+
+        for (
+
+            const monitor of this.monitors
+
+        ) {
+
 
             if (
+
                 typeof monitor.start === "function"
+
             ) {
+
 
                 await monitor.start();
 
@@ -75,8 +191,11 @@ class MonitoringRuntime {
         }
 
 
+
+
         this.status =
             "READY";
+
 
 
         this.recordEvent({
@@ -90,30 +209,68 @@ class MonitoringRuntime {
         });
 
 
+
         return true;
 
     }
 
 
+
+
+
     async collect() {
 
-        for (const monitor of this.monitors) {
+
+        for (
+
+            const monitor of this.monitors
+
+        ) {
+
 
             if (
+
                 typeof monitor.collect === "function"
+
             ) {
 
+
                 const data =
+
                     await monitor.collect();
 
 
+
                 this.metrics[
+
                     monitor.name
+
                 ] = data;
+
+
+
+                if (
+
+                    this.metricsCollector
+
+                ) {
+
+
+                    this.metricsCollector.record(
+
+                        monitor.name,
+
+                        data
+
+                    );
+
+                }
+
 
             }
 
         }
+
 
 
         return this.metrics;
@@ -121,30 +278,57 @@ class MonitoringRuntime {
     }
 
 
+
+
+
     async healthCheck() {
 
-        const result = [];
+
+        const result =
+            [];
 
 
-        for (const monitor of this.monitors) {
+
+        for (
+
+            const monitor of this.monitors
+
+        ) {
+
 
             if (
+
                 typeof monitor.health === "function"
+
             ) {
 
-                result.push({
+
+                const health = {
+
 
                     name:
                         monitor.name,
 
+
                     status:
                         await monitor.health()
 
-                });
+
+                };
+
+
+
+                result.push(
+
+                    health
+
+                );
+
 
             }
 
         }
+
 
 
         return result;
@@ -152,37 +336,296 @@ class MonitoringRuntime {
     }
 
 
-    recordEvent(event) {
 
-        this.events.push(event);
+
+
+    processEvent(
+
+        event
+
+    ) {
+
+
+        if (
+
+            this.communicationAdapter
+
+        ) {
+
+
+            return this.communicationAdapter.processEvent(
+
+                event
+
+            );
+
+        }
+
+
+
+        this.recordEvent(
+
+            event
+
+        );
+
 
         return true;
 
     }
 
 
+
+
+
+    createAlert(
+
+        severity,
+
+        message,
+
+        metadata = {}
+
+    ) {
+
+
+        if (
+
+            !this.alertManager
+
+        ) {
+
+
+            return false;
+
+        }
+
+
+
+        return this.alertManager.createAlert(
+
+            severity,
+
+            message,
+
+            metadata
+
+        );
+
+    }
+
+
+
+
+
+    generateOperationalReport() {
+
+
+        return {
+
+
+            timestamp:
+
+                new Date(),
+
+
+
+            runtime:
+
+                this.getStatus(),
+
+
+
+            metrics:
+
+                this.metricsCollector
+
+                ?
+
+                this.metricsCollector.getStatistics()
+
+                :
+
+                null,
+
+
+
+            health:
+
+                this.healthMonitor
+
+                ?
+
+                this.healthMonitor.getStatistics()
+
+                :
+
+                null,
+
+
+
+            alerts:
+
+                this.alertManager
+
+                ?
+
+                this.alertManager.getStatistics()
+
+                :
+
+                null,
+
+
+            events:
+
+                this.events.length
+
+
+        };
+
+    }
+
+
+
+
+
+    recordEvent(
+
+        event
+
+    ) {
+
+
+        this.events.push(
+
+            event
+
+        );
+
+
+        this.history.push({
+
+            event,
+
+            timestamp:
+
+                new Date()
+
+        });
+
+
+        return true;
+
+    }
+
+
+
+
+
     getEvents() {
+
 
         return this.events;
 
     }
 
 
+
+
+
     getMetrics() {
+
 
         return this.metrics;
 
     }
 
 
+
+
+
+    getHistory() {
+
+
+        return this.history;
+
+    }
+
+
+
+
+
+    getStatus() {
+
+
+        return {
+
+
+            name:
+
+                this.name,
+
+
+            version:
+
+                this.version,
+
+
+            status:
+
+                this.status,
+
+
+            monitors:
+
+                this.monitors.length,
+
+
+            metrics:
+
+                Object.keys(
+
+                    this.metrics
+
+                ).length,
+
+
+            events:
+
+                this.events.length,
+
+
+            startedAt:
+
+                this.startedAt
+
+
+        };
+
+    }
+
+
+
+
+
     async shutdown() {
 
 
-        for (const monitor of this.monitors) {
+
+        for (
+
+            const monitor of this.monitors
+
+        ) {
+
 
             if (
+
                 typeof monitor.shutdown === "function"
+
             ) {
+
 
                 await monitor.shutdown();
 
@@ -191,8 +634,10 @@ class MonitoringRuntime {
         }
 
 
+
         this.status =
             "STOPPED";
+
 
 
         this.recordEvent({
@@ -206,39 +651,11 @@ class MonitoringRuntime {
         });
 
 
+
         return true;
 
     }
 
-
-    getStatus() {
-
-        return {
-
-            name:
-                this.name,
-
-            version:
-                this.version,
-
-            status:
-                this.status,
-
-            monitors:
-                this.monitors.length,
-
-            metrics:
-                Object.keys(this.metrics).length,
-
-            events:
-                this.events.length,
-
-            startedAt:
-                this.startedAt
-
-        };
-
-    }
 
 }
 
