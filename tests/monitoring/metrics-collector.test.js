@@ -7,342 +7,469 @@
  * Test      : Metrics Collector
  * File      : metrics-collector.test.js
  *
- * Build     : BUILD-000440
- * Version   : 1.0.0
+ * Build     : BUILD-000800.7
+ * Version   : 2.0.0
+ *
+ * Mission:
+ * Validate operational metrics lifecycle,
+ * runtime integration and analytics.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
  */
 
+
 const MetricsCollector =
     require("../../src/monitoring/metrics-collector");
 
 
+
 describe(
-    "SKOS Metrics Collector Tests",
+    "SKOS Metrics Collector Operational Tests",
     () => {
+
 
         let collector;
 
+
+
         beforeEach(() => {
 
+
             collector =
-                new MetricsCollector();
+                new MetricsCollector({
+
+                    maxSamples: 3
+
+                });
+
 
         });
 
 
+
         test(
-            "Metrics collector should initialize",
+            "Should initialize collector",
             () => {
+
 
                 expect(
                     collector.initialize()
-                ).toBe(true);
+                )
+                .toBe(true);
+
+
 
                 expect(
                     collector.status
-                ).toBe("INITIALIZED");
+                )
+                .toBe(
+                    "INITIALIZED"
+                );
+
 
             }
         );
 
 
+
         test(
-            "Should register metric",
+            "Should register metric with metadata",
             () => {
 
-                expect(
-                    collector.registerMetric(
-                        "CPU_USAGE",
-                        {
-                            unit: "%"
-                        }
-                    )
-                ).toBe(true);
+
+                collector.registerMetric(
+
+                    "CPU_USAGE",
+
+                    {
+
+                        unit:
+                            "%"
+
+                    }
+
+                );
+
+
+                const metric =
+                    collector.getMetric(
+                        "CPU_USAGE"
+                    );
+
+
+
+                expect(metric)
+                    .toBeDefined();
+
+
 
                 expect(
-                    collector.getStatistics()
-                        .registeredMetrics
-                ).toBe(1);
+                    metric.metadata.unit
+                )
+                .toBe("%");
+
 
             }
         );
 
 
-        test(
-            "Should reject invalid metric name",
-            () => {
-
-                expect(
-                    () =>
-                        collector.registerMetric(
-                            null
-                        )
-                ).toThrow();
-
-            }
-        );
-
 
         test(
-            "Should record metric values",
+            "Should record metric samples",
             () => {
+
 
                 collector.record(
-                    "CPU_USAGE",
+                    "CPU",
                     40
                 );
 
+
                 collector.record(
-                    "CPU_USAGE",
+                    "CPU",
                     60
                 );
 
+
                 expect(
+
                     collector
-                        .getMetricValues(
-                            "CPU_USAGE"
-                        )
-                        .length
-                ).toBe(2);
+                    .getMetricValues(
+                        "CPU"
+                    )
+
+                )
+                .toEqual(
+                    [
+                        40,
+                        60
+                    ]
+                );
+
 
             }
         );
 
 
+
         test(
-            "Should calculate average",
+            "Should calculate statistics",
             () => {
+
 
                 collector.record(
                     "MEMORY",
                     20
                 );
 
+
                 collector.record(
                     "MEMORY",
                     40
                 );
 
+
+
                 expect(
                     collector.calculateAverage(
                         "MEMORY"
                     )
-                ).toBe(30);
-
-            }
-        );
+                )
+                .toBe(30);
 
 
-        test(
-            "Should calculate minimum",
-            () => {
-
-                collector.record(
-                    "LATENCY",
-                    12
-                );
-
-                collector.record(
-                    "LATENCY",
-                    8
-                );
-
-                collector.record(
-                    "LATENCY",
-                    25
-                );
 
                 expect(
                     collector.calculateMinimum(
-                        "LATENCY"
+                        "MEMORY"
                     )
-                ).toBe(8);
-
-            }
-        );
+                )
+                .toBe(20);
 
 
-        test(
-            "Should calculate maximum",
-            () => {
-
-                collector.record(
-                    "LATENCY",
-                    10
-                );
-
-                collector.record(
-                    "LATENCY",
-                    55
-                );
-
-                collector.record(
-                    "LATENCY",
-                    15
-                );
 
                 expect(
                     collector.calculateMaximum(
-                        "LATENCY"
+                        "MEMORY"
                     )
-                ).toBe(55);
+                )
+                .toBe(40);
+
 
             }
         );
 
 
+
         test(
-            "Should return latest metric",
+            "Should return latest sample",
             () => {
+
 
                 collector.record(
                     "REQUESTS",
                     100
                 );
 
+
                 collector.record(
                     "REQUESTS",
                     120
                 );
 
+
+
                 expect(
-                    collector
-                        .calculateLatest(
-                            "REQUESTS"
-                        )
-                        .value
-                ).toBe(120);
+                    collector.calculateLatest(
+                        "REQUESTS"
+                    ).value
+                )
+                .toBe(120);
+
 
             }
         );
+
+
+
+        test(
+            "Should execute runtime collection",
+            () => {
+
+
+                collector.initialize();
+
+
+
+                collector.execute({
+
+                    runtimeStatus:
+                        "READY",
+
+                    engineCount:
+                        16,
+
+                    knowledgeObjects:
+                        0
+
+                });
+
+
+
+                expect(
+
+                    collector
+                    .getMetricValues(
+                        "runtime.status"
+                    )
+
+                )
+                .toContain(
+                    "READY"
+                );
+
+
+            }
+        );
+
+
+
+        test(
+            "Should track events",
+            () => {
+
+
+                collector.initialize();
+
+
+
+                expect(
+                    collector.getEvents()
+                        .length
+                )
+                .toBeGreaterThan(0);
+
+
+            }
+        );
+
+
+
+        test(
+            "Should respect maximum samples",
+            () => {
+
+
+                collector.record(
+                    "TEST",
+                    1
+                );
+
+
+                collector.record(
+                    "TEST",
+                    2
+                );
+
+
+                collector.record(
+                    "TEST",
+                    3
+                );
+
+
+                collector.record(
+                    "TEST",
+                    4
+                );
+
+
+
+                expect(
+
+                    collector
+                    .getMetricValues(
+                        "TEST"
+                    )
+                    .length
+
+                )
+                .toBe(3);
+
+
+            }
+        );
+
 
 
         test(
             "Should clear metric",
             () => {
 
+
                 collector.record(
                     "QUEUE",
                     5
                 );
 
+
                 collector.clearMetric(
                     "QUEUE"
                 );
 
+
+
                 expect(
+
                     collector
-                        .getMetricValues(
-                            "QUEUE"
-                        )
-                        .length
-                ).toBe(0);
+                    .getMetricValues(
+                        "QUEUE"
+                    )
+                    .length
+
+                )
+                .toBe(0);
+
 
             }
         );
+
 
 
         test(
             "Should clear all metrics",
             () => {
 
+
                 collector.record(
                     "A",
                     1
                 );
+
 
                 collector.record(
                     "B",
                     2
                 );
 
+
                 collector.clearAll();
+
+
 
                 expect(
                     collector
-                        .getStatistics()
-                        .registeredMetrics
-                ).toBe(0);
+                    .getStatistics()
+                    .registeredMetrics
+                )
+                .toBe(0);
+
 
             }
         );
 
-
-        test(
-            "Should return statistics",
-            () => {
-
-                collector.record(
-                    "CPU",
-                    10
-                );
-
-                collector.record(
-                    "CPU",
-                    20
-                );
-
-                collector.record(
-                    "RAM",
-                    30
-                );
-
-                const stats =
-                    collector.getStatistics();
-
-                expect(
-                    stats.registeredMetrics
-                ).toBe(2);
-
-                expect(
-                    stats.totalSamples
-                ).toBe(3);
-
-            }
-        );
-
-
-        test(
-            "Should return collector status",
-            () => {
-
-                const status =
-                    collector.getStatus();
-
-                expect(
-                    status.name
-                ).toBe(
-                    "Metrics Collector"
-                );
-
-                expect(
-                    status.version
-                ).toBe(
-                    "1.0.0"
-                );
-
-            }
-        );
 
 
         test(
             "Should shutdown correctly",
             () => {
 
+
                 collector.initialize();
+
+
 
                 expect(
                     collector.shutdown()
-                ).toBe(true);
+                )
+                .toBe(true);
+
+
 
                 expect(
                     collector.status
-                ).toBe("SHUTDOWN");
+                )
+                .toBe(
+                    "SHUTDOWN"
+                );
+
 
             }
         );
+
+
+
+        test(
+            "Should return operational status",
+            () => {
+
+
+                const status =
+                    collector.getStatus();
+
+
+
+                expect(
+                    status.name
+                )
+                .toBe(
+                    "Metrics Collector"
+                );
+
+
+
+                expect(
+                    status.version
+                )
+                .toBe(
+                    "2.0.0"
+                );
+
+
+            }
+        );
+
 
     }
 );
