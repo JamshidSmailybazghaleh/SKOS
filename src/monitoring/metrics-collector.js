@@ -7,37 +7,125 @@
  * Component   : Metrics Collector
  * File        : metrics-collector.js
  *
- * Build       : BUILD-000440
- * Version     : 1.0.0
+ * Build       : BUILD-000800.6
+ * Version     : 2.0.0
  *
  * Mission:
- * Collect, aggregate, summarize and expose
- * operational metrics across the SKOS platform.
+ * Collect, aggregate, analyze and expose
+ * operational metrics across SKOS Runtime.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
  */
 
+
 class MetricsCollector {
+
 
     constructor(options = {}) {
 
-        this.name = "Metrics Collector";
-        this.version = "1.0.0";
-        this.status = "CREATED";
+
+        this.name =
+            "Metrics Collector";
+
+
+        this.version =
+            "2.0.0";
+
+
+        this.status =
+            "CREATED";
+
 
         this.maxSamples =
             options.maxSamples || 1000;
 
+
         this.metrics =
             new Map();
+
+
+        this.events =
+            [];
+
+
+        this.collectionInterval =
+            null;
+
+
     }
 
 
 
     initialize() {
 
-        this.status = "INITIALIZED";
+
+        this.status =
+            "INITIALIZED";
+
+
+        this.recordEvent(
+            "METRICS_INITIALIZED"
+        );
+
+
+        return true;
+
+    }
+
+
+
+    execute(context = {}) {
+
+
+        if (context.runtimeStatus) {
+
+
+            this.record(
+
+                "runtime.status",
+
+                context.runtimeStatus
+
+            );
+
+
+        }
+
+
+        if (context.engineCount) {
+
+
+            this.record(
+
+                "runtime.engines",
+
+                context.engineCount
+
+            );
+
+
+        }
+
+
+        if (context.knowledgeObjects !== undefined) {
+
+
+            this.record(
+
+                "knowledge.objects",
+
+                context.knowledgeObjects
+
+            );
+
+
+        }
+
+
+        this.status =
+            "READY";
+
 
         return true;
 
@@ -50,6 +138,7 @@ class MetricsCollector {
         metadata = {}
     ) {
 
+
         if (!metricName) {
 
             throw new Error(
@@ -58,10 +147,15 @@ class MetricsCollector {
 
         }
 
+
+
         if (!this.metrics.has(metricName)) {
 
+
             this.metrics.set(
+
                 metricName,
+
                 {
 
                     metadata,
@@ -69,13 +163,24 @@ class MetricsCollector {
                     samples: []
 
                 }
+
+            );
+
+
+            this.recordEvent(
+
+                "METRIC_REGISTERED"
+
             );
 
         }
 
+
+
         return true;
 
     }
+
 
 
 
@@ -84,14 +189,21 @@ class MetricsCollector {
         value
     ) {
 
+
         if (!this.metrics.has(metricName)) {
+
 
             this.registerMetric(metricName);
 
+
         }
+
+
 
         const metric =
             this.metrics.get(metricName);
+
+
 
         metric.samples.push({
 
@@ -102,14 +214,29 @@ class MetricsCollector {
 
         });
 
+
+
         if (
+
             metric.samples.length >
             this.maxSamples
+
         ) {
+
 
             metric.samples.shift();
 
+
+            this.recordEvent(
+
+                "METRIC_SAMPLE_LIMIT_REACHED"
+
+            );
+
+
         }
+
+
 
         return true;
 
@@ -117,7 +244,22 @@ class MetricsCollector {
 
 
 
+
+    collect(metricName, value) {
+
+
+        return this.record(
+            metricName,
+            value
+        );
+
+    }
+
+
+
+
     getMetric(metricName) {
+
 
         return this.metrics.get(metricName);
 
@@ -125,10 +267,14 @@ class MetricsCollector {
 
 
 
+
     getMetricValues(metricName) {
+
 
         const metric =
             this.metrics.get(metricName);
+
+
 
         if (!metric) {
 
@@ -136,9 +282,12 @@ class MetricsCollector {
 
         }
 
+
+
         return metric.samples.map(
 
-            sample => sample.value
+            sample =>
+                sample.value
 
         );
 
@@ -146,82 +295,93 @@ class MetricsCollector {
 
 
 
+
     calculateAverage(metricName) {
+
 
         const values =
             this.getMetricValues(metricName);
 
-        if (values.length === 0) {
+
+
+        if (!values.length) {
 
             return 0;
 
         }
 
-        const total =
+
+
+        return (
 
             values.reduce(
 
                 (sum, value) =>
-
                     sum + value,
 
                 0
 
-            );
+            )
 
-        return total / values.length;
+        ) / values.length;
 
     }
+
 
 
 
     calculateMinimum(metricName) {
 
+
         const values =
             this.getMetricValues(metricName);
 
-        if (values.length === 0) {
 
-            return 0;
-
-        }
-
-        return Math.min(...values);
+        return values.length
+            ? Math.min(...values)
+            : 0;
 
     }
+
 
 
 
     calculateMaximum(metricName) {
 
+
         const values =
             this.getMetricValues(metricName);
 
-        if (values.length === 0) {
 
-            return 0;
-
-        }
-
-        return Math.max(...values);
+        return values.length
+            ? Math.max(...values)
+            : 0;
 
     }
 
 
 
+
     calculateLatest(metricName) {
+
 
         const metric =
             this.metrics.get(metricName);
 
+
+
         if (
+
             !metric ||
             metric.samples.length === 0
+
         ) {
 
             return null;
 
         }
+
+
 
         return metric.samples[
             metric.samples.length - 1
@@ -231,96 +391,149 @@ class MetricsCollector {
 
 
 
-    clearMetric(metricName) {
 
-        if (
-            this.metrics.has(metricName)
-        ) {
+    recordEvent(type, data = {}) {
 
-            this.metrics.get(metricName)
-                .samples = [];
 
-        }
+        this.events.push({
 
-        return true;
+            type,
+
+            data,
+
+            timestamp:
+                new Date()
+
+        });
+
+
+    }
+
+
+
+
+    getEvents() {
+
+
+        return this.events;
 
     }
 
-
-
-    clearAll() {
-
-        this.metrics.clear();
-
-        return true;
-
-    }
 
 
 
     getStatistics() {
 
+
         return {
+
 
             registeredMetrics:
                 this.metrics.size,
 
+
             totalSamples:
 
                 Array.from(
-
                     this.metrics.values()
-
                 )
 
                 .reduce(
 
                     (sum, metric) =>
-
-                        sum + metric.samples.length,
+                        sum +
+                        metric.samples.length,
 
                     0
 
-                )
+                ),
+
+
+            events:
+                this.events.length
+
 
         };
 
+
     }
+
 
 
 
     getStatus() {
 
+
         return {
+
 
             name:
                 this.name,
 
+
             version:
                 this.version,
+
 
             status:
                 this.status,
 
+
             metrics:
-                this.metrics.size
+                this.metrics.size,
+
+
+            samples:
+                this.getStatistics()
+                    .totalSamples,
+
+
+            events:
+                this.events.length
+
 
         };
+
 
     }
 
 
 
+
     shutdown() {
+
+
+        if (this.collectionInterval) {
+
+
+            clearInterval(
+                this.collectionInterval
+            );
+
+
+        }
+
+
 
         this.status =
             "SHUTDOWN";
+
+
+        this.recordEvent(
+
+            "METRICS_SHUTDOWN"
+
+        );
+
+
 
         return true;
 
     }
 
 }
+
+
 
 module.exports =
     MetricsCollector;
