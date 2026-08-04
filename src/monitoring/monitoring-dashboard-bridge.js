@@ -465,4 +465,3 @@ class MonitoringDashboardBridge {
 
 module.exports =
     MonitoringDashboardBridge;
-``
