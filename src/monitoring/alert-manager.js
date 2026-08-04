@@ -7,14 +7,15 @@
  * Component : Alert Manager
  * File      : alert-manager.js
  *
- * Build     : BUILD-000443
- * Version   : 1.0.0
+ * Build     : BUILD-000801.1
+ * Version   : 2.0.0
  *
  * Mission:
- * Manage alerts, severity classification,
- * alert lifecycle and notification readiness.
+ * Manage operational alerts,
+ * severity classification,
+ * lifecycle management,
+ * and notification readiness.
  *
- * Copyright © Smaily Knowledge Foundation
  * ==========================================================
  */
 
@@ -30,7 +31,7 @@ class AlertManager {
 
 
         this.version =
-            "1.0.0";
+            "2.0.0";
 
 
         this.status =
@@ -49,11 +50,18 @@ class AlertManager {
             [];
 
 
+        this.events =
+            [];
+
+
+        this.counter =
+            0;
+
+
         this.options =
             options;
 
     }
-
 
 
 
@@ -65,10 +73,8 @@ class AlertManager {
             "INITIALIZED";
 
 
-        this.recordHistory(
-
+        this.recordEvent(
             "ALERT_MANAGER_INITIALIZED"
-
         );
 
 
@@ -79,12 +85,101 @@ class AlertManager {
 
 
 
+    execute(context = {}) {
+
+
+        if (
+            context.component &&
+            context.state
+        ) {
+
+
+            if (
+                context.state !==
+                "HEALTHY"
+            ) {
+
+
+                this.createAlert(
+
+                    this.resolveSeverity(
+                        context.state
+                    ),
+
+                    `Component ${context.component} unhealthy`,
+
+                    {
+
+                        component:
+                            context.component,
+
+                        state:
+                            context.state
+
+                    }
+
+                );
+
+            }
+
+
+        }
+
+
+        this.status =
+            "READY";
+
+
+        this.recordEvent(
+            "ALERT_RUNTIME_EXECUTED"
+        );
+
+
+        return this.getStatistics();
+
+    }
+
+
+
+
+    resolveSeverity(state) {
+
+
+        switch(state) {
+
+
+            case "FAILED":
+
+                return "CRITICAL";
+
+
+            case "WARNING":
+
+                return "WARNING";
+
+
+            case "ERROR":
+
+                return "ERROR";
+
+
+            default:
+
+                return "INFO";
+
+        }
+
+
+    }
+
+
+
 
     registerRule(
 
         ruleId,
 
-        rule
+        rule = {}
 
     ) {
 
@@ -93,9 +188,7 @@ class AlertManager {
 
 
             throw new Error(
-
                 "Rule id required."
-
             );
 
         }
@@ -106,27 +199,22 @@ class AlertManager {
 
 
             id:
-
                 ruleId,
 
 
             condition:
-
                 rule.condition || null,
 
 
             severity:
-
                 rule.severity || "WARNING",
 
 
             enabled:
-
                 true,
 
 
             createdAt:
-
                 new Date()
 
         };
@@ -143,7 +231,44 @@ class AlertManager {
 
 
 
+        this.recordEvent(
+
+            "RULE_REGISTERED",
+
+            record
+
+        );
+
+
         return record;
+
+    }
+
+
+
+
+
+    disableRule(ruleId) {
+
+
+        const rule =
+            this.rules.get(
+                ruleId
+            );
+
+
+        if (!rule) {
+
+            return false;
+
+        }
+
+
+        rule.enabled =
+            false;
+
+
+        return true;
 
     }
 
@@ -162,12 +287,16 @@ class AlertManager {
     ) {
 
 
+        this.counter++;
+
+
         const alert = {
 
 
             id:
 
-                `ALERT-${Date.now()}`,
+                `ALERT-${String(this.counter)
+                .padStart(6,"0")}`,
 
 
             severity:
@@ -193,6 +322,11 @@ class AlertManager {
 
             resolvedAt:
 
+                null,
+
+
+            acknowledgedAt:
+
                 null
 
         };
@@ -200,14 +334,12 @@ class AlertManager {
 
 
         this.alerts.push(
-
             alert
-
         );
 
 
 
-        this.recordHistory(
+        this.recordEvent(
 
             "ALERT_CREATED",
 
@@ -225,21 +357,56 @@ class AlertManager {
 
 
 
-    resolveAlert(
-
-        alertId
-
-    ) {
+    acknowledgeAlert(alertId) {
 
 
         const alert =
+            this.getAlert(
+                alertId
+            );
 
-            this.alerts.find(
 
-                item =>
+        if (!alert) {
 
-                    item.id === alertId
 
+            throw new Error(
+                "Alert not found."
+            );
+
+        }
+
+
+        alert.status =
+            "ACKNOWLEDGED";
+
+
+        alert.acknowledgedAt =
+            new Date();
+
+
+        this.recordEvent(
+
+            "ALERT_ACKNOWLEDGED",
+
+            alert
+
+        );
+
+
+        return alert;
+
+    }
+
+
+
+
+
+    resolveAlert(alertId) {
+
+
+        const alert =
+            this.getAlert(
+                alertId
             );
 
 
@@ -248,9 +415,7 @@ class AlertManager {
 
 
             throw new Error(
-
                 "Alert not found."
-
             );
 
         }
@@ -266,7 +431,7 @@ class AlertManager {
 
 
 
-        this.recordHistory(
+        this.recordEvent(
 
             "ALERT_RESOLVED",
 
@@ -284,17 +449,12 @@ class AlertManager {
 
 
 
-    getAlert(
-
-        alertId
-
-    ) {
+    getAlert(alertId) {
 
 
         return this.alerts.find(
 
             item =>
-
                 item.id === alertId
 
         );
@@ -322,7 +482,6 @@ class AlertManager {
         return this.alerts.filter(
 
             alert =>
-
                 alert.status === "OPEN"
 
         );
@@ -339,7 +498,6 @@ class AlertManager {
         return this.alerts.filter(
 
             alert =>
-
                 alert.status === "RESOLVED"
 
         );
@@ -350,17 +508,12 @@ class AlertManager {
 
 
 
-    getBySeverity(
-
-        severity
-
-    ) {
+    getBySeverity(severity) {
 
 
         return this.alerts.filter(
 
             alert =>
-
                 alert.severity === severity
 
         );
@@ -381,22 +534,16 @@ class AlertManager {
 
 
         const rule =
-
             this.rules.get(
-
                 ruleId
-
             );
-
 
 
         if (!rule) {
 
 
             throw new Error(
-
                 "Rule not found."
-
             );
 
         }
@@ -410,13 +557,12 @@ class AlertManager {
 
 
             triggered:
-
                 Boolean(value),
 
 
             severity:
-
                 rule.severity
+
 
         };
 
@@ -433,27 +579,37 @@ class AlertManager {
 
 
             totalAlerts:
-
                 this.alerts.length,
 
 
             openAlerts:
-
                 this.getOpenAlerts()
+                .length,
 
-                    .length,
+
+            acknowledgedAlerts:
+
+                this.alerts.filter(
+
+                    alert =>
+                        alert.status ===
+                        "ACKNOWLEDGED"
+
+                ).length,
 
 
             resolvedAlerts:
-
                 this.getResolvedAlerts()
-
-                    .length,
+                .length,
 
 
             rules:
+                this.rules.size,
 
-                this.rules.size
+
+            events:
+                this.events.length
+
 
         };
 
@@ -470,23 +626,20 @@ class AlertManager {
 
 
             name:
-
                 this.name,
 
 
             version:
-
                 this.version,
 
 
             status:
-
                 this.status,
 
 
             alerts:
-
                 this.alerts.length
+
 
         };
 
@@ -505,22 +658,47 @@ class AlertManager {
     ) {
 
 
-        this.history.push(
+        this.history.push({
 
-            {
+            event,
 
-                event,
+            data,
+
+            timestamp:
+                new Date()
+
+        });
+
+    }
 
 
-                data,
 
 
-                timestamp:
 
-                    new Date()
+    recordEvent(
 
-            }
+        event,
 
+        data = {}
+
+    ) {
+
+
+        this.events.push({
+
+            event,
+
+            data,
+
+            timestamp:
+                new Date()
+
+        });
+
+
+        this.recordHistory(
+            event,
+            data
         );
 
     }
@@ -536,7 +714,7 @@ class AlertManager {
             "SHUTDOWN";
 
 
-        this.recordHistory(
+        this.recordEvent(
 
             "ALERT_MANAGER_SHUTDOWN"
 
@@ -546,6 +724,7 @@ class AlertManager {
         return true;
 
     }
+
 
 }
 
