@@ -7,29 +7,50 @@
  * Component : Health Monitor
  * File      : health-monitor.js
  *
- * Build     : BUILD-000441
- * Version   : 1.0.0
+ * Build     : BUILD-000800.8
+ * Version   : 2.0.0
  *
  * Mission:
- * Monitor the operational health of all SKOS
- * components and produce unified health reports.
+ * Monitor operational health of SKOS components
+ * and provide unified runtime health reports.
  *
  * ==========================================================
  */
 
+
 class HealthMonitor {
+
 
     constructor(options = {}) {
 
-        this.name = "Health Monitor";
-        this.version = "1.0.0";
-        this.status = "CREATED";
 
-        this.components = new Map();
+        this.name =
+            "Health Monitor";
 
-        this.history = [];
 
-        this.options = options;
+        this.version =
+            "2.0.0";
+
+
+        this.status =
+            "CREATED";
+
+
+        this.components =
+            new Map();
+
+
+        this.history =
+            [];
+
+
+        this.events =
+            [];
+
+
+        this.options =
+            options;
+
 
     }
 
@@ -37,11 +58,63 @@ class HealthMonitor {
 
     initialize() {
 
-        this.status = "INITIALIZED";
+
+        this.status =
+            "INITIALIZED";
+
+
+        this.recordEvent(
+            "HEALTH_MONITOR_INITIALIZED"
+        );
+
 
         return true;
 
     }
+
+
+
+
+    execute(context = {}) {
+
+
+        if (context.components) {
+
+
+            for (
+                const component of context.components
+            ) {
+
+
+                this.updateHealth(
+
+                    component.id,
+
+                    component.state,
+
+                    component.details || {}
+
+                );
+
+
+            }
+
+        }
+
+
+        this.status =
+            "READY";
+
+
+        this.recordEvent(
+            "HEALTH_CHECK_COMPLETED"
+        );
+
+
+        return this.generateReport();
+
+    }
+
 
 
 
@@ -53,7 +126,9 @@ class HealthMonitor {
 
     ) {
 
+
         if (!componentId) {
+
 
             throw new Error(
                 "Component id required."
@@ -61,32 +136,64 @@ class HealthMonitor {
 
         }
 
+
+
         this.components.set(
 
             componentId,
 
             {
 
-                id: componentId,
+
+                id:
+                    componentId,
+
 
                 name:
-                    metadata.name || componentId,
+                    metadata.name ||
+                    componentId,
 
-                state: "UNKNOWN",
 
-                lastCheck: null,
+                state:
+                    "UNKNOWN",
 
-                uptime: 0,
 
-                details: {}
+                severity:
+                    "INFO",
+
+
+                lastCheck:
+                    null,
+
+
+                uptime:
+                    0,
+
+
+                details:
+                    {}
+
 
             }
 
         );
 
+
+        this.recordEvent(
+
+            "COMPONENT_REGISTERED",
+
+            {
+                componentId
+            }
+
+        );
+
+
         return true;
 
     }
+
 
 
 
@@ -100,10 +207,16 @@ class HealthMonitor {
 
     ) {
 
+
         const component =
-            this.components.get(componentId);
+            this.components.get(
+                componentId
+            );
+
+
 
         if (!component) {
+
 
             throw new Error(
                 "Component not registered."
@@ -111,12 +224,29 @@ class HealthMonitor {
 
         }
 
-        component.state = state;
 
-        component.details = details;
+
+        component.state =
+            state;
+
+
+
+        component.severity =
+            this.resolveSeverity(
+                state
+            );
+
+
+
+        component.details =
+            details;
+
+
 
         component.lastCheck =
             new Date();
+
+
 
         this.history.push({
 
@@ -129,9 +259,47 @@ class HealthMonitor {
 
         });
 
+
+
         return component;
 
     }
+
+
+
+
+    resolveSeverity(state) {
+
+
+        switch(state) {
+
+
+            case "HEALTHY":
+
+                return "INFO";
+
+
+            case "WARNING":
+
+                return "WARNING";
+
+
+            case "FAILED":
+
+                return "CRITICAL";
+
+
+            default:
+
+                return "UNKNOWN";
+
+
+        }
+
+
+    }
+
+
 
 
 
@@ -143,8 +311,13 @@ class HealthMonitor {
 
     ) {
 
+
         const component =
-            this.components.get(componentId);
+            this.components.get(
+                componentId
+            );
+
+
 
         if (!component) {
 
@@ -152,7 +325,11 @@ class HealthMonitor {
 
         }
 
-        component.uptime += milliseconds;
+
+
+        component.uptime +=
+            milliseconds;
+
 
         return true;
 
@@ -160,23 +337,33 @@ class HealthMonitor {
 
 
 
-    getComponentHealth(
 
-        componentId
+    getHealthScore() {
 
-    ) {
 
-        return this.components.get(componentId);
-
-    }
+        const total =
+            this.components.size;
 
 
 
-    getAllHealth() {
+        if (total === 0) {
 
-        return Array.from(
+            return 0;
 
-            this.components.values()
+        }
+
+
+
+        const healthy =
+
+            this.getHealthyComponents()
+            .length;
+
+
+
+        return Math.round(
+
+            (healthy / total) * 100
 
         );
 
@@ -184,7 +371,41 @@ class HealthMonitor {
 
 
 
+
+
+    getComponentHealth(
+        componentId
+    ) {
+
+
+        return this.components.get(
+            componentId
+        );
+
+    }
+
+
+
+
+
+    getAllHealth() {
+
+
+        return Array.from(
+
+            this.components.values()
+
+        );
+
+
+    }
+
+
+
+
+
     getHealthyComponents() {
+
 
         return this.getAllHealth()
 
@@ -192,107 +413,202 @@ class HealthMonitor {
 
                 component =>
 
-                    component.state === "HEALTHY"
+                    component.state ===
+                    "HEALTHY"
 
             );
 
+
     }
+
+
 
 
 
     getUnhealthyComponents() {
 
+
         return this.getAllHealth()
 
             .filter(
 
                 component =>
 
-                    component.state !== "HEALTHY"
+                    component.state !==
+                    "HEALTHY"
 
             );
 
+
     }
+
+
 
 
 
     generateReport() {
 
+
         return {
+
 
             timestamp:
                 new Date(),
 
+
+            healthScore:
+                this.getHealthScore(),
+
+
             total:
                 this.components.size,
 
+
             healthy:
-                this.getHealthyComponents().length,
+                this.getHealthyComponents()
+                    .length,
+
 
             unhealthy:
-                this.getUnhealthyComponents().length,
+                this.getUnhealthyComponents()
+                    .length,
+
 
             components:
                 this.getAllHealth()
 
+
         };
 
+
     }
+
+
+
+
+    recordEvent(
+
+        type,
+
+        data = {}
+
+    ) {
+
+
+        this.events.push({
+
+            type,
+
+            data,
+
+            timestamp:
+                new Date()
+
+        });
+
+
+    }
+
+
+
+
+    getEvents() {
+
+
+        return this.events;
+
+
+    }
+
+
 
 
 
     getStatistics() {
 
+
         return {
+
 
             registeredComponents:
                 this.components.size,
 
+
             healthChecks:
                 this.history.length,
 
-            healthy:
-                this.getHealthyComponents().length,
 
-            unhealthy:
-                this.getUnhealthyComponents().length
+            events:
+                this.events.length,
+
+
+            healthScore:
+                this.getHealthScore()
+
 
         };
 
+
     }
+
+
 
 
 
     getStatus() {
 
+
         return {
+
 
             name:
                 this.name,
 
+
             version:
                 this.version,
+
 
             status:
                 this.status,
 
+
             components:
-                this.components.size
+                this.components.size,
+
+
+            healthScore:
+                this.getHealthScore()
+
 
         };
 
+
     }
+
+
 
 
 
     shutdown() {
 
-        this.status = "SHUTDOWN";
+
+        this.status =
+            "SHUTDOWN";
+
+
+        this.recordEvent(
+            "HEALTH_MONITOR_SHUTDOWN"
+        );
+
 
         return true;
 
     }
 
+
 }
 
-module.exports = HealthMonitor;
+
+module.exports =
+    HealthMonitor;
