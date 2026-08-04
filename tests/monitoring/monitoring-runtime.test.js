@@ -7,294 +7,917 @@
  * Test : Monitoring Runtime
  * File : monitoring-runtime.test.js
  *
- * Build : BUILD-000800.5
- * Version : 1.0.0
+ * Build : BUILD-000808.3
+ * Version : 2.0.0
+ *
+ * Mission:
+ * Validate unified monitoring orchestration,
+ * service integration and operational reporting.
+ *
  * ==========================================================
  */
+
 
 const MonitoringRuntime =
     require("../../src/monitoring/monitoring-runtime");
 
 
-describe("Monitoring Runtime Tests", () => {
 
+describe(
+    "SKOS Monitoring Runtime Tests",
+    () => {
 
-    let monitoring;
 
-    let monitor;
+        let monitoring;
 
+        let monitor;
 
-    beforeEach(() => {
+        let metricsCollector;
 
-        monitoring =
-            new MonitoringRuntime();
+        let healthMonitor;
 
+        let alertManager;
 
-        monitor = {
+        let communicationAdapter;
 
-            name:
-                "Mock Health Monitor",
 
 
-            start:
-                jest.fn()
-                .mockResolvedValue(true),
+        beforeEach(() => {
 
 
-            collect:
-                jest.fn()
-                .mockResolvedValue({
 
-                    cpu: 20,
+            metricsCollector = {
 
-                    memory: 40
 
-                }),
+                records: [],
 
 
-            health:
-                jest.fn()
-                .mockResolvedValue(
-                    "HEALTHY"
-                ),
 
+                record(
 
-            shutdown:
-                jest.fn()
-                .mockResolvedValue(true)
+                    name,
 
-        };
+                    value
 
-    });
+                ) {
 
 
+                    this.records.push({
 
-    test("Should create monitoring runtime", () => {
+                        name,
 
+                        value
 
-        expect(monitoring)
-            .toBeDefined();
+                    });
 
 
-        expect(monitoring.name)
-            .toBe(
-                "SKOS Monitoring Runtime"
-            );
+                    return true;
 
+                },
 
-    });
 
 
+                getStatistics() {
 
-    test("Should register monitor", () => {
 
+                    return {
 
-        expect(
-            monitoring.registerMonitor(monitor)
-        )
-        .toBe(true);
+                        registeredMetrics:
+                            this.records.length
 
+                    };
 
-        expect(
-            monitoring.monitors.length
-        )
-        .toBe(1);
+                }
 
 
-    });
+            };
 
 
 
-    test("Should reject empty monitor", () => {
 
 
-        expect(() =>
+            healthMonitor = {
 
-            monitoring.registerMonitor()
 
-        )
-        .toThrow();
+                updates: [],
 
 
-    });
 
+                registerComponent:
 
+                    jest.fn()
+                    .mockReturnValue(true),
 
-    test("Should start monitoring runtime", async () => {
 
 
-        monitoring.registerMonitor(monitor);
+                updateHealth(
 
+                    component,
 
-        await monitoring.start();
+                    state,
 
+                    details
 
-        expect(
-            monitor.start
-        )
-        .toHaveBeenCalled();
+                ) {
 
 
-        expect(
-            monitoring.status
-        )
-        .toBe("READY");
+                    const result = {
 
 
-    });
+                        component,
 
+                        state,
 
+                        details
 
-    test("Should collect metrics", async () => {
+                    };
 
 
-        monitoring.registerMonitor(monitor);
 
+                    this.updates.push(
 
-        await monitoring.start();
+                        result
 
+                    );
 
-        const metrics =
-            await monitoring.collect();
 
+                    return result;
 
-        expect(
-            metrics["Mock Health Monitor"]
-        )
-        .toBeDefined();
+                },
 
 
-        expect(
-            metrics["Mock Health Monitor"].cpu
-        )
-        .toBe(20);
 
+                getStatistics() {
 
-    });
 
+                    return {
 
 
-    test("Should perform health check", async () => {
+                        registeredComponents:
+                            1,
 
 
-        monitoring.registerMonitor(monitor);
+                        healthChecks:
+                            this.updates.length
 
+                    };
 
-        const result =
-            await monitoring.healthCheck();
+                }
 
 
-        expect(
-            result.length
-        )
-        .toBe(1);
+            };
 
 
-        expect(
-            result[0].status
-        )
-        .toBe(
-            "HEALTHY"
-        );
 
 
-    });
 
+            alertManager = {
 
 
-    test("Should record monitoring events", () => {
+                alerts: [],
 
 
-        monitoring.recordEvent({
 
-            type:
-                "TEST_EVENT"
+                createAlert(
+
+                    severity,
+
+                    message,
+
+                    metadata
+
+                ) {
+
+
+                    const alert = {
+
+
+                        severity,
+
+                        message,
+
+                        metadata
+
+                    };
+
+
+                    this.alerts.push(
+
+                        alert
+
+                    );
+
+
+                    return alert;
+
+                },
+
+
+
+                getStatistics() {
+
+
+                    return {
+
+                        totalAlerts:
+                            this.alerts.length
+
+                    };
+
+                }
+
+
+            };
+
+
+
+
+
+            communicationAdapter = {
+
+
+                events: [],
+
+
+
+                processEvent(
+
+                    event
+
+                ) {
+
+
+                    this.events.push(
+
+                        event
+
+                    );
+
+
+                    return {
+
+
+                        processed:
+                            true
+
+                    };
+
+                }
+
+
+            };
+
+
+
+
+
+            monitoring =
+
+                new MonitoringRuntime({
+
+                    metricsCollector,
+
+                    healthMonitor,
+
+                    alertManager,
+
+                    communicationAdapter
+
+                });
+
+
+
+
+
+            monitor = {
+
+
+                name:
+                    "Mock Health Monitor",
+
+
+
+                start:
+
+                    jest.fn()
+                    .mockResolvedValue(true),
+
+
+
+                collect:
+
+                    jest.fn()
+                    .mockResolvedValue({
+
+                        cpu:
+                            20,
+
+                        memory:
+                            40
+
+                    }),
+
+
+
+                health:
+
+                    jest.fn()
+                    .mockResolvedValue(
+                        "HEALTHY"
+                    ),
+
+
+
+                shutdown:
+
+                    jest.fn()
+                    .mockResolvedValue(true)
+
+
+            };
+
 
         });
 
 
-        expect(
-            monitoring.getEvents().length
-        )
-        .toBe(1);
-
-
-    });
 
 
 
-    test("Should return collected metrics", async () => {
 
 
-        monitoring.registerMonitor(monitor);
+        test(
+            "Should create monitoring runtime",
+            () => {
 
 
-        await monitoring.collect();
-
-
-        expect(
-            Object.keys(
-                monitoring.getMetrics()
-            ).length
-        )
-        .toBe(1);
-
-
-    });
+                expect(
+                    monitoring
+                )
+                .toBeDefined();
 
 
 
-    test("Should shutdown monitoring", async () => {
+                expect(
+                    monitoring.name
+                )
+                .toBe(
+                    "SKOS Monitoring Runtime"
+                );
 
 
-        monitoring.registerMonitor(monitor);
-
-
-        await monitoring.shutdown();
-
-
-        expect(
-            monitor.shutdown
-        )
-        .toHaveBeenCalled();
-
-
-        expect(
-            monitoring.status
-        )
-        .toBe(
-            "STOPPED"
+            }
         );
 
 
-    });
 
 
 
-    test("Should return monitoring status", () => {
 
 
-        const status =
-            monitoring.getStatus();
+        test(
+            "Should initialize runtime",
+            () => {
 
 
-        expect(
-            status.name
-        )
-        .toBe(
-            "SKOS Monitoring Runtime"
+                expect(
+
+                    monitoring.initialize()
+
+                )
+                .toBe(true);
+
+
+
+                expect(
+                    monitoring.status
+                )
+                .toBe(
+                    "INITIALIZED"
+                );
+
+
+            }
         );
 
 
-        expect(
-            status.status
-        )
-        .toBe(
-            "INITIALIZED"
+
+
+
+
+
+        test(
+            "Should register monitor",
+            () => {
+
+
+                expect(
+
+                    monitoring.registerMonitor(
+                        monitor
+                    )
+
+                )
+                .toBe(true);
+
+
+
+                expect(
+
+                    monitoring.monitors.length
+
+                )
+                .toBe(1);
+
+
+            }
         );
 
 
-    });
 
 
-});
+
+
+
+        test(
+            "Should reject empty monitor",
+            () => {
+
+
+                expect(
+
+                    () =>
+                        monitoring.registerMonitor()
+
+                )
+                .toThrow();
+
+
+            }
+        );
+
+
+
+
+
+
+
+        test(
+            "Should start monitoring runtime",
+            async () => {
+
+
+                monitoring.registerMonitor(
+
+                    monitor
+
+                );
+
+
+
+                await monitoring.start();
+
+
+
+                expect(
+
+                    monitor.start
+
+                )
+                .toHaveBeenCalled();
+
+
+
+                expect(
+
+                    monitoring.status
+
+                )
+                .toBe(
+                    "READY"
+                );
+
+
+            }
+        );
+
+
+
+
+
+
+
+        test(
+            "Should collect monitor data",
+            async () => {
+
+
+                monitoring.registerMonitor(
+
+                    monitor
+
+                );
+
+
+
+                const metrics =
+
+                    await monitoring.collect();
+
+
+
+                expect(
+
+                    metrics["Mock Health Monitor"]
+
+                )
+                .toBeDefined();
+
+
+
+                expect(
+
+                    metrics["Mock Health Monitor"]
+                        .cpu
+
+                )
+                .toBe(20);
+
+
+            }
+        );
+
+
+
+
+
+
+
+        test(
+            "Should integrate with metrics collector",
+            async () => {
+
+
+                monitoring.registerMonitor(
+
+                    monitor
+
+                );
+
+
+
+                await monitoring.collect();
+
+
+
+                expect(
+
+                    metricsCollector.records.length
+
+                )
+                .toBe(1);
+
+
+            }
+        );
+
+
+
+
+
+
+
+        test(
+            "Should perform health check",
+            async () => {
+
+
+                monitoring.registerMonitor(
+
+                    monitor
+
+                );
+
+
+
+                const result =
+
+                    await monitoring.healthCheck();
+
+
+
+                expect(
+                    result.length
+                )
+                .toBe(1);
+
+
+
+                expect(
+
+                    result[0].status
+
+                )
+                .toBe(
+                    "HEALTHY"
+                );
+
+
+            }
+        );
+
+
+
+
+
+
+
+        test(
+            "Should create alert through runtime",
+            () => {
+
+
+                const alert =
+
+                    monitoring.createAlert(
+
+                        "CRITICAL",
+
+                        "Engine Failure",
+
+                        {
+
+                            engine:
+                                "Reasoning"
+
+                        }
+
+                    );
+
+
+
+                expect(
+
+                    alert.severity
+
+                )
+                .toBe(
+                    "CRITICAL"
+                );
+
+
+
+                expect(
+
+                    alertManager.alerts.length
+
+                )
+                .toBe(1);
+
+
+            }
+        );
+
+
+
+
+
+
+
+        test(
+            "Should process communication events",
+            () => {
+
+
+                const result =
+
+                    monitoring.processEvent({
+
+                        type:
+                            "MESSAGE_RECEIVED"
+
+                    });
+
+
+
+                expect(
+
+                    result.processed
+
+                )
+                .toBe(true);
+
+
+
+                expect(
+
+                    communicationAdapter.events.length
+
+                )
+                .toBe(1);
+
+
+            }
+        );
+
+
+
+
+
+
+
+        test(
+            "Should record runtime events",
+            () => {
+
+
+                monitoring.recordEvent({
+
+                    type:
+                        "TEST_EVENT"
+
+                });
+
+
+
+                expect(
+
+                    monitoring.getEvents().length
+
+                )
+                .toBe(1);
+
+
+            }
+        );
+
+
+
+
+
+
+
+        test(
+            "Should generate operational report",
+            () => {
+
+
+                const report =
+
+                    monitoring.generateOperationalReport();
+
+
+
+                expect(
+
+                    report.runtime
+
+                )
+                .toBeDefined();
+
+
+
+                expect(
+
+                    report.metrics
+
+                )
+                .toBeDefined();
+
+
+
+                expect(
+
+                    report.health
+
+                )
+                .toBeDefined();
+
+
+
+                expect(
+
+                    report.alerts
+
+                )
+                .toBeDefined();
+
+
+            }
+        );
+
+
+
+
+
+
+
+        test(
+            "Should return history",
+            () => {
+
+
+                monitoring.initialize();
+
+
+
+                expect(
+
+                    monitoring.getHistory().length
+
+                )
+                .toBeGreaterThan(0);
+
+
+            }
+        );
+
+
+
+
+
+
+
+        test(
+            "Should shutdown monitoring runtime",
+            async () => {
+
+
+                monitoring.registerMonitor(
+
+                    monitor
+
+                );
+
+
+
+                await monitoring.shutdown();
+
+
+
+                expect(
+
+                    monitor.shutdown
+
+                )
+                .toHaveBeenCalled();
+
+
+
+                expect(
+
+                    monitoring.status
+
+                )
+                .toBe(
+                    "STOPPED"
+                );
+
+
+            }
+        );
+
+
+
+
+
+
+
+        test(
+            "Should return runtime status",
+            () => {
+
+
+                const status =
+
+                    monitoring.getStatus();
+
+
+
+                expect(
+
+                    status.name
+
+                )
+                .toBe(
+                    "SKOS Monitoring Runtime"
+                );
+
+
+
+                expect(
+
+                    status.version
+
+                )
+                .toBe(
+                    "2.0.0"
+                );
+
+
+            }
+        );
+
+
+
+    }
+);
