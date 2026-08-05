@@ -382,9 +382,7 @@ class KnowledgeGraphEngine {
 shutdown() {
 
 
-    if (this.nodeManager.shutdown) {
-
-        this.nodeManager.shutdown();
+    if (this.nodeManager.shutdown); {
 
     }
 
