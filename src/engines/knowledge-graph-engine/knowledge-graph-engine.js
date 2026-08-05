@@ -389,11 +389,14 @@ shutdown() {
     }
 
 
-    if (this.edgeManager.shutdown) {
+    if (
+    this.nodeManager &&
+    typeof this.nodeManager.shutdown === "function"
+) {
 
-        this.edgeManager.shutdown();
+    this.nodeManager.shutdown();
 
-    }
+}
 
 
     this.status =
