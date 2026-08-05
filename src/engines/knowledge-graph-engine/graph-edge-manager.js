@@ -65,18 +65,15 @@ class GraphEdgeManager {
 
 
         if (
-
-            !this.nodeManager
-
-            ||
-
-            !this.nodeManager.exists(from)
-
-            ||
-
-            !this.nodeManager.exists(to)
-
-        ) {
+    !this.nodeManager ||
+    !this.nodeManager.hasNode(from) ||
+    !this.nodeManager.hasNode(to)
+) {
+    throw new Error(
+        "Both nodes must exist."
+    );
+        }
+        {
 
 
             throw new Error(
