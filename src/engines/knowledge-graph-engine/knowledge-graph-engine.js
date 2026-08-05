@@ -410,10 +410,3 @@ shutdown() {
 
 module.exports =
     KnowledgeGraphEngine;
-
-
-}
-
-
-module.exports =
-    KnowledgeGraphEngine;
