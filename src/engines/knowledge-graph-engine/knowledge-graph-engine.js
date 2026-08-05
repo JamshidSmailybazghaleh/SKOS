@@ -122,17 +122,30 @@ class KnowledgeGraphEngine {
 
     removeNode(id) {
 
-        const result =
-            this.nodeManager.removeNode(id);
+    if (this.edgeManager.removeRelationsByNode) {
+
+        this.edgeManager.removeRelationsByNode(id);
+
+    }
+
+    const result =
+        this.nodeManager.removeNode(id);
 
 
-        if (result) {
+    if (result) {
 
-            this.recordEvent(
-                "KNOWLEDGE_GRAPH_NODE_REMOVED",
-                {
-                    id
-                }
+        this.recordEvent(
+            "KNOWLEDGE_GRAPH_NODE_REMOVED",
+            {
+                id
+            }
+        );
+
+    }
+
+    return result;
+
+}
             );
 
         }
@@ -201,11 +214,17 @@ class KnowledgeGraphEngine {
 
 
 
-    getRelations(id) {
+    getRelations(id = null) {
 
-        return this.edgeManager.getRelations(id);
+    if (id === null) {
+
+        return this.edgeManager.getEdges();
 
     }
+
+    return this.edgeManager.getRelations(id);
+
+}
 
 
 
@@ -369,21 +388,35 @@ class KnowledgeGraphEngine {
 
 
     shutdown() {
+shutdown() {
 
 
-        this.status =
-            "SHUTDOWN";
+    if (this.nodeManager.shutdown) {
 
-
-        this.recordEvent(
-            "KNOWLEDGE_GRAPH_ENGINE_SHUTDOWN"
-        );
-
-
-        return true;
-
+        this.nodeManager.shutdown();
 
     }
+
+
+    if (this.edgeManager.shutdown) {
+
+        this.edgeManager.shutdown();
+
+    }
+
+
+    this.status =
+        "SHUTDOWN";
+
+
+    this.recordEvent(
+        "KNOWLEDGE_GRAPH_ENGINE_SHUTDOWN"
+    );
+
+
+    return true;
+
+}
 
 
 }
