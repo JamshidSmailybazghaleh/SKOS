@@ -370,19 +370,16 @@ class KnowledgeGraphEngine {
     }
 
 
-
-
-
     /**
-     * Shutdown
-     */
+ * Shutdown
+ */
 
-
-    shutdown() {
 shutdown() {
 
 
-    if (this.nodeManager.shutdown); {
+    if (this.nodeManager.shutdown) {
+
+        this.nodeManager.shutdown();
 
     }
 
@@ -406,6 +403,13 @@ shutdown() {
     return true;
 
 }
+
+
+}
+
+
+module.exports =
+    KnowledgeGraphEngine;
 
 
 }
