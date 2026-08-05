@@ -7,126 +7,91 @@
  * Engine     : Knowledge Graph Engine
  * File       : knowledge-graph-engine.js
  *
- * Build      : BUILD-000365
- * Version    : 1.1.0
+ * Build      : BUILD-000425
+ * Version    : 2.0.0
  *
- * Status     : Monitoring Integrated
+ * Status     : Core Stabilization Phase
  *
  * Mission:
  * Coordinate Knowledge Graph Operations.
+ *
+ * Responsibilities:
+ * - Manage Knowledge Nodes
+ * - Manage Knowledge Relations
+ * - Provide Graph Access Layer
+ * - Provide Stable API for SKOS Engines
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
  */
 
-
 const GraphNodeManager =
-
     require("./graph-node-manager");
 
-
 const GraphEdgeManager =
-
     require("./graph-edge-manager");
-
-
-
 
 
 class KnowledgeGraphEngine {
 
-
-
     constructor(options = {}) {
 
-
-
         this.name =
-
             "Knowledge Graph Engine";
 
-
-
         this.version =
-
-            "1.1.0";
-
-
+            "2.0.0";
 
         this.status =
-
             "CREATED";
 
 
-
         this.monitoring =
-
             options.monitoring || null;
 
 
-
         this.nodeManager =
-
             new GraphNodeManager({
-
-                monitoring:
-
-                    this.monitoring
-
+                monitoring: this.monitoring
             });
-
-
 
 
         this.edgeManager =
-
             new GraphEdgeManager({
-
-                monitoring:
-
-                    this.monitoring,
-
-
-                nodeManager:
-
-                    this.nodeManager
-
+                monitoring: this.monitoring,
+                nodeManager: this.nodeManager
             });
 
 
+        this.history =
+            [];
 
     }
 
 
-
-
-
+    /**
+     * Initialize Engine
+     */
 
     initialize() {
 
+        this.nodeManager.initialize();
+
+        this.edgeManager.initialize?.();
 
 
         this.status =
-
             "INITIALIZED";
 
 
-
         this.recordEvent(
-
             "KNOWLEDGE_GRAPH_ENGINE_INITIALIZED"
-
         );
-
 
 
         return true;
 
-
     }
-
-
-
 
 
 
@@ -137,52 +102,69 @@ class KnowledgeGraphEngine {
 
     addNode(object) {
 
+        const result =
+            this.nodeManager.addNode(object);
 
 
-        return this.nodeManager.addNode(
-
-            object
-
+        this.recordEvent(
+            "KNOWLEDGE_GRAPH_NODE_ADDED",
+            {
+                id: object.id
+            }
         );
 
 
+        return result;
+
     }
-
-
 
 
 
     removeNode(id) {
 
+        const result =
+            this.nodeManager.removeNode(id);
 
 
-        return this.nodeManager.removeNode(
+        if (result) {
 
-            id
+            this.recordEvent(
+                "KNOWLEDGE_GRAPH_NODE_REMOVED",
+                {
+                    id
+                }
+            );
 
-        );
+        }
 
+
+        return result;
 
     }
-
-
 
 
 
     getNode(id) {
 
-
-
-        return this.nodeManager.getNode(
-
-            id
-
-        );
-
+        return this.nodeManager.getNode(id);
 
     }
 
 
+
+    getNodes() {
+
+        return this.nodeManager.getAllNodes();
+
+    }
+
+
+
+    hasNode(id) {
+
+        return this.nodeManager.hasNode(id);
+
+    }
 
 
 
@@ -193,145 +175,126 @@ class KnowledgeGraphEngine {
 
 
     addRelation(
-
         from,
-
         to,
-
         type,
-
         metadata = {}
-
     ) {
 
 
-
         return this.edgeManager.addRelation(
-
             from,
-
             to,
-
             type,
-
             metadata
-
         );
-
 
     }
 
 
 
+    removeRelation(id) {
+
+        return this.edgeManager.removeRelation(id);
+
+    }
 
 
 
     getRelations(id) {
 
+        return this.edgeManager.getRelations(id);
+
+    }
 
 
-        return this.edgeManager.getRelations(
 
-            id
+    getOutgoing(id) {
 
-        );
+        return this.edgeManager.getOutgoing(id);
 
+    }
+
+
+
+    getIncoming(id) {
+
+        return this.edgeManager.getIncoming(id);
 
     }
 
 
 
 
-
-
-
     /**
-     * Complete Graph
+     * Complete Graph Export
      */
 
 
     getGraph() {
 
 
-
         return {
 
+            name:
+                this.name,
+
+
+            version:
+                this.version,
 
 
             nodes:
-
-                this.nodeManager.getNodes(),
-
-
+                this.getNodes(),
 
 
             edges:
-
                 this.edgeManager.getEdges()
-
 
 
         };
 
 
     }
-
-
 
 
 
 
 
     /**
-     * Graph Status
+     * Graph Statistics
      */
 
 
     getStatus() {
 
 
-
         return {
 
-
-
             name:
-
                 this.name,
 
 
-
             version:
-
                 this.version,
 
 
-
             status:
-
                 this.status,
 
 
-
             nodes:
-
                 this.nodeManager.count(),
 
 
-
             relations:
-
                 this.edgeManager.count()
-
 
 
         };
 
 
     }
-
-
-
 
 
 
@@ -342,31 +305,37 @@ class KnowledgeGraphEngine {
 
 
     recordEvent(
-
         name,
-
         metadata = {}
-
     ) {
+
+
+        const event = {
+
+            name,
+
+            metadata,
+
+            timestamp:
+                new Date()
+
+        };
+
+
+        this.history.push(event);
 
 
 
         if (
-
-            this.monitoring
-
+            this.monitoring &&
+            this.monitoring.recordEvent
         ) {
 
 
-
             this.monitoring.recordEvent(
-
                 name,
-
                 metadata
-
             );
-
 
         }
 
@@ -377,24 +346,38 @@ class KnowledgeGraphEngine {
 
 
 
+    /**
+     * History
+     */
+
+
+    getHistory() {
+
+        return [
+            ...this.history
+        ];
+
+    }
+
+
+
+
+
+    /**
+     * Shutdown
+     */
 
 
     shutdown() {
 
 
-
         this.status =
-
             "SHUTDOWN";
 
 
-
         this.recordEvent(
-
             "KNOWLEDGE_GRAPH_ENGINE_SHUTDOWN"
-
         );
-
 
 
         return true;
@@ -403,13 +386,8 @@ class KnowledgeGraphEngine {
     }
 
 
-
-
-
 }
 
 
-
 module.exports =
-
     KnowledgeGraphEngine;
