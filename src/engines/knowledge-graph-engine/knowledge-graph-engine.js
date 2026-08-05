@@ -122,11 +122,15 @@ class KnowledgeGraphEngine {
 
     removeNode(id) {
 
-    if (this.edgeManager.removeRelationsByNode) {
+    if (
+        this.edgeManager &&
+        typeof this.edgeManager.removeRelationsByNode === "function"
+    ) {
 
         this.edgeManager.removeRelationsByNode(id);
 
     }
+
 
     const result =
         this.nodeManager.removeNode(id);
@@ -142,6 +146,7 @@ class KnowledgeGraphEngine {
         );
 
     }
+
 
     return result;
 
