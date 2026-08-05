@@ -146,15 +146,6 @@ class KnowledgeGraphEngine {
     return result;
 
 }
-            );
-
-        }
-
-
-        return result;
-
-    }
-
 
 
     getNode(id) {
