@@ -1,336 +1,339 @@
 /**
- * ==========================================================
- * SKOS
- * Smaily Knowledge Operating System
- * ==========================================================
- *
- * Engine     : Knowledge Graph Engine
- * Module     : Graph Node Manager
- *
- * Build      : BUILD-000363
- * Version    : 1.0.0
- *
- * Mission:
- * Manage Knowledge Object nodes inside graph.
- *
- * Status:
- * Monitoring Integrated
- *
- * Copyright © Smaily Knowledge Foundation
- * ==========================================================
- */
+
+==========================================================
+
+SKOS
+
+Smaily Knowledge Operating System
+
+==========================================================
+
+Engine     : Knowledge Graph Engine
+
+Module     : Graph Node Manager
+
+Build      : BUILD-000363
+
+Version    : 1.0.0
+
+Mission:
+
+Manage Knowledge Object nodes inside graph.
+
+Status:
+
+Monitoring Integrated
+
+Copyright © Smaily Knowledge Foundation
+
+==========================================================
+*/
 
 
 class GraphNodeManager {
 
+constructor(options = {}) {  
 
-    constructor(options = {}) {
 
+    this.nodes =  
+        new Map();  
 
-        this.nodes =
-            new Map();
 
+    this.monitoring =  
+        options.monitoring || null;  
 
-        this.monitoring =
-            options.monitoring || null;
 
+}  
 
-    }
 
 
 
 
+initialize() {  
 
-    initialize() {
 
+    this.recordEvent(  
 
-        this.recordEvent(
+        "GRAPH_NODE_MANAGER_INITIALIZED"  
 
-            "GRAPH_NODE_MANAGER_INITIALIZED"
+    );  
 
-        );
 
+    return true;  
 
-        return true;
+}  
 
-    }
 
 
 
 
+addNode(object) {  
 
-    addNode(object) {
 
+    if (  
 
-        if (
+        !object ||  
 
-            !object ||
+        !object.id  
 
-            !object.id
+    ) {  
 
-        ) {
 
+        throw new Error(  
 
-            throw new Error(
+            "Node requires valid Knowledge Object id."  
 
-                "Node requires valid Knowledge Object id."
+        );  
 
-            );
+    }  
 
-        }
 
 
+    this.nodes.set(  
 
-        this.nodes.set(
+        object.id,  
 
-            object.id,
+        object  
 
-            object
+    );  
 
-        );
 
 
+    this.recordEvent(  
 
-        this.recordEvent(
+        "GRAPH_NODE_CREATED",  
 
-            "GRAPH_NODE_CREATED",
+        {  
 
-            {
+            id:  
 
-                id:
+                object.id  
 
-                    object.id
+        }  
 
-            }
+    );  
 
-        );
 
 
+    this.updateMetric(  
 
-        this.updateMetric(
+        "graphNodesCreated"  
 
-            "graphNodesCreated"
+    );  
 
-        );
 
 
+    return object;  
 
-        return object;
+}  
 
-    }
 
 
 
 
+getNode(id) {  
 
-    getNode(id) {
 
+    return (  
 
-        return (
+        this.nodes.get(id)  
 
-            this.nodes.get(id)
+        ||  
 
-            ||
+        null  
 
-            null
+    );  
 
-        );
+}  
 
-    }
 
 
 
 
+hasNode(id) {  
 
-    hasNode(id) {
 
+    return this.nodes.has(id);  
 
-        return this.nodes.has(id);
+}  
 
-    }
 
 
 
 
+removeNode(id) {  
 
-    removeNode(id) {
 
+    const exists =  
 
-        const exists =
+        this.nodes.delete(id);  
 
-            this.nodes.delete(id);
 
 
+    if (exists) {  
 
-        if (exists) {
 
+        this.recordEvent(  
 
-            this.recordEvent(
+            "GRAPH_NODE_REMOVED",  
 
-                "GRAPH_NODE_REMOVED",
+            {  
 
-                {
+                id  
 
-                    id
+            }  
 
-                }
+        );  
 
-            );
 
+        this.updateMetric(  
 
-            this.updateMetric(
+            "graphNodesRemoved"  
 
-                "graphNodesRemoved"
+        );  
 
-            );
 
+    }  
 
-        }
 
 
+    return exists;  
 
-        return exists;
+}  
 
-    }
 
 
 
 
+getAllNodes() {  
 
-    getAllNodes() {
 
+    return Array.from(  
 
-        return Array.from(
+        this.nodes.values()  
 
-            this.nodes.values()
+    );  
 
-        );
+}
 
-    }
 getNodes() {
 
-    return this.getAllNodes();
+return this.getAllNodes();
 
 }
 
+count() {  
 
 
+    return this.nodes.size;  
 
-    count() {
-
-
-        return this.nodes.size;
-
-    }
-
-
-
-
-
-    clear() {
-
-
-        this.nodes.clear();
-
-
-        this.recordEvent(
-
-            "GRAPH_NODES_CLEARED"
-
-        );
-
-
-    }
+}  
 
 
 
 
 
-    recordEvent(
-
-        name,
-
-        metadata = {}
-
-    ) {
+clear() {  
 
 
-        if (
-
-            this.monitoring
-
-        ) {
+    this.nodes.clear();  
 
 
-            this.monitoring.recordEvent(
+    this.recordEvent(  
 
-                name,
+        "GRAPH_NODES_CLEARED"  
 
-                metadata
-
-            );
-
-        }
+    );  
 
 
-    }
+}  
 
 
 
 
 
-    updateMetric(
+recordEvent(  
 
-        name
+    name,  
 
-    ) {
+    metadata = {}  
 
-
-        if (
-
-            this.monitoring
-
-        ) {
+) {  
 
 
-            this.monitoring.updateMetric(
+    if (  
 
-                name
+        this.monitoring  
 
-            );
-
-        }
+    ) {  
 
 
-    }
+        this.monitoring.recordEvent(  
+
+            name,  
+
+            metadata  
+
+        );  
+
+    }  
+
+
+}  
+
+
+
+
+
+updateMetric(  
+
+    name  
+
+) {  
+
+
+    if (  
+
+        this.monitoring  
+
+    ) {  
+
+
+        this.monitoring.updateMetric(  
+
+            name  
+
+        );  
+
+    }  
 
 
 }
 
-
-    getAllNodes() {
-
-        return Array.from(
-            this.nodes.values()
-        );
-
-    }
-
-
-    getNodes() {
-
-        return this.getAllNodes();
-
-    }
-
-
-    count() {
-
-        return this.nodes.size;
-
 }
 
+getAllNodes() {  
+
+    return Array.from(  
+        this.nodes.values()  
+    );  
+
+}  
+
+
+getNodes() {  
+
+    return this.getAllNodes();  
+
+}  
+
+
+count() {  
+
+    return this.nodes.size;
+
+}
 
 module.exports =
 
-    GraphNodeManager;
+GraphNodeManager;
