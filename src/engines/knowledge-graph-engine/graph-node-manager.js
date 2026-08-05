@@ -207,7 +207,11 @@ class GraphNodeManager {
         );
 
     }
+getNodes() {
 
+    return this.getAllNodes();
+
+}
 
 
 
