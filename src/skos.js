@@ -7,7 +7,7 @@
  * Component : SKOS Core Entry Point
  * File      : skos.js
  *
- * Build     : BUILD-000908.2
+ * Build     : BUILD-000908.3
  * Version   : 1.0.0
  *
  * ==========================================================
@@ -68,7 +68,7 @@ class SKOS {
 
 
         this.build =
-            "BUILD-000908.2";
+            "BUILD-000908.3";
 
 
         this.status =
@@ -76,64 +76,37 @@ class SKOS {
 
 
 
-        /*
-         * Main boot lifecycle
-         */
-
         this.bootSequence =
             new OperationalBootSequence();
 
 
-
-        /*
-         * Low level bootstrap executor
-         */
 
         this.bootstrap =
             new BootstrapSequence();
 
 
 
-
-        /*
-         * Boot controller
-         */
-
         this.bootManager =
             new BootManager();
 
 
-
-
-        /*
-         * Runtime layer
-         */
 
         this.orchestrator =
             new RuntimeOrchestrator();
 
 
 
-
-        /*
-         * Verification
-         */
-
         this.verifier =
             new BootVerificationEngine();
 
 
-
-
-        /*
-         * Operational state
-         */
 
         this.state =
             new OperationalStateManager();
 
 
     }
+
 
 
 
@@ -151,21 +124,16 @@ class SKOS {
         this.bootSequence.initialize();
 
 
-
         this.bootstrap.initialize();
-
 
 
         this.bootManager.initialize();
 
 
-
         this.orchestrator.initialize();
 
 
-
         this.verifier.initialize();
-
 
 
         this.state.initialize();
@@ -174,53 +142,120 @@ class SKOS {
 
 
         /*
-         * Connect bootstrap lifecycle
+         * Register Bootstrap Steps
+         */
+
+
+        this.bootstrap.registerStep(
+
+            "KERNEL_READY",
+
+            async () => {
+
+                return true;
+
+            },
+
+            10
+
+        );
+
+
+
+        this.bootstrap.registerStep(
+
+            "RUNTIME_READY",
+
+            async () => {
+
+                return true;
+
+            },
+
+            20
+
+        );
+
+
+
+        this.bootstrap.registerStep(
+
+            "VERIFICATION_READY",
+
+            async () => {
+
+                return true;
+
+            },
+
+            30
+
+        );
+
+
+
+
+
+        /*
+         * Attach Bootstrap
          */
 
 
         this.bootManager.attachBootstrap(
+
             this.bootstrap
+
         );
 
 
 
 
+
         /*
-         * Connect boot manager
+         * Attach Boot Manager
          */
 
 
         this.bootSequence.attachBootManager(
+
             this.bootManager
+
         );
 
 
 
 
+
         /*
-         * Connect runtime
+         * Attach Runtime
          */
 
 
         this.bootSequence.attachOrchestrator(
+
             this.orchestrator
+
         );
 
 
 
 
+
         /*
-         * Connect verifier
+         * Attach Verification Engine
          */
 
 
         this.bootSequence.attachVerifier(
+
             this.verifier
+
         );
 
 
 
         return true;
+
 
     }
 
@@ -237,10 +272,6 @@ class SKOS {
 
 
 
-        /*
-         * Verification components
-         */
-
 
         this.verifier.attachComponent(
 
@@ -255,6 +286,7 @@ class SKOS {
 
 
 
+
         this.verifier.attachComponent(
 
             "runtime",
@@ -265,6 +297,7 @@ class SKOS {
             }
 
         );
+
 
 
 
@@ -283,12 +316,9 @@ class SKOS {
 
 
 
-        /*
-         * Execute operational boot
-         */
-
 
         const report =
+
             await this.bootSequence.execute();
 
 
@@ -301,9 +331,13 @@ class SKOS {
             "system",
 
             report.success
+
                 ?
+
                 "OPERATIONAL"
+
                 :
+
                 "FAILED"
 
         );
@@ -326,15 +360,16 @@ class SKOS {
 
 
         this.status =
+
             report.success
 
-            ?
+                ?
 
-            "RUNNING"
+                "RUNNING"
 
-            :
+                :
 
-            "FAILED";
+                "FAILED";
 
 
 
@@ -351,6 +386,7 @@ class SKOS {
 
 
 
+
     async shutdown() {
 
 
@@ -359,14 +395,11 @@ class SKOS {
 
 
 
-
         await this.orchestrator.shutdown();
 
 
 
-
         this.state.shutdown();
-
 
 
 
@@ -386,11 +419,11 @@ class SKOS {
 
 
 
+
     getStatus() {
 
 
         return {
-
 
             system:
                 this.name,
