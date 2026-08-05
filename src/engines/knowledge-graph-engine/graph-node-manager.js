@@ -304,7 +304,27 @@ class GraphNodeManager {
 }
 
 
+    getAllNodes() {
 
+        return Array.from(
+            this.nodes.values()
+        );
+
+    }
+
+
+    getNodes() {
+
+        return this.getAllNodes();
+
+    }
+
+
+    count() {
+
+        return this.nodes.size;
+
+}
 
 
 module.exports =
