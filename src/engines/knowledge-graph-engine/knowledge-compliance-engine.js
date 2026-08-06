@@ -4,15 +4,15 @@
  * Smaily Knowledge Operating System
  * ==========================================================
  *
- * Engine      : Knowledge Graph Engine
+ * Engine      : Knowledge Governance Layer
  * File        : knowledge-compliance-engine.js
  *
- * Build       : BUILD-000406
+ * Build       : BUILD-000910.1
  * Version     : 1.0.0
  *
  * Mission:
- * Validate Knowledge Objects against
- * governance standards, policies and rules.
+ * Validate knowledge activities against governance,
+ * regulatory and operational compliance rules.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -25,12 +25,20 @@ class KnowledgeComplianceEngine {
     constructor(options = {}) {
 
 
+        this.engineId =
+            "KNOWLEDGE-COMPLIANCE-ENGINE";
+
+
         this.name =
             "Knowledge Compliance Engine";
 
 
         this.version =
             "1.0.0";
+
+
+        this.build =
+            "BUILD-000910.1";
 
 
         this.status =
@@ -41,12 +49,33 @@ class KnowledgeComplianceEngine {
             options.monitoring || null;
 
 
+        this.auditEngine =
+            options.auditEngine || null;
+
+
+        this.policyEngine =
+            options.policyEngine || null;
+
+
+        this.securityEngine =
+            options.securityEngine || null;
+
+
         this.rules =
             new Map();
 
 
-        this.reports =
+        this.assessments =
             [];
+
+
+        this.violations =
+            [];
+
+
+        this.createdAt =
+            new Date();
+
 
     }
 
@@ -54,7 +83,7 @@ class KnowledgeComplianceEngine {
 
 
 
-    initialize() {
+    initialize(){
 
 
         this.status =
@@ -63,7 +92,29 @@ class KnowledgeComplianceEngine {
 
         this.recordEvent(
 
-            "KNOWLEDGE_COMPLIANCE_ENGINE_INITIALIZED"
+            "COMPLIANCE_ENGINE_INITIALIZED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    start(){
+
+
+        this.status =
+            "RUNNING";
+
+
+        this.recordEvent(
+
+            "COMPLIANCE_ENGINE_STARTED"
 
         );
 
@@ -77,7 +128,7 @@ class KnowledgeComplianceEngine {
 
 
     /**
-     * Add compliance rule
+     * Register compliance rule
      */
 
 
@@ -85,16 +136,12 @@ class KnowledgeComplianceEngine {
 
         ruleId,
 
-        rule
+        definition = {}
 
-    ) {
+    ){
 
 
-        if (
-
-            !ruleId
-
-        ) {
+        if(!ruleId){
 
 
             throw new Error(
@@ -107,7 +154,7 @@ class KnowledgeComplianceEngine {
 
 
 
-        const record = {
+        const rule = {
 
 
             id:
@@ -117,22 +164,28 @@ class KnowledgeComplianceEngine {
 
             name:
 
-                rule.name || "Unnamed Rule",
+                definition.name ||
+
+                "Unnamed Rule",
 
 
             category:
 
-                rule.category || "GENERAL",
+                definition.category ||
+
+                "GOVERNANCE",
 
 
             condition:
 
-                rule.condition || {},
+                definition.condition || {},
 
 
             severity:
 
-                rule.severity || "MEDIUM",
+                definition.severity ||
+
+                "MEDIUM",
 
 
             enabled:
@@ -144,6 +197,7 @@ class KnowledgeComplianceEngine {
 
                 new Date()
 
+
         };
 
 
@@ -152,7 +206,7 @@ class KnowledgeComplianceEngine {
 
             ruleId,
 
-            record
+            rule
 
         );
 
@@ -172,7 +226,7 @@ class KnowledgeComplianceEngine {
 
 
 
-        return record;
+        return rule;
 
     }
 
@@ -181,245 +235,30 @@ class KnowledgeComplianceEngine {
 
 
     /**
-     * Remove rule
-     */
-
-
-    removeRule(
-
-        ruleId
-
-    ) {
-
-
-        return this.rules.delete(
-
-            ruleId
-
-        );
-
-    }
-
-
-
-
-
-    /**
-     * Get rule
-     */
-
-
-    getRule(
-
-        ruleId
-
-    ) {
-
-
-        return (
-
-            this.rules.get(
-
-                ruleId
-
-            )
-
-            ||
-
-            null
-
-        );
-
-    }
-
-
-
-
-
-    /**
-     * Execute compliance check
-     */
-
-
-    check(
-
-        objectId,
-
-        context = {}
-
-    ) {
-
-
-        if (
-
-            !objectId
-
-        ) {
-
-
-            throw new Error(
-
-                "Knowledge Object id required."
-
-            );
-
-        }
-
-
-
-        const violations =
-
-            [];
-
-
-
-        this.rules.forEach(
-
-            rule => {
-
-
-                if (
-
-                    rule.enabled &&
-
-                    !this.evaluateRule(
-
-                        rule.condition,
-
-                        context
-
-                    )
-
-                ) {
-
-
-                    violations.push(
-
-                        {
-
-                            ruleId:
-
-                                rule.id,
-
-
-                            severity:
-
-                                rule.severity,
-
-
-                            message:
-
-                                rule.name
-
-                        }
-
-                    );
-
-                }
-
-
-            }
-
-        );
-
-
-
-        const compliant =
-
-            violations.length === 0;
-
-
-
-        const report = {
-
-
-            objectId,
-
-
-            compliant,
-
-
-            violations,
-
-
-            checkedAt:
-
-                new Date()
-
-        };
-
-
-
-        this.reports.push(
-
-            report
-
-        );
-
-
-
-        this.recordEvent(
-
-            "COMPLIANCE_CHECK_COMPLETED",
-
-            {
-
-                objectId,
-
-
-                compliant
-
-            }
-
-        );
-
-
-
-        this.updateMetric(
-
-            "complianceChecks"
-
-        );
-
-
-
-        return report;
-
-    }
-
-
-
-
-
-    /**
-     * Evaluate compliance condition
+     * Evaluate compliance rule
      */
 
 
     evaluateRule(
 
-        condition,
+        rule,
 
         context
 
-    ) {
+    ){
 
 
         const keys =
 
             Object.keys(
 
-                condition
+                rule.condition
 
             );
 
 
 
-        if (
-
-            keys.length === 0
-
-        ) {
+        if(keys.length === 0){
 
 
             return true;
@@ -432,7 +271,9 @@ class KnowledgeComplianceEngine {
 
             key =>
 
-                context[key] === condition[key]
+                context[key] ===
+
+                rule.condition[key]
 
         );
 
@@ -443,41 +284,229 @@ class KnowledgeComplianceEngine {
 
 
     /**
-     * Enable rule
+     * Compliance assessment
      */
 
 
-    enableRule(
+    assess(
 
-        ruleId
+        request = {}
 
-    ) {
+    ){
 
 
-        const rule =
+        const {
 
-            this.getRule(
+            objectId,
 
-                ruleId
+            actor,
+
+            action,
+
+            context = {}
+
+        } = request;
+
+
+
+        const results =
+
+            [];
+
+
+
+        let compliant = true;
+
+
+
+        for(
+
+            const rule of
+
+            this.rules.values()
+
+        ){
+
+
+            if(
+
+                !rule.enabled
+
+            ){
+
+                continue;
+
+            }
+
+
+
+            const passed =
+
+                this.evaluateRule(
+
+                    rule,
+
+                    context
+
+                );
+
+
+
+            const result = {
+
+
+                ruleId:
+
+                    rule.id,
+
+
+                passed,
+
+
+                severity:
+
+                    rule.severity
+
+
+            };
+
+
+
+            results.push(
+
+                result
 
             );
 
 
 
-        if (
-
-            rule
-
-        ) {
+            if(!passed){
 
 
-            rule.enabled = true;
+                compliant = false;
+
+
+
+                this.createViolation({
+
+                    objectId,
+
+
+                    actor,
+
+
+                    action,
+
+
+                    ruleId:
+
+                        rule.id,
+
+
+                    severity:
+
+                        rule.severity
+
+                });
+
+            }
+
 
         }
 
 
 
-        return rule;
+
+
+        const assessment = {
+
+
+            id:
+
+                this.generateId(),
+
+
+            objectId,
+
+
+            actor,
+
+
+            action,
+
+
+            compliant,
+
+
+            results,
+
+
+            timestamp:
+
+                new Date()
+
+
+        };
+
+
+
+        this.assessments.push(
+
+            assessment
+
+        );
+
+
+
+        this.recordEvent(
+
+            "COMPLIANCE_ASSESSMENT_COMPLETED",
+
+            assessment
+
+        );
+
+
+
+        if(this.auditEngine){
+
+
+            this.auditEngine.record({
+
+                objectId,
+
+
+                actor:
+
+
+                    actor || "SYSTEM",
+
+
+                action:
+
+                    "COMPLIANCE_ASSESSMENT",
+
+
+                result:
+
+                    compliant
+
+                    ?
+
+                    "PASS"
+
+                    :
+
+                    "FAIL"
+
+
+            });
+
+        }
+
+
+
+        return assessment;
 
     }
 
@@ -486,41 +515,121 @@ class KnowledgeComplianceEngine {
 
 
     /**
-     * Disable rule
+     * Create violation
      */
 
 
-    disableRule(
+    createViolation(
 
-        ruleId
+        data = {}
 
-    ) {
+    ){
 
 
-        const rule =
+        const violation = {
 
-            this.getRule(
 
-                ruleId
+            id:
+
+                this.generateViolationId(),
+
+
+            objectId:
+
+                data.objectId || null,
+
+
+            actor:
+
+                data.actor || "SYSTEM",
+
+
+            action:
+
+                data.action || "UNKNOWN",
+
+
+            ruleId:
+
+                data.ruleId,
+
+
+            severity:
+
+                data.severity || "MEDIUM",
+
+
+            status:
+
+                "OPEN",
+
+
+            createdAt:
+
+                new Date()
+
+
+        };
+
+
+
+        this.violations.push(
+
+            violation
+
+        );
+
+
+
+        this.recordEvent(
+
+            "COMPLIANCE_VIOLATION_CREATED",
+
+            violation
+
+        );
+
+
+
+        return violation;
+
+    }
+
+
+
+
+
+    resolveViolation(
+
+        violationId
+
+    ){
+
+
+        const violation =
+
+            this.violations.find(
+
+                item =>
+
+                item.id === violationId
 
             );
 
 
 
-        if (
-
-            rule
-
-        ) {
+        if(violation){
 
 
-            rule.enabled = false;
+            violation.status =
+
+                "RESOLVED";
 
         }
 
 
 
-        return rule;
+        return violation;
 
     }
 
@@ -528,28 +637,7 @@ class KnowledgeComplianceEngine {
 
 
 
-    /**
-     * Get compliance reports
-     */
-
-
-    getReports() {
-
-
-        return this.reports;
-
-    }
-
-
-
-
-
-    /**
-     * Get rules registry
-     */
-
-
-    getRegistry() {
+    getRules(){
 
 
         return Array.from(
@@ -564,12 +652,29 @@ class KnowledgeComplianceEngine {
 
 
 
-    /**
-     * Statistics
-     */
+    getAssessments(){
 
 
-    getStatistics() {
+        return this.assessments;
+
+    }
+
+
+
+
+
+    getViolations(){
+
+
+        return this.violations;
+
+    }
+
+
+
+
+
+    getStatistics(){
 
 
         return {
@@ -580,29 +685,23 @@ class KnowledgeComplianceEngine {
                 this.rules.size,
 
 
-            reports:
+            assessments:
 
-                this.reports.length,
-
-
-            compliant:
-
-                this.reports.filter(
-
-                    item =>
-
-                        item.compliant
-
-                ).length,
+                this.assessments.length,
 
 
             violations:
 
-                this.reports.filter(
+                this.violations.length,
+
+
+            openViolations:
+
+                this.violations.filter(
 
                     item =>
 
-                        !item.compliant
+                    item.status === "OPEN"
 
                 ).length
 
@@ -615,10 +714,15 @@ class KnowledgeComplianceEngine {
 
 
 
-    getStatus() {
+    getStatus(){
 
 
         return {
+
+
+            engineId:
+
+                this.engineId,
 
 
             name:
@@ -631,22 +735,100 @@ class KnowledgeComplianceEngine {
                 this.version,
 
 
+            build:
+
+                this.build,
+
+
             status:
 
                 this.status,
 
 
-            rules:
+            statistics:
 
-                this.rules.size,
-
-
-            reports:
-
-                this.reports.length
+                this.getStatistics()
 
 
         };
+
+    }
+
+
+
+
+
+    stop(){
+
+
+        this.status =
+            "STOPPED";
+
+
+        this.recordEvent(
+
+            "COMPLIANCE_ENGINE_STOPPED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    shutdown(){
+
+
+        this.status =
+            "SHUTDOWN";
+
+
+        this.recordEvent(
+
+            "COMPLIANCE_ENGINE_SHUTDOWN"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    generateId(){
+
+
+        return (
+
+            "COMPLIANCE-" +
+
+            Date.now()
+
+        );
+
+    }
+
+
+
+
+
+    generateViolationId(){
+
+
+        return (
+
+            "VIOLATION-" +
+
+            Date.now()
+
+        );
 
     }
 
@@ -660,14 +842,10 @@ class KnowledgeComplianceEngine {
 
         metadata = {}
 
-    ) {
+    ){
 
 
-        if (
-
-            this.monitoring
-
-        ) {
+        if(this.monitoring){
 
 
             this.monitoring.recordEvent(
@@ -690,14 +868,10 @@ class KnowledgeComplianceEngine {
 
         metric
 
-    ) {
+    ){
 
 
-        if (
-
-            this.monitoring
-
-        ) {
+        if(this.monitoring){
 
 
             this.monitoring.updateMetric(
@@ -707,28 +881,6 @@ class KnowledgeComplianceEngine {
             );
 
         }
-
-    }
-
-
-
-
-
-    shutdown() {
-
-
-        this.status =
-            "SHUTDOWN";
-
-
-        this.recordEvent(
-
-            "KNOWLEDGE_COMPLIANCE_ENGINE_SHUTDOWN"
-
-        );
-
-
-        return true;
 
     }
 
