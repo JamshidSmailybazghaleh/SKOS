@@ -7,7 +7,7 @@
  * Engine      : Knowledge Graph Engine
  * File        : knowledge-policy-engine.js
  *
- * Build       : BUILD-000404
+ * Build       : BUILD-000909
  * Version     : 1.0.0
  *
  * Mission:
@@ -33,6 +33,10 @@ class KnowledgePolicyEngine {
             "1.0.0";
 
 
+        this.build =
+            "BUILD-000909";
+
+
         this.status =
             "CREATED";
 
@@ -45,10 +49,13 @@ class KnowledgePolicyEngine {
             new Map();
 
 
+
         this.executions =
             [];
 
     }
+
+
 
 
 
@@ -76,6 +83,56 @@ class KnowledgePolicyEngine {
 
 
 
+
+
+    start() {
+
+
+        this.status =
+            "RUNNING";
+
+
+        this.recordEvent(
+
+            "KNOWLEDGE_POLICY_ENGINE_STARTED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+
+
+    stop() {
+
+
+        this.status =
+            "STOPPED";
+
+
+        this.recordEvent(
+
+            "KNOWLEDGE_POLICY_ENGINE_STOPPED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+
+
     /**
      * Register policy
      */
@@ -85,16 +142,12 @@ class KnowledgePolicyEngine {
 
         id,
 
-        definition
+        definition = {}
 
     ) {
 
 
-        if (
-
-            !id
-
-        ) {
+        if (!id) {
 
 
             throw new Error(
@@ -115,7 +168,18 @@ class KnowledgePolicyEngine {
 
             name:
 
-                definition.name || "Unnamed Policy",
+                definition.name ||
+
+                "Unnamed Policy",
+
+
+
+            type:
+
+                definition.type ||
+
+                "GOVERNANCE",
+
 
 
             condition:
@@ -123,14 +187,31 @@ class KnowledgePolicyEngine {
                 definition.condition || {},
 
 
+
             action:
 
                 definition.action || {},
 
 
+
+            effect:
+
+                definition.effect ||
+
+                "ALLOW",
+
+
+
+            priority:
+
+                definition.priority || 0,
+
+
+
             enabled:
 
                 true,
+
 
 
             createdAt:
@@ -173,9 +254,6 @@ class KnowledgePolicyEngine {
 
 
 
-    /**
-     * Remove policy
-     */
 
 
     removePolicy(
@@ -197,9 +275,6 @@ class KnowledgePolicyEngine {
 
 
 
-    /**
-     * Get policy
-     */
 
 
     getPolicy(
@@ -229,6 +304,8 @@ class KnowledgePolicyEngine {
 
 
 
+
+
     /**
      * Execute policy
      */
@@ -253,11 +330,7 @@ class KnowledgePolicyEngine {
 
 
 
-        if (
-
-            !policy
-
-        ) {
+        if (!policy) {
 
 
             throw new Error(
@@ -267,6 +340,35 @@ class KnowledgePolicyEngine {
             );
 
         }
+
+
+
+
+
+        if (!policy.enabled) {
+
+
+            return {
+
+
+                policyId,
+
+
+                executed:
+
+                    false,
+
+
+                reason:
+
+                    "POLICY_DISABLED"
+
+
+            };
+
+        }
+
+
 
 
 
@@ -282,13 +384,34 @@ class KnowledgePolicyEngine {
 
 
 
+
+
         const result = {
 
 
             policyId,
 
 
+            policyName:
+
+                policy.name,
+
+
             matched,
+
+
+            effect:
+
+                matched
+
+                    ?
+
+                    policy.effect
+
+                    :
+
+                    "NONE",
+
 
 
             action:
@@ -304,7 +427,23 @@ class KnowledgePolicyEngine {
                     null,
 
 
+
             context,
+
+
+
+            reason:
+
+                matched
+
+                    ?
+
+                    "CONDITION_MATCHED"
+
+                    :
+
+                    "CONDITION_FAILED",
+
 
 
             executedAt:
@@ -312,6 +451,8 @@ class KnowledgePolicyEngine {
                 new Date()
 
         };
+
+
 
 
 
@@ -349,8 +490,76 @@ class KnowledgePolicyEngine {
 
 
 
+
+
     /**
-     * Evaluate policy conditions
+     * Execute all matching policies
+     */
+
+
+    evaluate(
+
+        context = {}
+
+    ) {
+
+
+        return Array.from(
+
+            this.policies.values()
+
+        )
+
+        .filter(
+
+            policy =>
+
+                policy.enabled &&
+
+                this.evaluateCondition(
+
+                    policy.condition,
+
+                    context
+
+                )
+
+        )
+
+        .sort(
+
+            (a,b)=>
+
+                b.priority -
+
+                a.priority
+
+        )
+
+        .map(
+
+            policy =>
+
+                this.execute(
+
+                    policy.id,
+
+                    context
+
+                )
+
+        );
+
+    }
+
+
+
+
+
+
+
+    /**
+     * Evaluate conditions
      */
 
 
@@ -400,9 +609,6 @@ class KnowledgePolicyEngine {
 
 
 
-    /**
-     * Enable policy
-     */
 
 
     enablePolicy(
@@ -422,12 +628,7 @@ class KnowledgePolicyEngine {
 
 
 
-        if (
-
-            policy
-
-        ) {
-
+        if(policy){
 
             policy.enabled = true;
 
@@ -443,9 +644,6 @@ class KnowledgePolicyEngine {
 
 
 
-    /**
-     * Disable policy
-     */
 
 
     disablePolicy(
@@ -465,12 +663,7 @@ class KnowledgePolicyEngine {
 
 
 
-        if (
-
-            policy
-
-        ) {
-
+        if(policy){
 
             policy.enabled = false;
 
@@ -486,9 +679,6 @@ class KnowledgePolicyEngine {
 
 
 
-    /**
-     * Get executions history
-     */
 
 
     getExecutionHistory() {
@@ -502,9 +692,6 @@ class KnowledgePolicyEngine {
 
 
 
-    /**
-     * Get registry
-     */
 
 
     getRegistry() {
@@ -522,9 +709,6 @@ class KnowledgePolicyEngine {
 
 
 
-    /**
-     * Statistics
-     */
 
 
     getStatistics() {
@@ -540,12 +724,35 @@ class KnowledgePolicyEngine {
 
             executions:
 
-                this.executions.length
+                this.executions.length,
 
+
+            allowed:
+
+                this.executions.filter(
+
+                    e =>
+
+                    e.effect === "ALLOW"
+
+                ).length,
+
+
+            denied:
+
+                this.executions.filter(
+
+                    e =>
+
+                    e.effect === "DENY"
+
+                ).length
 
         };
 
     }
+
+
 
 
 
@@ -567,24 +774,25 @@ class KnowledgePolicyEngine {
                 this.version,
 
 
+            build:
+
+                this.build,
+
+
             status:
 
                 this.status,
 
 
-            policies:
+            statistics:
 
-                this.policies.size,
-
-
-            executions:
-
-                this.executions.length
-
+                this.getStatistics()
 
         };
 
     }
+
+
 
 
 
@@ -599,11 +807,7 @@ class KnowledgePolicyEngine {
     ) {
 
 
-        if (
-
-            this.monitoring
-
-        ) {
+        if(this.monitoring){
 
 
             this.monitoring.recordEvent(
@@ -622,6 +826,8 @@ class KnowledgePolicyEngine {
 
 
 
+
+
     updateMetric(
 
         metric
@@ -629,11 +835,7 @@ class KnowledgePolicyEngine {
     ) {
 
 
-        if (
-
-            this.monitoring
-
-        ) {
+        if(this.monitoring){
 
 
             this.monitoring.updateMetric(
@@ -650,11 +852,15 @@ class KnowledgePolicyEngine {
 
 
 
+
+
     shutdown() {
 
 
         this.status =
+
             "SHUTDOWN";
+
 
 
         this.recordEvent(
@@ -664,12 +870,15 @@ class KnowledgePolicyEngine {
         );
 
 
+
         return true;
 
     }
 
 
 }
+
+
 
 
 
