@@ -252,3 +252,28 @@ controller
 
 panel.registerSource(
 "MONITORING",
+test(
+"Should generate snapshot",
+() => {
+
+    panel.connectController(
+        controller
+    );
+
+    panel.registerSource(
+        "MONITORING",
+        source
+    );
+
+    panel.collectMetrics();
+
+    const snapshot =
+        panel.generateSnapshot();
+
+    expect(
+        snapshot
+    )
+    .toBeDefined();
+
+});
+});
