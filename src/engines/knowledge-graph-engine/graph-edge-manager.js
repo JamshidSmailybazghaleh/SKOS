@@ -8,13 +8,19 @@
  * Module     : Graph Edge Manager
  *
  * Build      : BUILD-000364
- * Version    : 1.0.0
+ * Version    : 2.0.0
  *
- * Status     : Monitoring Integrated
+ * Status     : Core Stabilization Phase
  *
  * Mission:
- * Manage relationships between
- * Knowledge Object Nodes.
+ * Manage Knowledge Graph Relations.
+ *
+ * Responsibilities:
+ * - Create Relations
+ * - Remove Relations
+ * - Query Relations
+ * - Manage Graph Edges
+ * - Provide Stable Edge API
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -27,27 +33,58 @@ class GraphEdgeManager {
     constructor(options = {}) {
 
 
-        this.monitoring =
+        this.edges =
+            new Map();
 
+
+        this.monitoring =
             options.monitoring || null;
 
 
         this.nodeManager =
-
             options.nodeManager || null;
 
 
-        this.edges = [];
+        this.status =
+            "CREATED";
+
+
+        this.sequence =
+            0;
 
 
     }
 
 
 
+    /**
+     * Initialize
+     */
+
+
+    initialize() {
+
+
+        this.status =
+            "INITIALIZED";
+
+
+        this.recordEvent(
+
+            "GRAPH_EDGE_MANAGER_INITIALIZED"
+
+        );
+
+
+        return true;
+
+    }
+
+
 
 
     /**
-     * Create relationship
+     * Add Relation
      */
 
 
@@ -65,34 +102,34 @@ class GraphEdgeManager {
 
 
         if (
-    !this.nodeManager ||
-    !this.nodeManager.hasNode(from) ||
-    !this.nodeManager.hasNode(to)
-) {
-    throw new Error(
-        "Both nodes must exist."
-    );
-        }
-        {
+
+            !from ||
+
+            !to
+
+        ) {
 
 
             throw new Error(
 
-                "Both nodes must exist."
+                "Relation requires source and target nodes."
 
             );
 
-
         }
+
+
+
+        const id =
+
+            `REL-${++this.sequence}`;
 
 
 
         const relation = {
 
 
-            id:
-
-                this.generateId(),
+            id,
 
 
             from,
@@ -101,10 +138,15 @@ class GraphEdgeManager {
             to,
 
 
-            type,
+            type:
+
+
+                type || "RELATED",
+
 
 
             metadata,
+
 
 
             createdAt:
@@ -112,11 +154,14 @@ class GraphEdgeManager {
                 new Date()
 
 
+
         };
 
 
 
-        this.edges.push(
+        this.edges.set(
+
+            id,
 
             relation
 
@@ -127,78 +172,6 @@ class GraphEdgeManager {
         this.recordEvent(
 
             "GRAPH_RELATION_CREATED",
-
-            relation
-
-        );
-
-
-
-        this.updateMetric(
-
-            "relationsCreated"
-
-        );
-
-
-
-        return relation;
-
-
-    }
-
-
-
-
-
-    /**
-     * Remove relationship
-     */
-
-
-    removeRelation(id) {
-
-
-        const index =
-
-            this.edges.findIndex(
-
-                edge =>
-
-                    edge.id === id
-
-            );
-
-
-
-        if (
-
-            index === -1
-
-        ) {
-
-
-            return false;
-
-        }
-
-
-
-        const removed =
-
-            this.edges.splice(
-
-                index,
-
-                1
-
-            )[0];
-
-
-
-        this.recordEvent(
-
-            "GRAPH_RELATION_REMOVED",
 
             {
 
@@ -212,9 +185,155 @@ class GraphEdgeManager {
 
         this.updateMetric(
 
-            "relationsRemoved"
+            "graphRelationsCreated"
 
         );
+
+
+
+        return relation;
+
+
+    }
+
+
+
+
+    /**
+     * Get Relation
+     */
+
+
+    getRelation(id) {
+
+
+        return (
+
+            this.edges.get(id)
+
+            ||
+
+            null
+
+        );
+
+
+    }
+
+
+
+
+
+    /**
+     * Remove Relation
+     */
+
+
+    removeRelation(id) {
+
+
+        const result =
+
+            this.edges.delete(id);
+
+
+
+        if (result) {
+
+
+            this.recordEvent(
+
+                "GRAPH_RELATION_REMOVED",
+
+                {
+
+                    id
+
+                }
+
+            );
+
+
+            this.updateMetric(
+
+                "graphRelationsRemoved"
+
+            );
+
+
+        }
+
+
+
+        return result;
+
+
+    }
+
+
+
+
+
+    /**
+     * Remove All Relations Connected To Node
+     */
+
+
+    removeRelationsByNode(nodeId) {
+
+
+        let removed = false;
+
+
+
+        for (
+
+            const [id, edge]
+
+            of this.edges
+
+        ) {
+
+
+            if (
+
+                edge.from === nodeId ||
+
+                edge.to === nodeId
+
+            ) {
+
+
+                this.edges.delete(id);
+
+
+                removed = true;
+
+
+            }
+
+
+        }
+
+
+
+        if (removed) {
+
+
+            this.recordEvent(
+
+                "GRAPH_RELATIONS_REMOVED_BY_NODE",
+
+                {
+
+                    nodeId
+
+                }
+
+            );
+
+
+        }
 
 
 
@@ -228,156 +347,16 @@ class GraphEdgeManager {
 
 
     /**
-     * Find relations by node
-     */
-
-
-    getRelations(nodeId) {
-
-
-        return this.edges.filter(
-
-            edge =>
-
-                edge.from === nodeId
-
-                ||
-
-                edge.to === nodeId
-
-        );
-
-
-    }
-
-
-
-
-
-    /**
-     * Find outgoing relations
-     */
-
-
-    getOutgoing(nodeId) {
-
-
-        return this.edges.filter(
-
-            edge =>
-
-                edge.from === nodeId
-
-        );
-
-
-    }
-
-
-
-
-
-    /**
-     * Find incoming relations
-     */
-
-
-    getIncoming(nodeId) {
-
-
-        return this.edges.filter(
-
-            edge =>
-
-                edge.to === nodeId
-
-        );
-
-
-    }
-
-
-
-
-
-    /**
-     * Return all edges
+     * Get All Relations
      */
 
 
     getEdges() {
 
 
-        return [
+        return Array.from(
 
-            ...this.edges
-
-        ];
-
-
-    }
-
-
-
-
-
-    /**
-     * Count relations
-     */
-
-
-    count() {
-
-
-        return this.edges.length;
-
-
-    }
-
-
-
-
-
-    /**
-     * Clear graph relations
-     */
-
-
-    clear() {
-
-
-        this.edges.length = 0;
-
-
-    }
-
-
-
-
-
-    /**
-     * Generate relation id
-     */
-
-
-    generateId() {
-
-
-        return (
-
-            "edge-" +
-
-            Date.now()
-
-            +
-
-            "-" +
-
-            Math.floor(
-
-                Math.random() * 10000
-
-            )
+            this.edges.values()
 
         );
 
@@ -389,7 +368,140 @@ class GraphEdgeManager {
 
 
     /**
-     * Monitoring Event
+     * Alias
+     */
+
+
+    getRelations(nodeId = null) {
+
+
+        if (
+
+            nodeId === null
+
+        ) {
+
+
+            return this.getEdges();
+
+
+        }
+
+
+
+        return this.getEdges()
+
+            .filter(
+
+                edge =>
+
+                    edge.from === nodeId ||
+
+                    edge.to === nodeId
+
+            );
+
+
+    }
+
+
+
+
+
+    /**
+     * Outgoing Relations
+     */
+
+
+    getOutgoing(nodeId) {
+
+
+        return this.getEdges()
+
+            .filter(
+
+                edge =>
+
+                    edge.from === nodeId
+
+            );
+
+
+    }
+
+
+
+
+
+    /**
+     * Incoming Relations
+     */
+
+
+    getIncoming(nodeId) {
+
+
+        return this.getEdges()
+
+            .filter(
+
+                edge =>
+
+                    edge.to === nodeId
+
+            );
+
+
+    }
+
+
+
+
+
+    /**
+     * Count
+     */
+
+
+    count() {
+
+
+        return this.edges.size;
+
+
+    }
+
+
+
+
+
+    /**
+     * Clear
+     */
+
+
+    clear() {
+
+
+        this.edges.clear();
+
+
+
+        this.recordEvent(
+
+            "GRAPH_RELATIONS_CLEARED"
+
+        );
+
+
+    }
+
+
+
+
+
+    /**
+     * Monitoring
      */
 
 
@@ -404,7 +516,9 @@ class GraphEdgeManager {
 
         if (
 
-            this.monitoring
+            this.monitoring &&
+
+            typeof this.monitoring.recordEvent === "function"
 
         ) {
 
@@ -427,11 +541,6 @@ class GraphEdgeManager {
 
 
 
-    /**
-     * Monitoring Metric
-     */
-
-
     updateMetric(
 
         name
@@ -441,7 +550,9 @@ class GraphEdgeManager {
 
         if (
 
-            this.monitoring
+            this.monitoring &&
+
+            typeof this.monitoring.updateMetric === "function"
 
         ) {
 
@@ -458,6 +569,36 @@ class GraphEdgeManager {
 
     }
 
+
+
+
+
+    /**
+     * Shutdown
+     */
+
+
+    shutdown() {
+
+
+        this.status =
+
+            "SHUTDOWN";
+
+
+
+        this.recordEvent(
+
+            "GRAPH_EDGE_MANAGER_SHUTDOWN"
+
+        );
+
+
+
+        return true;
+
+
+    }
 
 
 }
