@@ -246,20 +246,10 @@ test(
 "Should generate snapshot",
 () => {
 
-panel.connectController(
-controller
-);
-
-panel.registerSource(
-"MONITORING",
-test(
-"Should generate snapshot",
-() => {
-
     panel.connectController(
         controller
     );
-
+});
     panel.registerSource(
         "MONITORING",
         source
