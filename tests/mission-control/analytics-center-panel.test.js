@@ -276,4 +276,3 @@ test(
     .toBeDefined();
 
 });
-});
