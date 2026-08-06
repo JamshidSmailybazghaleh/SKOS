@@ -7,20 +7,19 @@
  * Engine     : Knowledge Graph Engine
  * Module     : Graph Edge Manager
  *
- * Build      : BUILD-000364
+ * Build      : BUILD-000426
  * Version    : 2.0.0
  *
  * Status     : Core Stabilization Phase
  *
  * Mission:
- * Manage Knowledge Graph Relations.
+ * Manage relationships between Knowledge Objects.
  *
  * Responsibilities:
  * - Create Relations
  * - Remove Relations
- * - Query Relations
- * - Manage Graph Edges
- * - Provide Stable Edge API
+ * - Query Graph Edges
+ * - Provide Stable Graph API
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -33,8 +32,16 @@ class GraphEdgeManager {
     constructor(options = {}) {
 
 
-        this.edges =
-            new Map();
+        this.name =
+            "Graph Edge Manager";
+
+
+        this.version =
+            "2.0.0";
+
+
+        this.status =
+            "CREATED";
 
 
         this.monitoring =
@@ -45,20 +52,25 @@ class GraphEdgeManager {
             options.nodeManager || null;
 
 
-        this.status =
-            "CREATED";
+        this.edges =
+            new Map();
 
 
         this.sequence =
             0;
 
 
+        this.history =
+            [];
+
     }
 
 
 
     /**
+     * ======================================================
      * Initialize
+     * ======================================================
      */
 
 
@@ -82,9 +94,10 @@ class GraphEdgeManager {
 
 
 
-
     /**
+     * ======================================================
      * Add Relation
+     * ======================================================
      */
 
 
@@ -120,9 +133,58 @@ class GraphEdgeManager {
 
 
 
+        if (
+
+            this.nodeManager
+
+        ) {
+
+
+            const hasFrom =
+
+                typeof this.nodeManager.hasNode === "function"
+
+                    ? this.nodeManager.hasNode(from)
+
+                    : true;
+
+
+
+            const hasTo =
+
+                typeof this.nodeManager.hasNode === "function"
+
+                    ? this.nodeManager.hasNode(to)
+
+                    : true;
+
+
+
+            if (
+
+                !hasFrom ||
+
+                !hasTo
+
+            ) {
+
+
+                throw new Error(
+
+                    "Both nodes must exist."
+
+                );
+
+            }
+
+
+        }
+
+
+
         const id =
 
-            `REL-${++this.sequence}`;
+            this.generateId();
 
 
 
@@ -138,21 +200,15 @@ class GraphEdgeManager {
             to,
 
 
-            type:
-
-
-                type || "RELATED",
-
+            type,
 
 
             metadata,
 
 
-
             createdAt:
 
                 new Date()
-
 
 
         };
@@ -173,19 +229,14 @@ class GraphEdgeManager {
 
             "GRAPH_RELATION_CREATED",
 
-            {
-
-                id
-
-            }
+            relation
 
         );
 
 
-
         this.updateMetric(
 
-            "graphRelationsCreated"
+            "relationsCreated"
 
         );
 
@@ -198,9 +249,10 @@ class GraphEdgeManager {
 
 
 
-
     /**
+     * ======================================================
      * Get Relation
+     * ======================================================
      */
 
 
@@ -217,137 +269,14 @@ class GraphEdgeManager {
 
         );
 
-
     }
 
 
 
-
-
     /**
-     * Remove Relation
-     */
-
-
-    removeRelation(id) {
-
-
-        const result =
-
-            this.edges.delete(id);
-
-
-
-        if (result) {
-
-
-            this.recordEvent(
-
-                "GRAPH_RELATION_REMOVED",
-
-                {
-
-                    id
-
-                }
-
-            );
-
-
-            this.updateMetric(
-
-                "graphRelationsRemoved"
-
-            );
-
-
-        }
-
-
-
-        return result;
-
-
-    }
-
-
-
-
-
-    /**
-     * Remove All Relations Connected To Node
-     */
-
-
-    removeRelationsByNode(nodeId) {
-
-
-        let removed = false;
-
-
-
-        for (
-
-            const [id, edge]
-
-            of this.edges
-
-        ) {
-
-
-            if (
-
-                edge.from === nodeId ||
-
-                edge.to === nodeId
-
-            ) {
-
-
-                this.edges.delete(id);
-
-
-                removed = true;
-
-
-            }
-
-
-        }
-
-
-
-        if (removed) {
-
-
-            this.recordEvent(
-
-                "GRAPH_RELATIONS_REMOVED_BY_NODE",
-
-                {
-
-                    nodeId
-
-                }
-
-            );
-
-
-        }
-
-
-
-        return removed;
-
-
-    }
-
-
-
-
-
-    /**
+     * ======================================================
      * Get All Relations
+     * ======================================================
      */
 
 
@@ -360,16 +289,8 @@ class GraphEdgeManager {
 
         );
 
-
     }
 
-
-
-
-
-    /**
-     * Alias
-     */
 
 
     getRelations(nodeId = null) {
@@ -383,7 +304,6 @@ class GraphEdgeManager {
 
 
             return this.getEdges();
-
 
         }
 
@@ -406,10 +326,10 @@ class GraphEdgeManager {
 
 
 
-
-
     /**
+     * ======================================================
      * Outgoing Relations
+     * ======================================================
      */
 
 
@@ -426,15 +346,14 @@ class GraphEdgeManager {
 
             );
 
-
     }
 
 
 
-
-
     /**
+     * ======================================================
      * Incoming Relations
+     * ======================================================
      */
 
 
@@ -451,32 +370,132 @@ class GraphEdgeManager {
 
             );
 
-
     }
 
 
 
-
-
     /**
-     * Count
+     * ======================================================
+     * Remove Relation
+     * ======================================================
      */
 
 
-    count() {
+    removeRelation(id) {
 
 
-        return this.edges.size;
+        const relation =
 
+            this.edges.get(id);
+
+
+
+        if (
+
+            !relation
+
+        ) {
+
+
+            return false;
+
+        }
+
+
+
+        this.edges.delete(id);
+
+
+
+        this.recordEvent(
+
+            "GRAPH_RELATION_REMOVED",
+
+            {
+
+                id
+
+            }
+
+        );
+
+
+
+        this.updateMetric(
+
+            "relationsRemoved"
+
+        );
+
+
+
+        return true;
 
     }
 
 
 
+    /**
+     * ======================================================
+     * Remove All Relations Of Node
+     * ======================================================
+     */
+
+
+    removeRelationsByNode(nodeId) {
+
+
+        const removed = [];
+
+
+
+        for (
+
+            const [id, edge]
+
+            of this.edges
+
+        ) {
+
+
+            if (
+
+                edge.from === nodeId ||
+
+                edge.to === nodeId
+
+            ) {
+
+
+                removed.push(id);
+
+            }
+
+
+        }
+
+
+
+        removed.forEach(
+
+            id =>
+
+                this.edges.delete(id)
+
+        );
+
+
+
+        return removed.length;
+
+    }
+
 
 
     /**
+     * ======================================================
      * Clear
+     * ======================================================
      */
 
 
@@ -493,15 +512,65 @@ class GraphEdgeManager {
 
         );
 
+    }
+
+
+
+    /**
+     * ======================================================
+     * Count
+     * ======================================================
+     */
+
+
+    count() {
+
+
+        return this.edges.size;
 
     }
 
 
 
+    /**
+     * ======================================================
+     * Generate ID
+     * ======================================================
+     */
+
+
+    generateId() {
+
+
+        this.sequence++;
+
+
+
+        return (
+
+            "EDGE-" +
+
+            Date.now()
+
+            +
+
+            "-"
+
+            +
+
+            this.sequence
+
+        );
+
+
+    }
+
 
 
     /**
+     * ======================================================
      * Monitoring
+     * ======================================================
      */
 
 
@@ -512,6 +581,28 @@ class GraphEdgeManager {
         metadata = {}
 
     ) {
+
+
+        const event = {
+
+
+            name,
+
+
+            metadata,
+
+
+            timestamp:
+
+                new Date()
+
+
+        };
+
+
+
+        this.history.push(event);
+
 
 
         if (
@@ -531,7 +622,6 @@ class GraphEdgeManager {
 
             );
 
-
         }
 
 
@@ -539,13 +629,7 @@ class GraphEdgeManager {
 
 
 
-
-
-    updateMetric(
-
-        name
-
-    ) {
+    updateMetric(name) {
 
 
         if (
@@ -563,18 +647,56 @@ class GraphEdgeManager {
 
             );
 
-
         }
+
+    }
+
+
+
+    /**
+     * ======================================================
+     * Status
+     * ======================================================
+     */
+
+
+    getStatus() {
+
+
+        return {
+
+
+            name:
+
+                this.name,
+
+
+            version:
+
+                this.version,
+
+
+            status:
+
+                this.status,
+
+
+            relations:
+
+                this.count()
+
+
+        };
 
 
     }
 
 
 
-
-
     /**
+     * ======================================================
      * Shutdown
+     * ======================================================
      */
 
 
@@ -586,7 +708,6 @@ class GraphEdgeManager {
             "SHUTDOWN";
 
 
-
         this.recordEvent(
 
             "GRAPH_EDGE_MANAGER_SHUTDOWN"
@@ -594,11 +715,10 @@ class GraphEdgeManager {
         );
 
 
-
         return true;
 
-
     }
+
 
 
 }
