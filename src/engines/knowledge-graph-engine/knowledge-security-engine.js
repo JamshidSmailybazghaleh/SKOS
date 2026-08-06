@@ -7,7 +7,7 @@
  * Engine      : Knowledge Graph Engine
  * File        : knowledge-security-engine.js
  *
- * Build       : BUILD-000410
+ * Build       : BUILD-000909
  * Version     : 1.0.0
  *
  * Mission:
@@ -33,30 +33,61 @@ class KnowledgeSecurityEngine {
             "1.0.0";
 
 
+        this.build =
+            "BUILD-000909";
+
+
         this.status =
             "CREATED";
+
 
 
         this.monitoring =
             options.monitoring || null;
 
 
+
+        this.authenticationEngine =
+            options.authenticationEngine || null;
+
+
+
+        this.authorizationEngine =
+            options.authorizationEngine || null;
+
+
+
+        this.policyEngine =
+            options.policyEngine || null;
+
+
+
         this.roles =
             new Map();
+
 
 
         this.identities =
             new Map();
 
 
+
         this.accessRules =
             new Map();
+
+
+
+        this.securityDecisions =
+            [];
+
 
 
         this.securityEvents =
             [];
 
     }
+
+
 
 
 
@@ -84,6 +115,56 @@ class KnowledgeSecurityEngine {
 
 
 
+
+
+    start() {
+
+
+        this.status =
+            "RUNNING";
+
+
+        this.recordEvent(
+
+            "KNOWLEDGE_SECURITY_ENGINE_STARTED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+
+
+    stop() {
+
+
+        this.status =
+            "STOPPED";
+
+
+        this.recordEvent(
+
+            "KNOWLEDGE_SECURITY_ENGINE_STOPPED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+
+
     /**
      * Create security role
      */
@@ -98,11 +179,7 @@ class KnowledgeSecurityEngine {
     ) {
 
 
-        if (
-
-            !roleId
-
-        ) {
+        if(!roleId){
 
 
             throw new Error(
@@ -166,6 +243,8 @@ class KnowledgeSecurityEngine {
 
 
 
+
+
     /**
      * Register identity
      */
@@ -175,16 +254,12 @@ class KnowledgeSecurityEngine {
 
         identityId,
 
-        identity
+        identity = {}
 
     ) {
 
 
-        if (
-
-            !identityId
-
-        ) {
+        if(!identityId){
 
 
             throw new Error(
@@ -207,17 +282,32 @@ class KnowledgeSecurityEngine {
 
             name:
 
-                identity.name || "Unknown",
+                identity.name ||
+
+                "Unknown",
+
 
 
             role:
 
-                identity.role || null,
+                identity.role ||
+
+                null,
+
+
+
+            type:
+
+                identity.type ||
+
+                "USER",
+
 
 
             active:
 
                 true,
+
 
 
             createdAt:
@@ -260,8 +350,10 @@ class KnowledgeSecurityEngine {
 
 
 
+
+
     /**
-     * Create object access rule
+     * Define knowledge object security policy
      */
 
 
@@ -269,7 +361,7 @@ class KnowledgeSecurityEngine {
 
         objectId,
 
-        rule
+        rule = {}
 
     ) {
 
@@ -285,15 +377,40 @@ class KnowledgeSecurityEngine {
                 rule.allowedRoles || [],
 
 
+
+            allowedActions:
+
+                rule.allowedActions ||
+
+                [
+
+                    "READ"
+
+                ],
+
+
+
             encryption:
 
-                rule.encryption || false,
+                Boolean(
+
+                    rule.encryption
+
+                ),
+
 
 
             classification:
 
-                rule.classification || "PUBLIC"
+                rule.classification ||
 
+                "PUBLIC",
+
+
+
+            createdAt:
+
+                new Date()
 
         };
 
@@ -331,8 +448,10 @@ class KnowledgeSecurityEngine {
 
 
 
+
+
     /**
-     * Security authorization check
+     * Main security decision engine
      */
 
 
@@ -347,6 +466,7 @@ class KnowledgeSecurityEngine {
     ) {
 
 
+
         const identity =
 
             this.identities.get(
@@ -357,7 +477,7 @@ class KnowledgeSecurityEngine {
 
 
 
-        const accessRule =
+        const rule =
 
             this.accessRules.get(
 
@@ -371,28 +491,73 @@ class KnowledgeSecurityEngine {
 
 
 
-        if (
+        let reason =
+
+            "ACCESS_DENIED";
+
+
+
+
+
+        if(
 
             identity &&
 
-            accessRule
+            identity.active &&
 
-        ) {
+            rule
+
+        ){
 
 
-            approved =
 
-                accessRule.allowedRoles.includes(
+            const roleAllowed =
+
+                rule.allowedRoles.includes(
 
                     identity.role
 
                 );
 
+
+
+            const actionAllowed =
+
+                rule.allowedActions.includes(
+
+                    action
+
+                );
+
+
+
+            approved =
+
+                roleAllowed &&
+
+                actionAllowed;
+
+
+
+            reason =
+
+                approved
+
+                ?
+
+                "ACCESS_GRANTED"
+
+                :
+
+                "INSUFFICIENT_PERMISSION";
+
         }
 
 
 
-        const event = {
+
+
+        const decision = {
 
 
             identityId,
@@ -407,6 +572,95 @@ class KnowledgeSecurityEngine {
             approved,
 
 
+            reason,
+
+
+            classification:
+
+                rule
+
+                ?
+
+                rule.classification
+
+                :
+
+                "UNKNOWN",
+
+
+
+            timestamp:
+
+                new Date()
+
+        };
+
+
+
+
+
+        this.securityDecisions.push(
+
+            decision
+
+        );
+
+
+
+        this.securityEvents.push(
+
+            decision
+
+        );
+
+
+
+        this.recordEvent(
+
+            "SECURITY_DECISION_CREATED",
+
+            decision
+
+        );
+
+
+
+        this.updateMetric(
+
+            "securityDecisions"
+
+        );
+
+
+
+        return decision;
+
+    }
+
+
+
+
+
+
+
+    /**
+     * Register threat/security event
+     */
+
+
+    registerSecurityEvent(
+
+        event
+
+    ) {
+
+
+        const record = {
+
+
+            ...event,
+
+
             timestamp:
 
                 new Date()
@@ -417,7 +671,7 @@ class KnowledgeSecurityEngine {
 
         this.securityEvents.push(
 
-            event
+            record
 
         );
 
@@ -425,15 +679,15 @@ class KnowledgeSecurityEngine {
 
         this.recordEvent(
 
-            "SECURITY_AUTHORIZATION_CHECKED",
+            "SECURITY_EVENT_REGISTERED",
 
-            event
+            record
 
         );
 
 
 
-        return event;
+        return record;
 
     }
 
@@ -441,9 +695,6 @@ class KnowledgeSecurityEngine {
 
 
 
-    /**
-     * Disable identity
-     */
 
 
     disableIdentity(
@@ -463,11 +714,7 @@ class KnowledgeSecurityEngine {
 
 
 
-        if (
-
-            identity
-
-        ) {
+        if(identity){
 
 
             identity.active = false;
@@ -484,9 +731,6 @@ class KnowledgeSecurityEngine {
 
 
 
-    /**
-     * Enable identity
-     */
 
 
     enableIdentity(
@@ -506,11 +750,7 @@ class KnowledgeSecurityEngine {
 
 
 
-        if (
-
-            identity
-
-        ) {
+        if(identity){
 
 
             identity.active = true;
@@ -527,12 +767,9 @@ class KnowledgeSecurityEngine {
 
 
 
-    /**
-     * Security event history
-     */
 
 
-    getSecurityEvents() {
+    getSecurityEvents(){
 
 
         return this.securityEvents;
@@ -543,12 +780,22 @@ class KnowledgeSecurityEngine {
 
 
 
-    /**
-     * Statistics
-     */
 
 
-    getStatistics() {
+    getDecisions(){
+
+
+        return this.securityDecisions;
+
+    }
+
+
+
+
+
+
+
+    getStatistics(){
 
 
         return {
@@ -569,6 +816,11 @@ class KnowledgeSecurityEngine {
                 this.accessRules.size,
 
 
+            decisions:
+
+                this.securityDecisions.length,
+
+
             events:
 
                 this.securityEvents.length
@@ -582,7 +834,9 @@ class KnowledgeSecurityEngine {
 
 
 
-    getStatus() {
+
+
+    getStatus(){
 
 
         return {
@@ -598,24 +852,25 @@ class KnowledgeSecurityEngine {
                 this.version,
 
 
+            build:
+
+                this.build,
+
+
             status:
 
                 this.status,
 
 
-            roles:
+            statistics:
 
-                this.roles.size,
-
-
-            identities:
-
-                this.identities.size
-
+                this.getStatistics()
 
         };
 
     }
+
+
 
 
 
@@ -627,14 +882,10 @@ class KnowledgeSecurityEngine {
 
         metadata = {}
 
-    ) {
+    ){
 
 
-        if (
-
-            this.monitoring
-
-        ) {
+        if(this.monitoring){
 
 
             this.monitoring.recordEvent(
@@ -653,18 +904,16 @@ class KnowledgeSecurityEngine {
 
 
 
+
+
     updateMetric(
 
         metric
 
-    ) {
+    ){
 
 
-        if (
-
-            this.monitoring
-
-        ) {
+        if(this.monitoring){
 
 
             this.monitoring.updateMetric(
@@ -681,11 +930,15 @@ class KnowledgeSecurityEngine {
 
 
 
-    shutdown() {
+
+
+    shutdown(){
 
 
         this.status =
+
             "SHUTDOWN";
+
 
 
         this.recordEvent(
@@ -695,12 +948,15 @@ class KnowledgeSecurityEngine {
         );
 
 
+
         return true;
 
     }
 
 
 }
+
+
 
 
 
