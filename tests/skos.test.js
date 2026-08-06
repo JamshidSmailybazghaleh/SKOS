@@ -127,7 +127,7 @@ test(
 
     expect(status.build)
     .toBe(
-        "BUILD-000908.1"
+        "BUILD-000908.3"
     );
 
 });
