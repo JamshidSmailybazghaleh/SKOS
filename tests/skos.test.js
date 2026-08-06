@@ -14,151 +14,150 @@
  */
 
 const SKOS =
-require("../src/skos");
+    require("../src/skos");
+
 
 
 describe(
-"SKOS End-to-End Boot Tests",
-() => {
+    "SKOS End-to-End Boot Tests",
+    () => {
 
 
 
+        test(
+            "Should create SKOS instance",
+            () => {
 
-test(
-"Should create SKOS instance",
-() => {
+                expect(SKOS)
+                    .toBeDefined();
 
-    expect(SKOS)
-    .toBeDefined();
 
-    expect(SKOS.name)
-    .toBe(
-        "Smaily Knowledge Operating System"
-    );
+                expect(SKOS.name)
+                    .toBe(
+                        "Smaily Knowledge Operating System"
+                    );
 
-});
+            }
+        );
 
 
 
 
 
-test(
-"Should initialize successfully",
-async () => {
+        test(
+            "Should initialize successfully",
+            async () => {
 
-    const result =
-        await SKOS.initialize();
+                const result =
+                    await SKOS.initialize();
 
-    expect(result)
-    .toBe(true);
 
-});
+                expect(result)
+                    .toBe(true);
 
+            }
+        );
 
 
 
 
-test(
-"Should perform full boot sequence",
-async () => {
 
-    const report =
-        await SKOS.start();
 
-    expect(report)
-    .toBeDefined();
 
-    expect(report.success)
-    .toBe(true);
+        test(
+            "Should perform full boot sequence",
+            async () => {
 
-});
+                const report =
+                    await SKOS.start();
 
 
+                expect(report)
+                    .toBeDefined();
 
 
+                expect(report.success)
+                    .toBe(true);
 
+            }
+        );
 
-test(
-"Should become operational",
-() => {
 
-    const status =
-        SKOS.getStatus();
 
-    expect(status.status)
-    .toBe(
-        "RUNNING"
-    );
 
-});
 
 
 
+        test(
+            "Should become operational",
+            () => {
 
+                const status =
+                    SKOS.getStatus();
 
 
+                expect(status.status)
+                    .toBe(
+                        "RUNNING"
+                    );
 
-test(
-"Should expose version",
-() => {
+            }
+        );
 
-    const status =
-        SKOS.getStatus();
 
-    expect(status.version)
-    .toBe(
-        "1.0.0"
-    );
 
-});
 
 
 
 
 
+        test(
+            "Should expose version",
+            () => {
 
+                const status =
+                    SKOS.getStatus();
 
-test(
-"Should expose build",
-() => {
 
-    const status =
-        skos.getStatus();
+                expect(status.version)
+                    .toBe(
+                        "1.0.0"
+                    );
 
+            }
+        );
 
-    expect(
-        status.build
-    )
-    .toBeDefined();
 
 
-    expect(
-        status.build
-    )
-    .toMatch(
-        /^BUILD-\d{6}\.\d+$/
-    );
 
-});
 
 
 
 
+        test(
+            "Should expose build",
+            () => {
 
+                const status =
+                    SKOS.getStatus();
 
 
+                expect(
+                    status.build
+                )
+                .toBeDefined();
 
-test(
-"Should shutdown successfully",
-async () => {
 
-    const result =
-        await SKOS.shutdown();
+                expect(
+                    status.build
+                )
+                .toMatch(
+                    /^BUILD-\d{6}\.\d+$/
+                );
 
-    expect(result)
-    .toBe(true);
+            }
+        );
 
-});
 
 
 
@@ -166,20 +165,44 @@ async () => {
 
 
 
-test(
-"Should stop runtime",
-() => {
+        test(
+            "Should shutdown successfully",
+            async () => {
 
-    const status =
-        SKOS.getStatus();
+                const result =
+                    await SKOS.shutdown();
 
-    expect(status.status)
-    .toBe(
-        "STOPPED"
-    );
 
-});
+                expect(result)
+                    .toBe(true);
 
+            }
+        );
 
 
-});
+
+
+
+
+
+
+        test(
+            "Should stop runtime",
+            () => {
+
+                const status =
+                    SKOS.getStatus();
+
+
+                expect(status.status)
+                    .toBe(
+                        "STOPPED"
+                    );
+
+            }
+        );
+
+
+
+    }
+);
