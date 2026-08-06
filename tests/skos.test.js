@@ -7,7 +7,7 @@
  * Test      : SKOS End-to-End Boot
  * File      : skos.test.js
  *
- * Build     : BUILD-000908.2
+ * Build     : BUILD-000908.3
  * Version   : 1.0.0
  *
  * ==========================================================
