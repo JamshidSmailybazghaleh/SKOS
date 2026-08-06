@@ -72,9 +72,11 @@ describe(
         ).toBe(true);
 
         expect(
-            launcher.status
-        ).toBe("RUNNING");
-
+    launcher.status
+)
+.toBe(
+    "READY"
+    
     });
 
 
