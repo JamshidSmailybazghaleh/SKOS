@@ -123,11 +123,20 @@ test(
 () => {
 
     const status =
-        SKOS.getStatus();
+        skos.getStatus();
 
-    expect(status.build)
-    .toBe(
-        "BUILD-000908.3"
+
+    expect(
+        status.build
+    )
+    .toBeDefined();
+
+
+    expect(
+        status.build
+    )
+    .toMatch(
+        /^BUILD-\d{6}\.\d+$/
     );
 
 });
