@@ -249,7 +249,7 @@ test(
     panel.connectController(
         controller
     );
-});
+
     panel.registerSource(
         "MONITORING",
         source
@@ -264,5 +264,7 @@ test(
         snapshot
     )
     .toBeDefined();
+
+});
 
 });
