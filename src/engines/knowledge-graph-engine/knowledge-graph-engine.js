@@ -4,43 +4,42 @@
  * Smaily Knowledge Operating System
  * ==========================================================
  *
- * Engine     : Knowledge Graph Engine
- * File       : knowledge-graph-engine.js
+ * Engine      : Knowledge Graph Engine
+ * File        : knowledge-graph-engine.js
  *
- * Build      : BUILD-000425
- * Version    : 2.0.0
- *
- * Status     : Core Stabilization Phase
+ * Build       : BUILD-000420
+ * Version     : 1.0.0
  *
  * Mission:
- * Coordinate Knowledge Graph Operations.
- *
- * Responsibilities:
- * - Manage Knowledge Nodes
- * - Manage Knowledge Relations
- * - Provide Graph Access Layer
- * - Provide Stable API for SKOS Engines
+ * Manage knowledge graph nodes, edges,
+ * relationships and traversal operations.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
  */
 
-const GraphNodeManager =
-    require("./graph-node-manager");
-
-const GraphEdgeManager =
-    require("./graph-edge-manager");
-
 
 class KnowledgeGraphEngine {
 
+
     constructor(options = {}) {
+
+
+        this.engineId =
+            "KNOWLEDGE-GRAPH-ENGINE";
+
 
         this.name =
             "Knowledge Graph Engine";
 
+
         this.version =
-            "2.0.0";
+            "1.0.0";
+
+
+        this.build =
+            "BUILD-000420";
+
 
         this.status =
             "CREATED";
@@ -50,34 +49,27 @@ class KnowledgeGraphEngine {
             options.monitoring || null;
 
 
-        this.nodeManager =
-            new GraphNodeManager({
-                monitoring: this.monitoring
-            });
+
+        this.nodes =
+            new Map();
 
 
-        this.edgeManager =
-            new GraphEdgeManager({
-                monitoring: this.monitoring,
-                nodeManager: this.nodeManager
-            });
+
+        this.edges =
+            [];
 
 
-        this.history =
+
+        this.graphHistory =
             [];
 
     }
 
 
-    /**
-     * Initialize Engine
-     */
 
-    initialize() {
 
-        this.nodeManager.initialize();
 
-        this.edgeManager.initialize?.();
+    initialize(){
 
 
         this.status =
@@ -85,7 +77,9 @@ class KnowledgeGraphEngine {
 
 
         this.recordEvent(
+
             "KNOWLEDGE_GRAPH_ENGINE_INITIALIZED"
+
         );
 
 
@@ -95,180 +89,23 @@ class KnowledgeGraphEngine {
 
 
 
-    /**
-     * Node Operations
-     */
 
 
-    addNode(object) {
+    start(){
 
-        const result =
-            this.nodeManager.addNode(object);
+
+        this.status =
+            "RUNNING";
 
 
         this.recordEvent(
-            "KNOWLEDGE_GRAPH_NODE_ADDED",
-            {
-                id: object.id
-            }
+
+            "KNOWLEDGE_GRAPH_ENGINE_STARTED"
+
         );
 
 
-        return result;
-
-    }
-
-
-
-    removeNode(id) {
-
-    if (
-        this.edgeManager &&
-        typeof this.edgeManager.removeRelationsByNode === "function"
-    ) {
-
-        this.edgeManager.removeRelationsByNode(id);
-
-    }
-
-
-    const result =
-        this.nodeManager.removeNode(id);
-
-
-    if (result) {
-
-        this.recordEvent(
-            "KNOWLEDGE_GRAPH_NODE_REMOVED",
-            {
-                id
-            }
-        );
-
-    }
-
-
-    return result;
-
-}
-
-
-    getNode(id) {
-
-        return this.nodeManager.getNode(id);
-
-    }
-
-
-
-    getNodes() {
-
-        return this.nodeManager.getAllNodes();
-
-    }
-
-
-
-    hasNode(id) {
-
-        return this.nodeManager.hasNode(id);
-
-    }
-
-
-
-
-    /**
-     * Relation Operations
-     */
-
-
-    addRelation(
-        from,
-        to,
-        type,
-        metadata = {}
-    ) {
-
-
-        return this.edgeManager.addRelation(
-            from,
-            to,
-            type,
-            metadata
-        );
-
-    }
-
-
-
-    removeRelation(id) {
-
-        return this.edgeManager.removeRelation(id);
-
-    }
-
-
-
-    getRelations(id = null) {
-
-    if (id === null) {
-
-        return this.edgeManager.getEdges();
-
-    }
-
-    return this.edgeManager.getRelations(id);
-
-}
-
-
-
-    getOutgoing(id) {
-
-        return this.edgeManager.getOutgoing(id);
-
-    }
-
-
-
-    getIncoming(id) {
-
-        return this.edgeManager.getIncoming(id);
-
-    }
-
-
-
-
-    /**
-     * Complete Graph Export
-     */
-
-
-    getGraph() {
-
-
-        return {
-
-            name:
-                this.name,
-
-
-            version:
-                this.version,
-
-
-            nodes:
-                this.getNodes(),
-
-
-            edges:
-                this.edgeManager.getEdges()
-
-
-        };
-
+        return true;
 
     }
 
@@ -277,84 +114,99 @@ class KnowledgeGraphEngine {
 
 
     /**
-     * Graph Statistics
+     * Add graph node
      */
 
 
-    getStatus() {
+    addNode(
+
+        nodeId,
+
+        data = {}
+
+    ){
 
 
-        return {
-
-            name:
-                this.name,
+        if(!nodeId){
 
 
-            version:
-                this.version,
+            throw new Error(
 
+                "Node id required."
 
-            status:
-                this.status,
-
-
-            nodes:
-                this.nodeManager.count(),
-
-
-            relations:
-                this.edgeManager.count()
-
-
-        };
-
-
-    }
-
-
-
-
-    /**
-     * Monitoring Event
-     */
-
-
-    recordEvent(
-        name,
-        metadata = {}
-    ) {
-
-
-        const event = {
-
-            name,
-
-            metadata,
-
-            timestamp:
-                new Date()
-
-        };
-
-
-        this.history.push(event);
-
-
-
-        if (
-            this.monitoring &&
-            this.monitoring.recordEvent
-        ) {
-
-
-            this.monitoring.recordEvent(
-                name,
-                metadata
             );
 
         }
 
 
+
+        const node = {
+
+
+            id:
+
+                nodeId,
+
+
+            type:
+
+                data.type || "KNOWLEDGE_OBJECT",
+
+
+            label:
+
+                data.label || "Unknown",
+
+
+            properties:
+
+                data.properties || {},
+
+
+            semantic:
+
+                data.semantic || null,
+
+
+            ontology:
+
+                data.ontology || null,
+
+
+            createdAt:
+
+                new Date()
+
+        };
+
+
+
+        this.nodes.set(
+
+            nodeId,
+
+            node
+
+        );
+
+
+
+        this.recordEvent(
+
+            "GRAPH_NODE_CREATED",
+
+            {
+
+                nodeId
+
+            }
+
+        );
+
+
+
+        return node;
+
     }
 
 
@@ -362,59 +214,562 @@ class KnowledgeGraphEngine {
 
 
     /**
-     * History
+     * Add relationship edge
      */
 
 
-    getHistory() {
+    addEdge(
 
-        return [
-            ...this.history
-        ];
+        source,
+
+        relation,
+
+        target
+
+    ){
+
+
+        if(
+
+            !this.nodes.has(source) ||
+
+            !this.nodes.has(target)
+
+        ){
+
+
+            throw new Error(
+
+                "Graph nodes not found."
+
+            );
+
+        }
+
+
+
+        const edge = {
+
+
+            id:
+
+                "EDGE-" + Date.now(),
+
+
+            source,
+
+
+            relation,
+
+
+            target,
+
+
+            createdAt:
+
+                new Date()
+
+        };
+
+
+
+        this.edges.push(
+
+            edge
+
+        );
+
+
+
+        this.graphHistory.push(
+
+            edge
+
+        );
+
+
+
+        this.recordEvent(
+
+            "GRAPH_EDGE_CREATED",
+
+            edge
+
+        );
+
+
+
+        return edge;
 
     }
+
+
+
 
 
     /**
- * Shutdown
- */
-
-shutdown() {
+     * Get node
+     */
 
 
-    if (this.nodeManager.shutdown) {
+    getNode(
 
-        this.nodeManager.shutdown();
+        nodeId
+
+    ){
+
+
+        return (
+
+            this.nodes.get(
+
+                nodeId
+
+            )
+
+            ||
+
+            null
+
+        );
 
     }
 
 
-    if (
-    this.nodeManager &&
-    typeof this.nodeManager.shutdown === "function"
-) {
 
-    this.nodeManager.shutdown();
+
+
+    /**
+     * Find connected nodes
+     */
+
+
+    getNeighbors(
+
+        nodeId
+
+    ){
+
+
+        return this.edges.filter(
+
+            edge =>
+
+                edge.source === nodeId ||
+
+                edge.target === nodeId
+
+        );
+
+    }
+
+
+
+
+
+    /**
+     * Graph traversal
+     */
+
+
+    traverse(
+
+        startNode,
+
+        depth = 1
+
+    ){
+
+
+        const visited =
+
+            new Set();
+
+
+
+        const queue =
+
+            [
+
+                {
+
+                    id:
+
+                        startNode,
+
+                    level:
+
+                        0
+
+                }
+
+            ];
+
+
+
+        while(queue.length){
+
+
+            const current =
+
+                queue.shift();
+
+
+
+            if(
+
+                visited.has(
+
+                    current.id
+
+                )
+
+            )
+
+                continue;
+
+
+
+            visited.add(
+
+                current.id
+
+            );
+
+
+
+            if(
+
+                current.level < depth
+
+            ){
+
+
+                this.getNeighbors(
+
+                    current.id
+
+                )
+
+                .forEach(
+
+                    edge => {
+
+
+                        const next =
+
+                            edge.source === current.id
+
+                                ?
+
+                                edge.target
+
+                                :
+
+                                edge.source;
+
+
+
+                        queue.push(
+
+                            {
+
+                                id:
+
+                                    next,
+
+
+                                level:
+
+                                    current.level + 1
+
+                            }
+
+                        );
+
+                    }
+
+                );
+
+            }
+
+        }
+
+
+
+        return Array.from(
+
+            visited
+
+        );
+
+    }
+
+
+
+
+
+    /**
+     * Search nodes
+     */
+
+
+    search(
+
+        keyword
+
+    ){
+
+
+        return Array.from(
+
+            this.nodes.values()
+
+        )
+
+        .filter(
+
+            node =>
+
+                node.label
+
+                .toLowerCase()
+
+                .includes(
+
+                    keyword.toLowerCase()
+
+                )
+
+        );
+
+    }
+
+
+
+
+
+    /**
+     * Export graph
+     */
+
+
+    exportGraph(){
+
+
+        return {
+
+
+            nodes:
+
+                Array.from(
+
+                    this.nodes.values()
+
+                ),
+
+
+            edges:
+
+                this.edges
+
+
+        };
+
+    }
+
+
+
+
+
+    /**
+     * Statistics
+     */
+
+
+    getStatistics(){
+
+
+        return {
+
+
+            nodes:
+
+                this.nodes.size,
+
+
+            edges:
+
+                this.edges.length,
+
+
+            density:
+
+                this.nodes.size > 0
+
+                ?
+
+                (
+
+                    this.edges.length /
+
+                    this.nodes.size
+
+                )
+
+                :
+
+                0
+
+
+        };
+
+    }
+
+
+
+
+
+    getStatus(){
+
+
+        return {
+
+
+            engineId:
+
+                this.engineId,
+
+
+            name:
+
+                this.name,
+
+
+            version:
+
+                this.version,
+
+
+            build:
+
+                this.build,
+
+
+            status:
+
+                this.status,
+
+
+            statistics:
+
+                this.getStatistics()
+
+        };
+
+    }
+
+
+
+
+
+    stop(){
+
+
+        this.status =
+            "STOPPED";
+
+
+        this.recordEvent(
+
+            "KNOWLEDGE_GRAPH_ENGINE_STOPPED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    shutdown(){
+
+
+        this.status =
+            "SHUTDOWN";
+
+
+        this.recordEvent(
+
+            "KNOWLEDGE_GRAPH_ENGINE_SHUTDOWN"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    recordEvent(
+
+        event,
+
+        metadata = {}
+
+    ){
+
+
+        if(this.monitoring){
+
+
+            this.monitoring.recordEvent(
+
+                event,
+
+                metadata
+
+            );
+
+        }
+
+    }
+
+
+
+
+
+    updateMetric(
+
+        metric
+
+    ){
+
+
+        if(this.monitoring){
+
+
+            this.monitoring.updateMetric(
+
+                metric
+
+            );
+
+        }
+
+    }
+
 
 }
 
-
-    this.status =
-        "SHUTDOWN";
-
-
-    this.recordEvent(
-        "KNOWLEDGE_GRAPH_ENGINE_SHUTDOWN"
-    );
-
-
-    return true;
-
-}
-
-
-}
 
 
 module.exports =
+
     KnowledgeGraphEngine;
