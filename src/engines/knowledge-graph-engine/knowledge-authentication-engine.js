@@ -4,10 +4,10 @@
  * Smaily Knowledge Operating System
  * ==========================================================
  *
- * Engine      : Knowledge Authentication Engine
+ * Engine      : Knowledge Graph Security Stack
  * File        : knowledge-authentication-engine.js
  *
- * Build       : BUILD-000909
+ * Build       : BUILD-000909.1
  * Version     : 1.0.0
  *
  * Mission:
@@ -18,64 +18,80 @@
  * ==========================================================
  */
 
+
 class KnowledgeAuthenticationEngine {
-
-    static STATUS = {
-
-        CREATED: "CREATED",
-
-        INITIALIZED: "INITIALIZED",
-
-        SHUTDOWN: "SHUTDOWN"
-
-    };
-
 
 
     constructor(options = {}) {
 
+
+        this.engineId =
+            "KNOWLEDGE-AUTHENTICATION-ENGINE";
+
+
         this.name =
             "Knowledge Authentication Engine";
+
 
         this.version =
             "1.0.0";
 
+
+        this.build =
+            "BUILD-000909.1";
+
+
         this.status =
-            KnowledgeAuthenticationEngine.STATUS.CREATED;
+            "CREATED";
+
 
         this.monitoring =
             options.monitoring || null;
 
+
+        this.identityProvider =
+            options.identityProvider || null;
+
+
         this.identities =
             new Map();
+
 
         this.credentials =
             new Map();
 
+
         this.sessions =
             new Map();
 
-        this.authenticationLogs =
+
+        this.authenticationHistory =
             [];
 
-        this.failedAttempts =
-            new Map();
 
-        this.lockedAccounts =
-            new Set();
+        this.createdAt =
+            new Date();
+
 
     }
 
 
 
+
+
     initialize() {
 
+
         this.status =
-            KnowledgeAuthenticationEngine.STATUS.INITIALIZED;
+            "INITIALIZED";
+
 
         this.recordEvent(
-            "KNOWLEDGE_AUTHENTICATION_ENGINE_INITIALIZED"
+
+            "AUTHENTICATION_ENGINE_INITIALIZED"
+
         );
+
 
         return true;
 
@@ -83,7 +99,43 @@ class KnowledgeAuthenticationEngine {
 
 
 
-    addIdentity(identityId, identity) {
+
+
+    start() {
+
+
+        this.status =
+            "RUNNING";
+
+
+        this.recordEvent(
+
+            "AUTHENTICATION_ENGINE_STARTED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    /**
+     * Register identity
+     */
+
+
+    registerIdentity(
+
+        identityId,
+
+        identity = {}
+
+    ) {
+
 
         if (!identityId) {
 
@@ -93,36 +145,54 @@ class KnowledgeAuthenticationEngine {
 
         }
 
+
         const record = {
+
 
             id:
                 identityId,
+
 
             name:
                 identity.name || "Unknown",
 
+
             type:
                 identity.type || "USER",
 
+
             active:
                 true,
+
 
             createdAt:
                 new Date()
 
+
         };
 
+
+
         this.identities.set(
+
             identityId,
+
             record
+
         );
 
+
+
         this.recordEvent(
-            "AUTH_IDENTITY_CREATED",
+
+            "IDENTITY_REGISTERED",
+
             {
                 identityId
             }
+
         );
+
 
         return record;
 
@@ -130,35 +200,74 @@ class KnowledgeAuthenticationEngine {
 
 
 
-    addCredential(identityId, credential) {
 
-        if (!identityId || !credential) {
+
+    /**
+     * Register credential
+     */
+
+
+    registerCredential(
+
+        identityId,
+
+        credential = {}
+
+    ) {
+
+
+        if (
+
+            !identityId ||
+
+            !credential.secret
+
+        ) {
+
 
             throw new Error(
+
                 "Identity and credential required."
+
             );
 
         }
+
+
 
         const record = {
 
+
             identityId,
 
-            secret:
-                credential.secret,
 
             type:
+
                 credential.type || "PASSWORD",
 
+
+            secret:
+
+                credential.secret,
+
+
             createdAt:
+
                 new Date()
+
 
         };
 
+
+
         this.credentials.set(
+
             identityId,
+
             record
+
         );
+
 
         return record;
 
@@ -166,152 +275,208 @@ class KnowledgeAuthenticationEngine {
 
 
 
-    authenticate(identityId, secret) {
 
-        if (
-            this.lockedAccounts.has(
-                identityId
-            )
-        ) {
 
-            return {
+    /**
+     * Authenticate
+     */
 
-                identityId,
 
-                authenticated: false,
+    authenticate(
 
-                reason: "ACCOUNT_LOCKED",
+        identityId,
 
-                timestamp:
-                    new Date()
+        secret
 
-            };
+    ) {
 
-        }
+
 
         const identity =
+
             this.identities.get(
+
                 identityId
+
             );
+
+
 
         const credential =
+
             this.credentials.get(
+
                 identityId
+
             );
 
-        const success =
+
+
+        const authenticated =
+
             Boolean(
+
                 identity &&
+
                 credential &&
+
                 identity.active &&
+
                 credential.secret === secret
+
             );
+
+
 
         let session = null;
 
-        if (success) {
 
-            this.failedAttempts.delete(
-                identityId
-            );
+
+        if (authenticated) {
+
 
             session =
+
                 this.createSession(
+
                     identityId
+
                 );
 
-        } else {
-
-            const attempts =
-                (
-                    this.failedAttempts.get(
-                        identityId
-                    ) || 0
-                ) + 1;
-
-            this.failedAttempts.set(
-                identityId,
-                attempts
-            );
-
-            if (attempts >= 5) {
-
-                this.lockedAccounts.add(
-                    identityId
-                );
-
-            }
 
         }
 
-        const result = {
 
-            identityId,
 
-            authenticated:
-                success,
+        const decision = {
+
+
+            id:
+
+                this.generateId(),
+
+
+            subject:
+
+                identityId,
+
+
+            decision:
+
+                authenticated
+
+                    ?
+
+                    "ALLOW"
+
+                    :
+
+                    "DENY",
+
+
+            reason:
+
+                authenticated
+
+                    ?
+
+                    "Valid credentials"
+
+                    :
+
+                    "Authentication failed",
+
 
             session,
 
+
             timestamp:
+
                 new Date()
+
 
         };
 
-        this.authenticationLogs.push(
-            result
+
+
+        this.authenticationHistory.push(
+
+            decision
+
         );
+
+
 
         this.recordEvent(
-            "AUTHENTICATION_COMPLETED",
-            result
+
+            "AUTHENTICATION_DECISION",
+
+            decision
+
         );
 
-        return result;
+
+        return decision;
 
     }
 
 
 
-    createSession(identityId) {
+
+
+    /**
+     * Create session
+     */
+
+
+    createSession(
+
+        identityId
+
+    ) {
+
 
         const sessionId =
+
             "SESSION-" +
+
             Date.now();
+
+
 
         const session = {
 
+
             id:
+
                 sessionId,
 
-            token:
-                "TOKEN-" +
-                Date.now() +
-                "-" +
-                Math.random()
-                    .toString(36)
-                    .substring(2),
 
             identityId,
 
+
             active:
+
                 true,
 
-            createdAt:
-                new Date(),
 
-            expiresAt:
-                new Date(
-                    Date.now() +
-                    3600000
-                )
+            createdAt:
+
+                new Date()
+
 
         };
 
+
+
         this.sessions.set(
+
             sessionId,
+
             session
+
         );
+
 
         return session;
 
@@ -319,45 +484,60 @@ class KnowledgeAuthenticationEngine {
 
 
 
-    validateSession(sessionId) {
+
+
+    /**
+     * Validate session
+     */
+
+
+    validateSession(
+
+        sessionId
+
+    ) {
+
 
         const session =
+
             this.sessions.get(
+
                 sessionId
+
             );
 
-        if (
-            !session ||
-            !session.active
-        ) {
 
-            return false;
 
-        }
+        return Boolean(
 
-        if (
-            new Date() >
-            session.expiresAt
-        ) {
+            session &&
 
-            session.active = false;
+            session.active
 
-            return false;
-
-        }
-
-        return true;
+        );
 
     }
 
 
 
-    revokeSession(sessionId) {
+
+
+    revokeSession(
+
+        sessionId
+
+    ) {
+
 
         const session =
+
             this.sessions.get(
+
                 sessionId
+
             );
+
+
 
         if (session) {
 
@@ -365,34 +545,37 @@ class KnowledgeAuthenticationEngine {
 
         }
 
+
         return session;
 
     }
 
 
 
-    logout(sessionId) {
-
-        return this.revokeSession(
-            sessionId
-        );
-
-    }
 
 
+    disableIdentity(
 
-    disableIdentity(identityId) {
+        identityId
+
+    ) {
+
 
         const identity =
+
             this.identities.get(
+
                 identityId
+
             );
 
-        if (identity) {
+
+        if(identity){
 
             identity.active = false;
 
         }
+
 
         return identity;
 
@@ -400,79 +583,131 @@ class KnowledgeAuthenticationEngine {
 
 
 
-    getAuthenticationLogs() {
 
-        return this.authenticationLogs;
+
+    execute(
+
+        request = {}
+
+    ) {
+
+
+        return this.authenticate(
+
+            request.identityId,
+
+            request.secret
+
+        );
 
     }
+
+
+
+
+
+    getHistory() {
+
+
+        return this.authenticationHistory;
+
+    }
+
+
 
 
 
     getStatistics() {
 
+
         return {
 
+
             identities:
+
                 this.identities.size,
 
+
             credentials:
+
                 this.credentials.size,
 
+
             sessions:
+
                 this.sessions.size,
 
-            activeSessions:
-
-                [...this.sessions.values()]
-                    .filter(
-                        s => s.active
-                    ).length,
 
             attempts:
-                this.authenticationLogs.length,
+
+                this.authenticationHistory.length,
+
 
             successful:
 
-                this.authenticationLogs.filter(
-                    item =>
-                        item.authenticated
+                this.authenticationHistory.filter(
+
+                    x =>
+
+                    x.decision === "ALLOW"
+
                 ).length,
+
 
             failed:
 
-                this.authenticationLogs.filter(
-                    item =>
-                        !item.authenticated
-                ).length,
+                this.authenticationHistory.filter(
 
-            locked:
+                    x =>
 
-                this.lockedAccounts.size
+                    x.decision === "DENY"
+
+                ).length
+
 
         };
 
     }
+
+
 
 
 
     getStatus() {
 
+
         return {
 
+
+            engineId:
+
+                this.engineId,
+
+
             name:
+
                 this.name,
 
+
             version:
+
                 this.version,
 
+
+            build:
+
+                this.build,
+
+
             status:
+
                 this.status,
 
-            identities:
-                this.identities.size,
 
-            sessions:
-                this.sessions.size
+            statistics:
+
+                this.getStatistics()
+
 
         };
 
@@ -480,51 +715,120 @@ class KnowledgeAuthenticationEngine {
 
 
 
-    recordEvent(event, metadata = {}) {
-
-        if (this.monitoring) {
-
-            this.monitoring.recordEvent(
-                event,
-                metadata
-            );
-
-        }
-
-    }
 
 
+    stop() {
 
-    updateMetric(metric) {
-
-        if (this.monitoring) {
-
-            this.monitoring.updateMetric(
-                metric
-            );
-
-        }
-
-    }
-
-
-
-    shutdown() {
-
-        this.sessions.clear();
 
         this.status =
-            KnowledgeAuthenticationEngine.STATUS.SHUTDOWN;
+            "STOPPED";
+
 
         this.recordEvent(
-            "KNOWLEDGE_AUTHENTICATION_ENGINE_SHUTDOWN"
+
+            "AUTHENTICATION_ENGINE_STOPPED"
+
         );
+
 
         return true;
 
     }
 
+
+
+
+
+    shutdown() {
+
+
+        this.status =
+            "SHUTDOWN";
+
+
+        this.recordEvent(
+
+            "AUTHENTICATION_ENGINE_SHUTDOWN"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    generateId() {
+
+
+        return (
+
+            "AUTH-" +
+
+            Date.now()
+
+        );
+
+    }
+
+
+
+
+
+    recordEvent(
+
+        event,
+
+        metadata = {}
+
+    ) {
+
+
+        if(this.monitoring){
+
+            this.monitoring.recordEvent(
+
+                event,
+
+                metadata
+
+            );
+
+        }
+
+    }
+
+
+
+
+
+    updateMetric(
+
+        metric
+
+    ) {
+
+
+        if(this.monitoring){
+
+            this.monitoring.updateMetric(
+
+                metric
+
+            );
+
+        }
+
+    }
+
+
 }
 
+
+
 module.exports =
+
     KnowledgeAuthenticationEngine;
