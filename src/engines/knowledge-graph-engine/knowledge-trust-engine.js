@@ -4,16 +4,15 @@
  * Smaily Knowledge Operating System
  * ==========================================================
  *
- * Engine      : Knowledge Graph Engine
+ * Engine      : Knowledge Governance Layer
  * File        : knowledge-trust-engine.js
  *
- * Build       : BUILD-000425
+ * Build       : BUILD-000910.4
  * Version     : 1.0.0
  *
  * Mission:
- * Evaluate and manage trust levels of knowledge objects
- * based on provenance, verification, quality signals,
- * and confidence indicators.
+ * Calculate and manage trust scores
+ * for knowledge assets.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -26,12 +25,20 @@ class KnowledgeTrustEngine {
     constructor(options = {}) {
 
 
+        this.engineId =
+            "KNOWLEDGE-TRUST-ENGINE";
+
+
         this.name =
             "Knowledge Trust Engine";
 
 
         this.version =
             "1.0.0";
+
+
+        this.build =
+            "BUILD-000910.4";
 
 
         this.status =
@@ -42,16 +49,30 @@ class KnowledgeTrustEngine {
             options.monitoring || null;
 
 
-        this.trustRecords =
+        this.integrityEngine =
+            options.integrityEngine || null;
+
+
+        this.complianceEngine =
+            options.complianceEngine || null;
+
+
+        this.riskEngine =
+            options.riskEngine || null;
+
+
+        this.auditEngine =
+            options.auditEngine || null;
+
+
+        this.trustProfiles =
             new Map();
 
 
-        this.evaluations =
+        this.assessments =
             [];
 
 
-        this.history =
-            [];
 
     }
 
@@ -59,7 +80,7 @@ class KnowledgeTrustEngine {
 
 
 
-    initialize() {
+    initialize(){
 
 
         this.status =
@@ -68,7 +89,29 @@ class KnowledgeTrustEngine {
 
         this.recordEvent(
 
-            "KNOWLEDGE_TRUST_ENGINE_INITIALIZED"
+            "TRUST_ENGINE_INITIALIZED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    start(){
+
+
+        this.status =
+            "RUNNING";
+
+
+        this.recordEvent(
+
+            "TRUST_ENGINE_STARTED"
 
         );
 
@@ -82,101 +125,62 @@ class KnowledgeTrustEngine {
 
 
     /**
-     * Create trust record
+     * Create trust profile
      */
 
 
-    createTrustRecord(
+    createProfile(
 
-        knowledgeId,
+        objectId,
 
-        data = {}
+        profile = {}
 
-    ) {
-
-
-        if (
-
-            !knowledgeId
-
-        ) {
-
-
-            throw new Error(
-
-                "Knowledge id required."
-
-            );
-
-        }
-
+    ){
 
 
         const record = {
 
 
-            knowledgeId,
+            objectId,
 
 
-            provenanceScore:
+            sourceScore:
 
-                data.provenanceScore || 0,
-
-
-            qualityScore:
-
-                data.qualityScore || 0,
+                profile.sourceScore || 0,
 
 
-            verificationScore:
+            integrityScore:
 
-                data.verificationScore || 0,
-
-
-            confidence:
-
-                data.confidence || 0,
+                profile.integrityScore || 0,
 
 
-            trustScore:
+            complianceScore:
 
-                0,
+                profile.complianceScore || 0,
 
 
-            level:
+            riskScore:
 
-                "UNKNOWN",
+                profile.riskScore || 0,
+
+
+            humanValidation:
+
+                profile.humanValidation || 0,
 
 
             createdAt:
 
                 new Date()
 
+
         };
 
 
 
-        this.trustRecords.set(
+        this.trustProfiles.set(
 
-            knowledgeId,
-
-            record
-
-        );
-
-
-
-        this.calculateTrust(
-
-            knowledgeId
-
-        );
-
-
-
-        this.addHistory(
-
-            "TRUST_RECORD_CREATED",
+            objectId,
 
             record
 
@@ -197,117 +201,57 @@ class KnowledgeTrustEngine {
      */
 
 
-    calculateTrust(
+    calculateScore(
 
-        knowledgeId
+        profile
 
-    ) {
+    ){
 
 
-        const record =
+        const score =
 
-            this.trustRecords.get(
 
-                knowledgeId
+            (
+
+                profile.sourceScore * 0.25
+
+                +
+
+                profile.integrityScore * 0.30
+
+                +
+
+                profile.complianceScore * 0.25
+
+                +
+
+                profile.humanValidation * 0.20
+
+            )
+
+            -
+
+            (
+
+                profile.riskScore * 0.20
 
             );
 
 
 
-        if (
+        return Math.max(
 
-            !record
+            0,
 
-        ) {
+            Math.min(
 
+                Math.round(score),
 
-            return null;
-
-        }
-
-
-
-        record.trustScore =
-
-
-            (
-
-                record.provenanceScore *
-
-                0.35
+                100
 
             )
-
-            +
-
-            (
-
-                record.qualityScore *
-
-                0.30
-
-            )
-
-            +
-
-            (
-
-                record.verificationScore *
-
-                0.25
-
-            )
-
-            +
-
-            (
-
-                record.confidence *
-
-                0.10
-
-            );
-
-
-
-        record.level =
-
-            this.getTrustLevel(
-
-                record.trustScore
-
-            );
-
-
-
-        this.evaluations.push(
-
-            {
-
-                knowledgeId,
-
-
-                score:
-
-                    record.trustScore,
-
-
-                level:
-
-                    record.level,
-
-
-                timestamp:
-
-                    new Date()
-
-            }
 
         );
-
-
-
-        return record;
 
     }
 
@@ -316,63 +260,35 @@ class KnowledgeTrustEngine {
 
 
     /**
-     * Determine trust level
+     * Trust classification
      */
 
 
-    getTrustLevel(
+    classify(
 
         score
 
-    ) {
+    ){
 
 
-        if (
-
-            score >= 90
-
-        ) {
-
+        if(score >= 90)
 
             return "VERY_HIGH";
 
-        }
 
-
-        if (
-
-            score >= 75
-
-        ) {
-
+        if(score >= 75)
 
             return "HIGH";
 
-        }
 
-
-        if (
-
-            score >= 50
-
-        ) {
-
+        if(score >= 50)
 
             return "MEDIUM";
 
-        }
 
-
-        if (
-
-            score >= 25
-
-        ) {
-
+        if(score >= 25)
 
             return "LOW";
-
-        }
 
 
         return "UNTRUSTED";
@@ -384,48 +300,33 @@ class KnowledgeTrustEngine {
 
 
     /**
-     * Update trust signals
+     * Evaluate knowledge trust
      */
 
 
-    updateSignals(
+    assess(
 
-        knowledgeId,
+        objectId
 
-        signals
-
-    ) {
+    ){
 
 
-        const record =
+        const profile =
 
-            this.trustRecords.get(
+            this.trustProfiles.get(
 
-                knowledgeId
+                objectId
 
             );
 
 
 
-        if (
-
-            record
-
-        ) {
+        if(!profile){
 
 
-            Object.assign(
+            throw new Error(
 
-                record,
-
-                signals
-
-            );
-
-
-            this.calculateTrust(
-
-                knowledgeId
+                "Trust profile not found."
 
             );
 
@@ -433,23 +334,90 @@ class KnowledgeTrustEngine {
 
 
 
-        this.addHistory(
+        const score =
 
-            "TRUST_SIGNALS_UPDATED",
+            this.calculateScore(
 
-            {
+                profile
 
-                knowledgeId,
+            );
 
-                signals
 
-            }
+
+        const assessment = {
+
+
+            id:
+
+                this.generateId(),
+
+
+            objectId,
+
+
+            score,
+
+
+            level:
+
+                this.classify(
+
+                    score
+
+                ),
+
+
+            timestamp:
+
+                new Date()
+
+
+        };
+
+
+
+        this.assessments.push(
+
+            assessment
 
         );
 
 
 
-        return record;
+        this.recordEvent(
+
+            "TRUST_ASSESSMENT_COMPLETED",
+
+            assessment
+
+        );
+
+
+
+        if(this.auditEngine){
+
+
+            this.auditEngine.record({
+
+                objectId,
+
+
+                action:
+
+                    "TRUST_ASSESSMENT",
+
+
+                result:
+
+                    assessment.level
+
+            });
+
+        }
+
+
+
+        return assessment;
 
     }
 
@@ -458,20 +426,80 @@ class KnowledgeTrustEngine {
 
 
     /**
-     * Get trust record
+     * Update trust factor
      */
 
 
-    getTrustRecord(
+    updateFactor(
 
-        knowledgeId
+        objectId,
 
-    ) {
+        factor,
+
+        value
+
+    ){
 
 
-        return this.trustRecords.get(
+        const profile =
 
-            knowledgeId
+            this.trustProfiles.get(
+
+                objectId
+
+            );
+
+
+
+        if(!profile){
+
+
+            throw new Error(
+
+                "Trust profile not found."
+
+            );
+
+        }
+
+
+
+        profile[factor] = value;
+
+
+
+        profile.updatedAt =
+
+            new Date();
+
+
+
+        return profile;
+
+    }
+
+
+
+
+
+    getProfile(
+
+        objectId
+
+    ){
+
+
+        return (
+
+            this.trustProfiles.get(
+
+                objectId
+
+            )
+
+            ||
+
+            null
 
         );
 
@@ -481,14 +509,10 @@ class KnowledgeTrustEngine {
 
 
 
-    getTrustRecords() {
+    getAssessments(){
 
 
-        return Array.from(
-
-            this.trustRecords.values()
-
-        );
+        return this.assessments;
 
     }
 
@@ -496,90 +520,40 @@ class KnowledgeTrustEngine {
 
 
 
-    getEvaluations() {
-
-
-        return this.evaluations;
-
-    }
-
-
-
-
-
-    /**
-     * Statistics
-     */
-
-
-    getStatistics() {
-
-
-        const records =
-
-            this.getTrustRecords();
-
+    getStatistics(){
 
 
         return {
 
 
-            knowledgeObjects:
+            profiles:
 
-                records.length,
-
-
-            veryHigh:
-
-                records.filter(
-
-                    item =>
-
-                        item.level === "VERY_HIGH"
-
-                ).length,
+                this.trustProfiles.size,
 
 
-            high:
+            assessments:
 
-                records.filter(
+                this.assessments.length,
+
+
+            trusted:
+
+                this.assessments.filter(
 
                     item =>
 
-                        item.level === "HIGH"
-
-                ).length,
-
-
-            medium:
-
-                records.filter(
-
-                    item =>
-
-                        item.level === "MEDIUM"
-
-                ).length,
-
-
-            low:
-
-                records.filter(
-
-                    item =>
-
-                        item.level === "LOW"
+                    item.score >= 75
 
                 ).length,
 
 
             untrusted:
 
-                records.filter(
+                this.assessments.filter(
 
                     item =>
 
-                        item.level === "UNTRUSTED"
+                    item.score < 25
 
                 ).length
 
@@ -592,10 +566,15 @@ class KnowledgeTrustEngine {
 
 
 
-    getStatus() {
+    getStatus(){
 
 
         return {
+
+
+            engineId:
+
+                this.engineId,
 
 
             name:
@@ -608,20 +587,19 @@ class KnowledgeTrustEngine {
                 this.version,
 
 
+            build:
+
+                this.build,
+
+
             status:
 
                 this.status,
 
 
-            records:
+            statistics:
 
-                this.trustRecords.size,
-
-
-            evaluations:
-
-                this.evaluations.length
-
+                this.getStatistics()
 
         };
 
@@ -631,44 +609,58 @@ class KnowledgeTrustEngine {
 
 
 
-    addHistory(
-
-        event,
-
-        data = {}
-
-    ) {
+    stop(){
 
 
-        const record = {
-
-
-            event,
-
-
-            data,
-
-
-            timestamp:
-
-                new Date()
-
-        };
-
-
-        this.history.push(
-
-            record
-
-        );
-
+        this.status =
+            "STOPPED";
 
 
         this.recordEvent(
 
-            event,
+            "TRUST_ENGINE_STOPPED"
 
-            data
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    shutdown(){
+
+
+        this.status =
+            "SHUTDOWN";
+
+
+        this.recordEvent(
+
+            "TRUST_ENGINE_SHUTDOWN"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    generateId(){
+
+
+        return (
+
+            "TRUST-" +
+
+            Date.now()
 
         );
 
@@ -684,14 +676,10 @@ class KnowledgeTrustEngine {
 
         metadata = {}
 
-    ) {
+    ){
 
 
-        if (
-
-            this.monitoring
-
-        ) {
+        if(this.monitoring){
 
 
             this.monitoring.recordEvent(
@@ -714,14 +702,10 @@ class KnowledgeTrustEngine {
 
         metric
 
-    ) {
+    ){
 
 
-        if (
-
-            this.monitoring
-
-        ) {
+        if(this.monitoring){
 
 
             this.monitoring.updateMetric(
@@ -731,28 +715,6 @@ class KnowledgeTrustEngine {
             );
 
         }
-
-    }
-
-
-
-
-
-    shutdown() {
-
-
-        this.status =
-            "SHUTDOWN";
-
-
-        this.recordEvent(
-
-            "KNOWLEDGE_TRUST_ENGINE_SHUTDOWN"
-
-        );
-
-
-        return true;
 
     }
 
