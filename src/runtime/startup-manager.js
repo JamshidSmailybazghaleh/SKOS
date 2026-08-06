@@ -8,29 +8,52 @@
  * File      : startup-manager.js
  *
  * Build     : BUILD-000449
- * Version   : 1.0.0
+ * Version   : 1.0.1
  *
  * Mission:
  * Complete operational startup sequence of SKOS.
+ *
+ * Architecture:
+ * Bootstrap Runtime
+ *        |
+ * SKOS Kernel
+ *        |
+ * SDKC Runtime Connector
+ *        |
+ * Engine Orchestrator
+ *
  * ==========================================================
  */
 
+
 class StartupManager {
+
 
     constructor(options = {}) {
 
         this.name = "Startup Manager";
-        this.version = "1.0.0";
+
+        this.version = "1.0.1";
+
         this.status = "CREATED";
 
+
         this.bootstrap = null;
+
         this.kernel = null;
+
+        this.sdkc = null;
+
         this.orchestrator = null;
 
+
         this.steps = [];
+
         this.startTime = null;
 
+
         this.options = options;
+
     }
 
 
@@ -51,6 +74,14 @@ class StartupManager {
 
 
 
+    attachSDKC(sdkc) {
+
+        this.sdkc = sdkc;
+
+    }
+
+
+
     attachOrchestrator(orchestrator) {
 
         this.orchestrator = orchestrator;
@@ -61,144 +92,415 @@ class StartupManager {
 
     run() {
 
+
         this.startTime = new Date();
+
 
         this.status = "STARTING";
 
+
+        this.steps = [];
+
+
+
         this.executeStep(
+
             "BOOTSTRAP_RUNTIME",
-            () => this.bootstrap.initialize()
+
+            () => {
+
+                if (!this.bootstrap) {
+
+                    throw new Error(
+                        "Bootstrap runtime is not attached"
+                    );
+
+                }
+
+
+                return this.bootstrap.initialize();
+
+            }
+
         );
 
+
+
         this.executeStep(
+
             "KERNEL_INITIALIZATION",
-            () => this.kernel.initialize()
+
+            () => {
+
+                if (!this.kernel) {
+
+                    throw new Error(
+                        "Kernel is not attached"
+                    );
+
+                }
+
+
+                return this.kernel.initialize();
+
+            }
+
         );
 
+
+
         this.executeStep(
+
             "SDKC_CONNECTION",
-            () => this.kernel.connectSDKC()
+
+            () => {
+
+                if (!this.sdkc) {
+
+                    throw new Error(
+                        "SDKC runtime connector is not attached"
+                    );
+
+                }
+
+
+                return this.sdkc.initialize();
+
+            }
+
         );
 
+
+
         this.executeStep(
+
             "KNOWLEDGE_RUNTIME",
-            () => this.kernel.activateKnowledgeRuntime()
+
+            () => {
+
+
+                if (
+                    typeof this.kernel.activateKnowledgeRuntime
+                    === "function"
+                ) {
+
+                    return this.kernel
+                        .activateKnowledgeRuntime();
+
+                }
+
+
+                return true;
+
+            }
+
         );
 
+
+
         this.executeStep(
+
             "AUTONOMOUS_RUNTIME",
-            () => this.kernel.activateAutonomousRuntime()
+
+            () => {
+
+
+                if (
+                    typeof this.kernel.activateAutonomousRuntime
+                    === "function"
+                ) {
+
+                    return this.kernel
+                        .activateAutonomousRuntime();
+
+                }
+
+
+                return true;
+
+            }
+
         );
 
+
+
         this.executeStep(
+
             "ENGINE_ORCHESTRATION",
-            () => this.orchestrator.startAll()
+
+            () => {
+
+                if (!this.orchestrator) {
+
+                    throw new Error(
+                        "Engine orchestrator is not attached"
+                    );
+
+                }
+
+
+                return this.orchestrator.startAll();
+
+            }
+
         );
+
+
 
         this.status = "READY";
 
+
         return true;
+
     }
+
+
 
 
 
     executeStep(name, callback) {
 
+
         const record = {
 
+
             name,
+
+
             status: "RUNNING",
+
+
             started: new Date()
+
 
         };
 
+
+
         this.steps.push(record);
+
+
 
         try {
 
-            callback();
+
+            const result = callback();
+
 
             record.status = "SUCCESS";
 
+
+            record.result = result;
+
+
+
         } catch (error) {
 
+
             record.status = "FAILED";
+
+
             record.error = error.message;
+
+
+            record.finished = new Date();
+
+
 
             this.status = "FAILED";
 
+
+
             throw error;
+
 
         }
 
+
+
         record.finished = new Date();
 
+
+
         return true;
+
+
     }
+
+
 
 
 
     getSteps() {
 
+
         return this.steps;
 
+
     }
+
+
 
 
 
     getStatus() {
 
+
         return {
+
 
             name: this.name,
 
+
             version: this.version,
+
 
             status: this.status,
 
+
             startedAt: this.startTime,
+
 
             completedSteps:
 
                 this.steps.filter(
-                    step => step.status === "SUCCESS"
+
+                    step =>
+                        step.status === "SUCCESS"
+
                 ).length,
+
+
+            failedSteps:
+
+                this.steps.filter(
+
+                    step =>
+                        step.status === "FAILED"
+
+                ).length,
+
 
             totalSteps:
 
                 this.steps.length
 
+
         };
 
+
     }
+
+
 
 
 
     shutdown() {
 
-        if (this.orchestrator) {
 
-            this.orchestrator.shutdownAll();
+        this.status = "SHUTTING_DOWN";
+
+
+
+        try {
+
+
+
+            if (this.orchestrator) {
+
+
+                if (
+                    typeof this.orchestrator.shutdownAll
+                    === "function"
+                ) {
+
+                    this.orchestrator.shutdownAll();
+
+                }
+
+            }
+
+
+
+
+
+            if (this.sdkc) {
+
+
+                if (
+                    typeof this.sdkc.shutdown
+                    === "function"
+                ) {
+
+                    this.sdkc.shutdown();
+
+                }
+
+            }
+
+
+
+
+
+            if (this.kernel) {
+
+
+                if (
+                    typeof this.kernel.shutdown
+                    === "function"
+                ) {
+
+                    this.kernel.shutdown();
+
+                }
+
+            }
+
+
+
+
+
+            if (this.bootstrap) {
+
+
+                if (
+                    typeof this.bootstrap.shutdown
+                    === "function"
+                ) {
+
+                    this.bootstrap.shutdown();
+
+                }
+
+            }
+
+
+
+            this.status = "SHUTDOWN";
+
+
+
+            return true;
+
+
+
+        } catch (error) {
+
+
+            this.status = "FAILED";
+
+
+            throw error;
+
 
         }
 
-        if (this.kernel) {
 
-            this.kernel.shutdown();
-
-        }
-
-        if (this.bootstrap) {
-
-            this.bootstrap.shutdown();
-
-        }
-
-        this.status = "SHUTDOWN";
-
-        return true;
     }
 
+
 }
+
+
 
 module.exports = StartupManager;
