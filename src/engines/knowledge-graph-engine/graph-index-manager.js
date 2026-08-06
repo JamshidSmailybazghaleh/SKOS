@@ -185,14 +185,30 @@ class GraphIndexManager {
      */
 
 
-    add(object) {
+    add(
+    objectOrIndex,
+    key,
+    legacyObject
+) {
+
+    // Legacy API:
+    // add(index, key, object)
+
+    if (
+        typeof objectOrIndex === "string"
+    ) {
+
+        const indexName =
+            objectOrIndex;
+
+        const object =
+            legacyObject;
 
 
         if (
             !object ||
             !object.id
         ) {
-
 
             throw new Error(
                 "Indexed object requires id."
@@ -201,79 +217,102 @@ class GraphIndexManager {
         }
 
 
-
         this.indexes.id.set(
             object.id,
             object
         );
 
 
-
-        if (object.type) {
-
-
-            this.addToIndex(
-                "type",
-                object.type,
-                object
-            );
-
-
-        }
-
-
-
-        if (
-            Array.isArray(object.tags)
-        ) {
-
-
-            object.tags.forEach(
-                tag => {
-
-
-                    this.addToIndex(
-                        "tag",
-                        tag,
-                        object
-                    );
-
-
-                }
-            );
-
-
-        }
-
-
-
-        if (object.language) {
-
-
-            this.addToIndex(
-                "language",
-                object.language,
-                object
-            );
-
-
-        }
-
-
-
-        this.recordEvent(
-            "GRAPH_INDEX_OBJECT_ADDED",
-            {
-                id:
-                    object.id
-            }
+        this.addToIndex(
+            indexName,
+            key,
+            object
         );
 
 
         return object;
 
+    }
+
+
+
+    // New SKOS API:
+    // add(object)
+
+    const object =
+        objectOrIndex;
+
+
+    if (
+        !object ||
+        !object.id
+    ) {
+
+        throw new Error(
+            "Indexed object requires id."
+        );
 
     }
+
+
+    this.indexes.id.set(
+        object.id,
+        object
+    );
+
+
+    if (object.type) {
+
+        this.addToIndex(
+            "type",
+            object.type,
+            object
+        );
+
+    }
+
+
+    if (
+        Array.isArray(object.tags)
+    ) {
+
+        object.tags.forEach(
+            tag => {
+
+                this.addToIndex(
+                    "tag",
+                    tag,
+                    object
+                );
+
+            }
+        );
+
+    }
+
+
+    if (object.language) {
+
+        this.addToIndex(
+            "language",
+            object.language,
+            object
+        );
+
+    }
+
+
+    this.recordEvent(
+        "GRAPH_INDEX_OBJECT_ADDED",
+        {
+            id: object.id
+        }
+    );
+
+
+    return object;
+
+}
 
 
 
