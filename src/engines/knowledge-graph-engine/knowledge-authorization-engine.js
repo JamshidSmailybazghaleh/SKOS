@@ -7,12 +7,12 @@
  * Engine      : Knowledge Graph Engine
  * File        : knowledge-authorization-engine.js
  *
- * Build       : BUILD-000416
+ * Build       : BUILD-000909
  * Version     : 1.0.0
  *
  * Mission:
- * Decide whether authenticated identities or AI agents
- * are authorized to perform actions on knowledge resources.
+ * Authorize users, systems and AI agents
+ * to access and operate on knowledge resources.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -33,6 +33,10 @@ class KnowledgeAuthorizationEngine {
             "1.0.0";
 
 
+        this.build =
+            "BUILD-000909";
+
+
         this.status =
             "CREATED";
 
@@ -41,12 +45,29 @@ class KnowledgeAuthorizationEngine {
             options.monitoring || null;
 
 
+        this.authentication =
+            options.authentication || null;
+
+
+
         this.rules =
             new Map();
 
 
+
+        this.roles =
+            new Map();
+
+
+
+        this.permissions =
+            new Map();
+
+
+
         this.decisions =
             [];
+
 
 
         this.roleHierarchy =
@@ -74,6 +95,144 @@ class KnowledgeAuthorizationEngine {
 
 
         return true;
+
+    }
+
+
+
+
+
+    start() {
+
+
+        this.status =
+            "RUNNING";
+
+
+        this.recordEvent(
+
+            "KNOWLEDGE_AUTHORIZATION_ENGINE_STARTED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    /**
+     * Add role
+     */
+
+
+    addRole(
+
+        roleId,
+
+        role
+
+    ) {
+
+
+        const record = {
+
+
+            id:
+
+                roleId,
+
+
+            name:
+
+                role.name || roleId,
+
+
+            permissions:
+
+                role.permissions || [],
+
+
+            createdAt:
+
+                new Date()
+
+
+        };
+
+
+
+        this.roles.set(
+
+            roleId,
+
+            record
+
+        );
+
+
+        return record;
+
+    }
+
+
+
+
+
+    /**
+     * Add permission
+     */
+
+
+    addPermission(
+
+        permissionId,
+
+        permission
+
+    ) {
+
+
+        const record = {
+
+
+            id:
+
+                permissionId,
+
+
+            resource:
+
+                permission.resource || "*",
+
+
+            action:
+
+                permission.action || "*",
+
+
+            createdAt:
+
+                new Date()
+
+
+        };
+
+
+
+        this.permissions.set(
+
+            permissionId,
+
+            record
+
+        );
+
+
+        return record;
 
     }
 
@@ -122,12 +281,17 @@ class KnowledgeAuthorizationEngine {
 
             subject:
 
-                rule.subject || null,
+                rule.subject || "*",
+
+
+            subjectType:
+
+                rule.subjectType || "USER",
 
 
             resource:
 
-                rule.resource || null,
+                rule.resource || "*",
 
 
             actions:
@@ -153,6 +317,7 @@ class KnowledgeAuthorizationEngine {
             createdAt:
 
                 new Date()
+
 
         };
 
@@ -191,7 +356,7 @@ class KnowledgeAuthorizationEngine {
 
 
     /**
-     * Add role inheritance
+     * Role inheritance
      */
 
 
@@ -238,7 +403,6 @@ class KnowledgeAuthorizationEngine {
             );
 
 
-
         return true;
 
     }
@@ -248,7 +412,7 @@ class KnowledgeAuthorizationEngine {
 
 
     /**
-     * Check authorization
+     * Authorization decision
      */
 
 
@@ -258,18 +422,23 @@ class KnowledgeAuthorizationEngine {
 
         resource,
 
-        action
+        action,
+
+        context = {}
 
     ) {
 
 
         const matchingRules =
 
+
             Array.from(
 
                 this.rules.values()
 
-            ).filter(
+            )
+
+            .filter(
 
                 rule =>
 
@@ -284,6 +453,7 @@ class KnowledgeAuthorizationEngine {
 
                     ) &&
 
+
                     (
 
                         rule.resource === resource ||
@@ -291,6 +461,7 @@ class KnowledgeAuthorizationEngine {
                         rule.resource === "*"
 
                     ) &&
+
 
                     rule.actions.includes(
 
@@ -302,47 +473,8 @@ class KnowledgeAuthorizationEngine {
 
 
 
-        let allowed = false;
 
-
-
-        if (
-
-            matchingRules.length > 0
-
-        ) {
-
-
-            const rule =
-
-                matchingRules.sort(
-
-                    (
-
-                        a,
-
-                        b
-
-                    ) =>
-
-                        b.priority -
-
-                        a.priority
-
-                )[0];
-
-
-
-            allowed =
-
-                rule.effect === "ALLOW";
-
-
-        }
-
-
-
-        const decision = {
+        let decision = {
 
 
             subject,
@@ -354,7 +486,14 @@ class KnowledgeAuthorizationEngine {
             action,
 
 
-            allowed,
+            allowed:
+
+                false,
+
+
+            reason:
+
+                "NO_MATCHING_RULE",
 
 
             timestamp:
@@ -363,6 +502,58 @@ class KnowledgeAuthorizationEngine {
 
 
         };
+
+
+
+
+
+        if (
+
+            matchingRules.length
+
+        ) {
+
+
+            const rule =
+
+                matchingRules.sort(
+
+                    (a,b) =>
+
+                        b.priority -
+
+                        a.priority
+
+                )[0];
+
+
+
+            decision.allowed =
+
+                rule.effect === "ALLOW";
+
+
+
+            decision.reason =
+
+                rule.effect;
+
+
+            decision.ruleId =
+
+                rule.id;
+
+
+        }
+
+
+
+
+
+        decision.context =
+
+            context;
+
 
 
 
@@ -393,8 +584,68 @@ class KnowledgeAuthorizationEngine {
 
 
     /**
-     * Disable authorization rule
+     * Validate access through authentication engine
      */
+
+
+    authorizeSession(
+
+        sessionId,
+
+        resource,
+
+        action
+
+    ) {
+
+
+        if (
+
+            this.authentication &&
+
+            !this.authentication.validateSession(
+
+                sessionId
+
+            )
+
+        ) {
+
+
+            return {
+
+
+                allowed:
+
+                    false,
+
+
+                reason:
+
+                    "INVALID_SESSION"
+
+
+            };
+
+        }
+
+
+
+        return this.authorize(
+
+            sessionId,
+
+            resource,
+
+            action
+
+        );
+
+
+    }
+
+
+
 
 
     disableRule(
@@ -426,18 +677,12 @@ class KnowledgeAuthorizationEngine {
         }
 
 
-
         return rule;
 
     }
 
 
 
-
-
-    /**
-     * Enable authorization rule
-     */
 
 
     enableRule(
@@ -469,18 +714,12 @@ class KnowledgeAuthorizationEngine {
         }
 
 
-
         return rule;
 
     }
 
 
 
-
-
-    /**
-     * Authorization history
-     */
 
 
     getDecisions() {
@@ -509,11 +748,6 @@ class KnowledgeAuthorizationEngine {
 
 
 
-    /**
-     * Statistics
-     */
-
-
     getStatistics() {
 
 
@@ -525,6 +759,16 @@ class KnowledgeAuthorizationEngine {
                 this.rules.size,
 
 
+            roles:
+
+                this.roles.size,
+
+
+            permissions:
+
+                this.permissions.size,
+
+
             decisions:
 
                 this.decisions.length,
@@ -534,9 +778,7 @@ class KnowledgeAuthorizationEngine {
 
                 this.decisions.filter(
 
-                    item =>
-
-                        item.allowed
+                    d => d.allowed
 
                 ).length,
 
@@ -545,19 +787,13 @@ class KnowledgeAuthorizationEngine {
 
                 this.decisions.filter(
 
-                    item =>
+                    d => !d.allowed
 
-                        !item.allowed
-
-                ).length,
-
-
-            roles:
-
-                this.roleHierarchy.size
+                ).length
 
 
         };
+
 
     }
 
@@ -581,22 +817,23 @@ class KnowledgeAuthorizationEngine {
                 this.version,
 
 
+            build:
+
+                this.build,
+
+
             status:
 
                 this.status,
 
 
-            rules:
+            statistics:
 
-                this.rules.size,
-
-
-            decisions:
-
-                this.decisions.length
+                this.getStatistics()
 
 
         };
+
 
     }
 
@@ -625,34 +862,6 @@ class KnowledgeAuthorizationEngine {
                 event,
 
                 metadata
-
-            );
-
-        }
-
-    }
-
-
-
-
-
-    updateMetric(
-
-        metric
-
-    ) {
-
-
-        if (
-
-            this.monitoring
-
-        ) {
-
-
-            this.monitoring.updateMetric(
-
-                metric
 
             );
 
