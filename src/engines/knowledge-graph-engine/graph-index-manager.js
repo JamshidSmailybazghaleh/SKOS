@@ -7,14 +7,22 @@
  * Engine     : Knowledge Graph Engine
  * Module     : Graph Index Manager
  *
- * Build      : BUILD-000363
- * Version    : 1.0.0
+ * File       : graph-index-manager.js
  *
- * Status     : Monitoring Integrated
+ * Build      : BUILD-000425
+ * Version    : 2.0.0
+ *
+ * Status     : Core Stabilization Phase
  *
  * Mission:
  * Manage high performance indexes
  * for Knowledge Graph entities.
+ *
+ * Responsibilities:
+ * - Create Indexes
+ * - Maintain Index Entries
+ * - Search Knowledge Objects
+ * - Provide Stable Index API
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -32,7 +40,7 @@ class GraphIndexManager {
 
 
         this.version =
-            "1.0.0";
+            "2.0.0";
 
 
         this.status =
@@ -43,33 +51,33 @@ class GraphIndexManager {
             options.monitoring || null;
 
 
-
-        this.indexes = {
-
-
-            id:
-                new Map(),
+        this.indexes =
+            new Map();
 
 
-            type:
-                new Map(),
+        /*
+         * Default indexes
+         */
 
+        this.createIndex("id");
 
-            tag:
-                new Map(),
+        this.createIndex("type");
 
+        this.createIndex("tag");
 
-            language:
-                new Map()
-
-
-        };
+        this.createIndex("language");
 
 
     }
 
 
 
+
+    /**
+     * ======================================================
+     * Initialize
+     * ======================================================
+     */
 
 
     initialize() {
@@ -96,81 +104,32 @@ class GraphIndexManager {
 
 
     /**
-     * Add object to indexes
+     * ======================================================
+     * Index Management
+     * ======================================================
      */
 
 
-    add(object) {
+    createIndex(name) {
 
 
-        if (
-            !object ||
-            !object.id
-        ) {
+        if (!name) {
 
             throw new Error(
-
-                "Indexed object requires id."
-
+                "Index name required."
             );
 
         }
 
 
-
-        this.indexes.id.set(
-
-            object.id,
-
-            object
-
-        );
+        if (!this.indexes.has(name)) {
 
 
+            this.indexes.set(
 
+                name,
 
-
-        if (object.type) {
-
-
-            this.addToIndex(
-
-                "type",
-
-                object.type,
-
-                object
-
-            );
-
-        }
-
-
-
-
-
-        if (
-            Array.isArray(object.tags)
-        ) {
-
-
-            object.tags.forEach(
-
-                tag => {
-
-
-                    this.addToIndex(
-
-                        "tag",
-
-                        tag,
-
-                        object
-
-                    );
-
-
-                }
+                new Map()
 
             );
 
@@ -178,54 +137,31 @@ class GraphIndexManager {
         }
 
 
+        return true;
 
 
-
-        if (object.language) {
-
-
-            this.addToIndex(
-
-                "language",
-
-                object.language,
-
-                object
-
-            );
-
-
-        }
+    }
 
 
 
 
 
-        this.recordEvent(
+    hasIndex(name) {
 
-            "GRAPH_INDEX_OBJECT_ADDED",
 
-            {
+        return this.indexes.has(name);
 
-                id:
 
-                    object.id
-
-            }
-
-        );
+    }
 
 
 
-        this.updateMetric(
-
-            "indexedObjects"
-
-        );
 
 
+    removeIndex(name) {
 
-        return object;
+
+        return this.indexes.delete(name);
 
 
     }
@@ -235,11 +171,177 @@ class GraphIndexManager {
 
 
     /**
-     * Internal index handler
+     * ======================================================
+     * Add Object
+     *
+     * Supports:
+     *
+     * add(object)
+     *
+     * and
+     *
+     * add(index,key,object)
+     *
+     * ======================================================
      */
 
 
-    addToIndex(
+    add(...args) {
+
+
+        /*
+         * New API
+         */
+
+        if (args.length === 1) {
+
+
+            const object =
+                args[0];
+
+
+            if (
+                !object ||
+                !object.id
+            ) {
+
+                throw new Error(
+                    "Indexed object requires id."
+                );
+
+            }
+
+
+            this.indexValue(
+
+                "id",
+
+                object.id,
+
+                object
+
+            );
+
+
+            if (object.type) {
+
+                this.indexValue(
+                    "type",
+                    object.type,
+                    object
+                );
+
+            }
+
+
+            if (
+                Array.isArray(object.tags)
+            ) {
+
+
+                object.tags.forEach(
+
+                    tag => {
+
+                        this.indexValue(
+                            "tag",
+                            tag,
+                            object
+                        );
+
+                    }
+
+                );
+
+            }
+
+
+            if (object.language) {
+
+                this.indexValue(
+                    "language",
+                    object.language,
+                    object
+                );
+
+            }
+
+
+            this.recordEvent(
+
+                "GRAPH_INDEX_OBJECT_ADDED",
+
+                {
+                    id: object.id
+                }
+
+            );
+
+
+            return object;
+
+
+        }
+
+
+
+
+
+        /*
+         * Legacy Test API
+         */
+
+        if (args.length === 3) {
+
+
+            const [
+
+                index,
+
+                key,
+
+                object
+
+            ] = args;
+
+
+            this.indexValue(
+
+                index,
+
+                key,
+
+                object
+
+            );
+
+
+            return object;
+
+
+        }
+
+
+        throw new Error(
+            "Invalid add arguments."
+        );
+
+
+    }
+
+
+
+
+
+
+    /**
+     * ======================================================
+     * Internal Index Writer
+     * ======================================================
+     */
+
+
+    indexValue(
 
         index,
 
@@ -250,12 +352,19 @@ class GraphIndexManager {
     ) {
 
 
-        if (
-            !this.indexes[index].has(key)
-        ) {
+        this.createIndex(index);
 
 
-            this.indexes[index].set(
+        const map =
+
+            this.indexes.get(index);
+
+
+
+        if (!map.has(key)) {
+
+
+            map.set(
 
                 key,
 
@@ -268,10 +377,8 @@ class GraphIndexManager {
 
 
 
-        this.indexes[index]
-
+        map
             .get(key)
-
             .push(object);
 
 
@@ -283,16 +390,71 @@ class GraphIndexManager {
 
 
     /**
-     * Search by id
+     * ======================================================
+     * Search
+     * ======================================================
+     */
+
+
+    search(
+
+        index,
+
+        key
+
+    ) {
+
+
+        if (
+            !this.indexes.has(index)
+        ) {
+
+            return [];
+
+        }
+
+
+
+        return (
+
+            this.indexes
+                .get(index)
+                .get(key)
+
+            ||
+
+            []
+
+        );
+
+
+    }
+
+
+
+
+
+    /**
+     * ======================================================
+     * Find APIs
+     * ======================================================
      */
 
 
     findById(id) {
 
 
+        const result =
+
+            this.search(
+                "id",
+                id
+            );
+
+
         return (
 
-            this.indexes.id.get(id)
+            result[0]
 
             ||
 
@@ -307,21 +469,14 @@ class GraphIndexManager {
 
 
 
-    /**
-     * Search by type
-     */
-
-
     findByType(type) {
 
 
-        return (
+        return this.search(
 
-            this.indexes.type.get(type)
+            "type",
 
-            ||
-
-            []
+            type
 
         );
 
@@ -330,23 +485,16 @@ class GraphIndexManager {
 
 
 
-
-
-    /**
-     * Search by tag
-     */
 
 
     findByTag(tag) {
 
 
-        return (
+        return this.search(
 
-            this.indexes.tag.get(tag)
+            "tag",
 
-            ||
-
-            []
+            tag
 
         );
 
@@ -355,23 +503,16 @@ class GraphIndexManager {
 
 
 
-
-
-    /**
-     * Search by language
-     */
 
 
     findByLanguage(language) {
 
 
-        return (
+        return this.search(
 
-            this.indexes.language.get(language)
+            "language",
 
-            ||
-
-            []
+            language
 
         );
 
@@ -383,7 +524,9 @@ class GraphIndexManager {
 
 
     /**
-     * Remove object from index
+     * ======================================================
+     * Remove
+     * ======================================================
      */
 
 
@@ -404,7 +547,12 @@ class GraphIndexManager {
 
 
 
-        this.indexes.id.delete(id);
+        const idIndex =
+
+            this.indexes.get("id");
+
+
+        idIndex.delete(id);
 
 
 
@@ -413,9 +561,7 @@ class GraphIndexManager {
             "GRAPH_INDEX_OBJECT_REMOVED",
 
             {
-
                 id
-
             }
 
         );
@@ -432,8 +578,27 @@ class GraphIndexManager {
 
 
     /**
+     * ======================================================
      * Statistics
+     * ======================================================
      */
+
+
+    count() {
+
+
+        const index =
+
+            this.indexes.get("id");
+
+
+        return index.size;
+
+
+    }
+
+
+
 
 
     getStatus() {
@@ -441,26 +606,20 @@ class GraphIndexManager {
 
         return {
 
-
             name:
-
                 this.name,
 
-
             version:
-
                 this.version,
 
-
             status:
-
                 this.status,
 
+            indexes:
+                this.indexes.size,
 
             indexedObjects:
-
-                this.indexes.id.size
-
+                this.count()
 
         };
 
@@ -469,6 +628,13 @@ class GraphIndexManager {
 
 
 
+
+
+    /**
+     * ======================================================
+     * Monitoring
+     * ======================================================
+     */
 
 
     recordEvent(
@@ -481,7 +647,11 @@ class GraphIndexManager {
 
 
         if (
-            this.monitoring
+
+            this.monitoring &&
+
+            typeof this.monitoring.recordEvent === "function"
+
         ) {
 
 
@@ -492,6 +662,7 @@ class GraphIndexManager {
                 metadata
 
             );
+
 
         }
 
@@ -510,7 +681,11 @@ class GraphIndexManager {
 
 
         if (
-            this.monitoring
+
+            this.monitoring &&
+
+            typeof this.monitoring.updateMetric === "function"
+
         ) {
 
 
@@ -519,6 +694,7 @@ class GraphIndexManager {
                 name
 
             );
+
 
         }
 
@@ -529,12 +705,18 @@ class GraphIndexManager {
 
 
 
+    /**
+     * ======================================================
+     * Shutdown
+     * ======================================================
+     */
+
+
     shutdown() {
 
 
         this.status =
             "SHUTDOWN";
-
 
 
         this.recordEvent(
@@ -555,5 +737,4 @@ class GraphIndexManager {
 
 
 module.exports =
-
     GraphIndexManager;
