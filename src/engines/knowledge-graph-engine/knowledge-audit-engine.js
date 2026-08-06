@@ -1,18 +1,19 @@
+
 /**
  * ==========================================================
  * SKOS
  * Smaily Knowledge Operating System
  * ==========================================================
  *
- * Engine      : Knowledge Graph Engine
+ * Engine      : Knowledge Graph Security Stack
  * File        : knowledge-audit-engine.js
  *
- * Build       : BUILD-000408
+ * Build       : BUILD-000909.5
  * Version     : 1.0.0
  *
  * Mission:
- * Track, record and analyze all knowledge
- * governance activities and changes.
+ * Record, trace and analyze all knowledge
+ * governance and security activities.
  *
  * Copyright © Smaily Knowledge Foundation
  * ==========================================================
@@ -25,12 +26,20 @@ class KnowledgeAuditEngine {
     constructor(options = {}) {
 
 
+        this.engineId =
+            "KNOWLEDGE-AUDIT-ENGINE";
+
+
         this.name =
             "Knowledge Audit Engine";
 
 
         this.version =
             "1.0.0";
+
+
+        this.build =
+            "BUILD-000909.5";
 
 
         this.status =
@@ -41,8 +50,21 @@ class KnowledgeAuditEngine {
             options.monitoring || null;
 
 
+        this.securityEngine =
+            options.securityEngine || null;
+
+
         this.auditLogs =
             [];
+
+
+        this.events =
+            [];
+
+
+        this.createdAt =
+            new Date();
+
 
     }
 
@@ -50,7 +72,7 @@ class KnowledgeAuditEngine {
 
 
 
-    initialize() {
+    initialize(){
 
 
         this.status =
@@ -59,7 +81,29 @@ class KnowledgeAuditEngine {
 
         this.recordEvent(
 
-            "KNOWLEDGE_AUDIT_ENGINE_INITIALIZED"
+            "AUDIT_ENGINE_INITIALIZED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    start(){
+
+
+        this.status =
+            "RUNNING";
+
+
+        this.recordEvent(
+
+            "AUDIT_ENGINE_STARTED"
 
         );
 
@@ -73,22 +117,18 @@ class KnowledgeAuditEngine {
 
 
     /**
-     * Record audit event
+     * Create audit record
      */
 
 
     record(
 
-        event
+        event = {}
 
-    ) {
+    ){
 
 
-        if (
-
-            !event
-
-        ) {
+        if(!event){
 
 
             throw new Error(
@@ -101,7 +141,7 @@ class KnowledgeAuditEngine {
 
 
 
-        const log = {
+        const record = {
 
 
             id:
@@ -119,6 +159,11 @@ class KnowledgeAuditEngine {
                 event.actor || "SYSTEM",
 
 
+            actorType:
+
+                event.actorType || "SYSTEM",
+
+
             action:
 
                 event.action || "UNKNOWN",
@@ -134,7 +179,7 @@ class KnowledgeAuditEngine {
                 event.policy || null,
 
 
-            result:
+            securityDecision:
 
                 event.result || null,
 
@@ -148,13 +193,14 @@ class KnowledgeAuditEngine {
 
                 new Date()
 
+
         };
 
 
 
         this.auditLogs.push(
 
-            log
+            record
 
         );
 
@@ -166,9 +212,9 @@ class KnowledgeAuditEngine {
 
             {
 
-                id:
+                auditId:
 
-                    log.id
+                    record.id
 
             }
 
@@ -184,7 +230,7 @@ class KnowledgeAuditEngine {
 
 
 
-        return log;
+        return record;
 
     }
 
@@ -193,21 +239,73 @@ class KnowledgeAuditEngine {
 
 
     /**
-     * Generate audit identifier
+     * Register security event
      */
 
 
-    generateId() {
+    registerSecurityEvent(
+
+        event
+
+    ){
 
 
-        return (
+        const record = {
 
-            "AUDIT-" +
 
-            Date.now()
+            id:
+
+                this.generateEventId(),
+
+
+            type:
+
+                event.type || "SECURITY_EVENT",
+
+
+            severity:
+
+                event.severity || "INFO",
+
+
+            description:
+
+                event.description || "",
+
+
+            source:
+
+                event.source || "SECURITY_ENGINE",
+
+
+            timestamp:
+
+                new Date()
+
+
+        };
+
+
+
+        this.events.push(
+
+            record
 
         );
 
+
+
+        this.recordEvent(
+
+            "SECURITY_EVENT_REGISTERED",
+
+            record
+
+        );
+
+
+        return record;
+
     }
 
 
@@ -215,22 +313,22 @@ class KnowledgeAuditEngine {
 
 
     /**
-     * Get audit by object
+     * Search by knowledge object
      */
 
 
-    getByObject(
+    findByObject(
 
         objectId
 
-    ) {
+    ){
 
 
         return this.auditLogs.filter(
 
-            log =>
+            item =>
 
-                log.objectId === objectId
+                item.objectId === objectId
 
         );
 
@@ -241,22 +339,22 @@ class KnowledgeAuditEngine {
 
 
     /**
-     * Get audit by actor
+     * Search by actor
      */
 
 
-    getByActor(
+    findByActor(
 
         actor
 
-    ) {
+    ){
 
 
         return this.auditLogs.filter(
 
-            log =>
+            item =>
 
-                log.actor === actor
+                item.actor === actor
 
         );
 
@@ -267,22 +365,22 @@ class KnowledgeAuditEngine {
 
 
     /**
-     * Get audit by action
+     * Search by action
      */
 
 
-    getByAction(
+    findByAction(
 
         action
 
-    ) {
+    ){
 
 
         return this.auditLogs.filter(
 
-            log =>
+            item =>
 
-                log.action === action
+                item.action === action
 
         );
 
@@ -293,19 +391,18 @@ class KnowledgeAuditEngine {
 
 
     /**
-     * Latest audit record
+     * Latest record
      */
 
 
-    getLatest() {
+    getLatest(){
 
 
-        if (
+        if(
 
             this.auditLogs.length === 0
 
-        ) {
-
+        ){
 
             return null;
 
@@ -326,11 +423,11 @@ class KnowledgeAuditEngine {
 
 
     /**
-     * Full audit history
+     * Complete history
      */
 
 
-    getHistory() {
+    getHistory(){
 
 
         return this.auditLogs;
@@ -341,20 +438,10 @@ class KnowledgeAuditEngine {
 
 
 
-    /**
-     * Remove audit records
-     */
+    getSecurityEvents(){
 
 
-    clearHistory() {
-
-
-        this.auditLogs =
-
-            [];
-
-
-        return true;
+        return this.events;
 
     }
 
@@ -363,19 +450,24 @@ class KnowledgeAuditEngine {
 
 
     /**
-     * Audit statistics
+     * Statistics
      */
 
 
-    getStatistics() {
+    getStatistics(){
 
 
         return {
 
 
-            total:
+            records:
 
                 this.auditLogs.length,
+
+
+            events:
+
+                this.events.length,
 
 
             actors:
@@ -384,7 +476,7 @@ class KnowledgeAuditEngine {
 
                     this.auditLogs.map(
 
-                        log => log.actor
+                        item => item.actor
 
                     )
 
@@ -397,7 +489,7 @@ class KnowledgeAuditEngine {
 
                     this.auditLogs.map(
 
-                        log => log.action
+                        item => item.action
 
                     )
 
@@ -412,10 +504,15 @@ class KnowledgeAuditEngine {
 
 
 
-    getStatus() {
+    getStatus(){
 
 
         return {
+
+
+            engineId:
+
+                this.engineId,
 
 
             name:
@@ -428,17 +525,116 @@ class KnowledgeAuditEngine {
                 this.version,
 
 
+            build:
+
+                this.build,
+
+
             status:
 
                 this.status,
 
 
-            records:
+            statistics:
 
-                this.auditLogs.length
+                this.getStatistics()
 
 
         };
+
+    }
+
+
+
+
+
+    clear(){
+
+
+        this.auditLogs = [];
+
+        this.events = [];
+
+
+        return true;
+
+    }
+
+
+
+
+
+    stop(){
+
+
+        this.status =
+            "STOPPED";
+
+
+        this.recordEvent(
+
+            "AUDIT_ENGINE_STOPPED"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    shutdown(){
+
+
+        this.status =
+            "SHUTDOWN";
+
+
+        this.recordEvent(
+
+            "AUDIT_ENGINE_SHUTDOWN"
+
+        );
+
+
+        return true;
+
+    }
+
+
+
+
+
+    generateId(){
+
+
+        return (
+
+            "AUDIT-" +
+
+            Date.now()
+
+        );
+
+    }
+
+
+
+
+
+    generateEventId(){
+
+
+        return (
+
+            "EVENT-" +
+
+            Date.now()
+
+        );
 
     }
 
@@ -452,14 +648,10 @@ class KnowledgeAuditEngine {
 
         metadata = {}
 
-    ) {
+    ){
 
 
-        if (
-
-            this.monitoring
-
-        ) {
+        if(this.monitoring){
 
 
             this.monitoring.recordEvent(
@@ -482,14 +674,10 @@ class KnowledgeAuditEngine {
 
         metric
 
-    ) {
+    ){
 
 
-        if (
-
-            this.monitoring
-
-        ) {
+        if(this.monitoring){
 
 
             this.monitoring.updateMetric(
@@ -499,28 +687,6 @@ class KnowledgeAuditEngine {
             );
 
         }
-
-    }
-
-
-
-
-
-    shutdown() {
-
-
-        this.status =
-            "SHUTDOWN";
-
-
-        this.recordEvent(
-
-            "KNOWLEDGE_AUDIT_ENGINE_SHUTDOWN"
-
-        );
-
-
-        return true;
 
     }
 
