@@ -49,20 +49,6 @@ class SKOSRuntime {
 
             "1.0.0";
 
-/*
-==========================================================
-Core Managers
-(Modular Bridge - BUILD-000909.3)
-==========================================================
-*/
-
-this.events = null;
-
-this.lifecycle = null;
-
-this.registry = null;
-
-this.diagnostics = null;
 
         this.build =
 
