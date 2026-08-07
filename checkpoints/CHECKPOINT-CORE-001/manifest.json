@@ -1,0 +1,8 @@
+{
+  "files": [
+    "src/core/module-contract.js",
+    "src/core/module-registry.js",
+    "src/core/event-bus.js",
+    "src/core/lifecycle-manager.js"
+  ]
+}
