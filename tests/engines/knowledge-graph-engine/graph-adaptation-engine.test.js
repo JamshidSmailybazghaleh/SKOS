@@ -31,22 +31,31 @@ describe(
 
 
         let engine;
+let graph;
 
+beforeEach(() => {
+    engine = new GraphAdaptationEngine();
 
-
-        beforeEach(
-
-            () => {
-
-
-                engine =
-
-                    new GraphAdaptationEngine();
-
-
+    graph = {
+        nodes: [
+            { id: "A" },
+            { id: "B" },
+            { id: "C" }
+        ],
+        edges: [
+            {
+                from: "A",
+                to: "B",
+                type: "RELATED"
+            },
+            {
+                from: "A",
+                to: "B",
+                type: "RELATED"
             }
-
-        );
+        ]
+    };
+});
 
 
 
