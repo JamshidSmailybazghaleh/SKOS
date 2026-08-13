@@ -80,24 +80,36 @@ class SKOSAlphaRuntime {
 
 
     start() {
+start() {
 
-        if (
-            this.status !== "INITIALIZED"
-        ) {
+    if (
+        this.status !== "INITIALIZED"
+    ) {
 
-            this.initialize();
+        this.initialize();
 
-        }
+    }
 
-        this.startedAt =
-            new Date();
+    this.startedAt =
+        new Date();
+
+    try {
 
         this.startup.run();
 
         this.status = "RUNNING";
 
         return true;
+
+    } catch (error) {
+
+        this.status = "FAILED";
+
+        throw error;
+
     }
+
+}
 
 
 
