@@ -4,79 +4,102 @@
  * Browser Bootstrap
  * ------------------------------------------------------------
  * File      : bootstrap.js
- * Operation : OP-020
  * Build     : BUILD-000423
  * Version   : 2.0.0
- * Role      : BROWSER ENTRY POINT
+ * Role      : SINGLE BROWSER ENTRY POINT
  * ============================================================
  */
 
 const Bootstrap = {
 
-    started: false,
+    initialized: false,
+
 
     async initialize() {
 
-        if (this.started) {
-            return SKOSKernelRuntime.getStatus();
+        if (this.initialized) {
+
+            return true;
         }
-
-        this.started = true;
-
-        console.log(
-            "=========================================="
-        );
-
-        console.log(
-            "SKOS MISSION CONTROL"
-        );
-
-        console.log(
-            "PRIMARY RUNTIME BOOT"
-        );
-
-        console.log(
-            "=========================================="
-        );
 
         try {
 
             if (
                 typeof CONFIG === "undefined"
             ) {
+
                 throw new Error(
                     "CONFIG not loaded."
                 );
             }
 
+
             if (
-                typeof SKOSKernelRuntime === "undefined"
+                typeof SKOSKernelRuntime ===
+                "undefined"
             ) {
+
                 throw new Error(
-                    "Primary SKOS Kernel not loaded."
+                    "Primary SKOSKernelRuntime not loaded."
                 );
             }
 
-            const status =
-                await SKOSKernelRuntime.boot();
 
-            console.log(
-                "SKOS READY",
-                status
-            );
+            if (
+                typeof Logger !== "undefined" &&
+                Logger.info
+            ) {
 
-            return status;
+                Logger.info(
+                    "SKOS Bootstrap Starting..."
+                );
+            }
 
-        } catch (error) {
 
-            this.started = false;
+            /*
+             * SINGLE AUTHORITATIVE BOOT
+             */
+
+            await
+                SKOSKernelRuntime.boot();
+
+
+            this.initialized = true;
+
+
+            if (
+                typeof Logger !== "undefined" &&
+                Logger.info
+            ) {
+
+                Logger.info(
+                    "SKOS Bootstrap Completed."
+                );
+            }
+
+
+            return true;
+
+        }
+        catch (error) {
+
+            if (
+                typeof Logger !== "undefined" &&
+                Logger.error
+            ) {
+
+                Logger.error(
+                    "SKOS Bootstrap Failed:",
+                    error
+                );
+            }
 
             console.error(
-                "SKOS BOOT FAILED:",
+                "SKOS Bootstrap Failed:",
                 error
             );
 
-            throw error;
+            return false;
         }
     }
 };
@@ -86,19 +109,16 @@ window.addEventListener(
     "DOMContentLoaded",
     async () => {
 
-        try {
+        await Bootstrap.initialize();
 
-            await Bootstrap.initialize();
-
-        } catch (error) {
-
-            console.error(
-                "Fatal Bootstrap Error:",
-                error
-            );
-        }
     }
 );
 
+
+if (typeof window !== "undefined") {
+
+    window.Bootstrap =
+        Bootstrap;
+}
 
 Object.freeze(Bootstrap);
