@@ -1,73 +1,83 @@
 /**
  * ============================================================
  * SKOS Mission Control
- * Legacy Kernel Compatibility Facade
+ * Kernel Compatibility Facade
  * ------------------------------------------------------------
  * File      : kernel.js
  * Build     : BUILD-000423
  * Version   : 2.0.0
- * Authority : SKOSKernelRuntime
+ * Role      : COMPATIBILITY FACADE
  *
- * IMPORTANT:
- * This file MUST NOT create or own a runtime.
+ * This file is NOT the primary kernel.
+ * All operations delegate to SKOSKernelRuntime.
  * ============================================================
  */
 
 const SKOS = {
 
     get version() {
-        return SKOSKernelRuntime.version;
+
+        return (
+            typeof SKOSKernelRuntime !== "undefined"
+                ? SKOSKernelRuntime.version
+                : "UNKNOWN"
+        );
     },
 
-    get initialized() {
-        return SKOSKernelRuntime.initialized;
-    },
 
-    get modules() {
-        return Array.from(
-            SKOSKernelRuntime.modules.keys()
+    get build() {
+
+        return (
+            typeof SKOSKernelRuntime !== "undefined"
+                ? SKOSKernelRuntime.build
+                : "UNKNOWN"
         );
     },
 
 
     async initialize() {
-        return await SKOSKernelRuntime.boot();
+
+        return await
+            SKOSKernelRuntime.boot();
     },
 
 
     async start() {
-        return await SKOSKernelRuntime.boot();
+
+        return await
+            SKOSKernelRuntime.boot();
     },
 
 
     async loadRegistry() {
-        return await SKOSKernelRuntime.loadRegistry();
+
+        return await
+            SKOSKernelRuntime.loadRegistry();
     },
 
 
     async loadModules() {
-        return await SKOSKernelRuntime.initializeModules();
+
+        return await
+            SKOSKernelRuntime.loadModules();
     },
 
 
     async loadStatus() {
 
-        return SKOSKernelRuntime.getStatus();
+        return await
+            SKOSKernelRuntime.loadStatus();
     },
 
 
     renderDashboard() {
 
-        console.log(
-            "Rendering Dashboard..."
-        );
-
         if (
             typeof DashboardService !== "undefined" &&
-            typeof DashboardService.getDashboard === "function"
+            typeof DashboardService.render === "function"
         ) {
 
-            return DashboardService.getDashboard();
+            return DashboardService.render();
         }
 
         return true;
@@ -76,15 +86,9 @@ const SKOS = {
 
     getLoadedModules() {
 
-        return Array.from(
-            SKOSKernelRuntime.modules.keys()
-        );
-    },
-
-
-    isInitialized() {
-
-        return SKOSKernelRuntime.initialized;
+        return [
+            ...SKOSKernelRuntime.modules
+        ];
     },
 
 
@@ -94,13 +98,29 @@ const SKOS = {
     },
 
 
-    shutdown() {
+    isInitialized() {
 
-        return SKOSKernelRuntime.shutdown();
+        return SKOSKernelRuntime.initialized;
+    },
+
+
+    isRunning() {
+
+        return SKOSKernelRuntime.running;
+    },
+
+
+    async shutdown() {
+
+        return await
+            SKOSKernelRuntime.shutdown();
     }
 };
 
 
-window.SKOS = SKOS;
+if (typeof window !== "undefined") {
+
+    window.SKOS = SKOS;
+}
 
 Object.freeze(SKOS);
