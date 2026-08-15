@@ -262,7 +262,10 @@ describe(
 
         test(
             "Should generate executive summary",
-            () => {
+              () => {
+      ...
+  }
+);
 
                 panel.registerSource(
                     "A",
