@@ -1,3 +1,20 @@
+/**
+ * ============================================================
+ * SKOS - System Bootstrap Adapter
+ * ------------------------------------------------------------
+ * File      : system-bootstrap.js
+ * Operation : OP-021
+ * Build     : BUILD-000423
+ * Version   : 2.0.0
+ * Status    : ACTIVE
+ * Role      : ORCHESTRATION ADAPTER
+ *
+ * IMPORTANT:
+ *   This component NEVER boots an independent kernel.
+ *   It delegates all runtime authority to SKOSKernelRuntime.
+ * ============================================================
+ */
+
 class SystemBootstrap {
 
     constructor(config = {}) {
@@ -22,6 +39,8 @@ class SystemBootstrap {
 
         this.initialized = true;
 
+        this.bootState = "INITIALIZED";
+
         return true;
     }
 
@@ -32,10 +51,20 @@ class SystemBootstrap {
 
         this.bootState = "DELEGATED";
 
+        if (
+            typeof SKOSKernelRuntime === "undefined"
+        ) {
+
+            throw new Error(
+                "SKOSKernelRuntime is not available."
+            );
+        }
+
         const result =
             await SKOSKernelRuntime.boot();
 
         this.running = true;
+
         this.bootState = "READY";
 
         return result;
@@ -45,14 +74,24 @@ class SystemBootstrap {
     healthCheck() {
 
         return {
-            name: this.name,
-            version: this.version,
-            build: this.build,
 
-            role: "ORCHESTRATION_ADAPTER",
+            name:
+                this.name,
+
+            version:
+                this.version,
+
+            build:
+                this.build,
+
+            role:
+                "ORCHESTRATION_ADAPTER",
 
             kernel:
-                SKOSKernelRuntime.getStatus(),
+                typeof SKOSKernelRuntime !==
+                "undefined"
+                    ? SKOSKernelRuntime.getStatus()
+                    : null,
 
             initialized:
                 this.initialized,
@@ -68,9 +107,16 @@ class SystemBootstrap {
 
     async shutdown() {
 
-        await SKOSKernelRuntime.shutdown();
+        if (
+            typeof SKOSKernelRuntime !==
+            "undefined"
+        ) {
+
+            await SKOSKernelRuntime.shutdown();
+        }
 
         this.running = false;
+
         this.bootState = "STOPPED";
 
         return true;
@@ -79,10 +125,14 @@ class SystemBootstrap {
 
 
 if (typeof module !== "undefined") {
-    module.exports = SystemBootstrap;
+
+    module.exports =
+        SystemBootstrap;
 }
 
 
 if (typeof window !== "undefined") {
-    window.SystemBootstrap = SystemBootstrap;
+
+    window.SystemBootstrap =
+        SystemBootstrap;
 }
