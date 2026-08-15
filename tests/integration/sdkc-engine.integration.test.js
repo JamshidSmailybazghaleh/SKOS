@@ -59,13 +59,9 @@ test(
 
 
 sdkc.store({
-
-id:
-"SKOS-KO-000001",
-
-title:
-"Knowledge Object"
-
+    id: "SKOS-KO-000001",
+    type: "KNOWLEDGE_OBJECT",
+    title: "Knowledge Object"
 });
 
 
