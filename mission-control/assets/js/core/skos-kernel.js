@@ -1,35 +1,34 @@
 /**
  * ============================================================
- * SKOS - Smaily Knowledge Operating System
+ * SKOS — Smaily Knowledge Operating System
  * PRIMARY RUNTIME KERNEL
  * ------------------------------------------------------------
- * File      : skos-kernel.js
- * Operation : OP-020
+ * File      : mission-control/assets/js/core/skos-kernel.js
  * Build     : BUILD-000423
  * Version   : 2.0.0
  * Status    : ACTIVE
  * Authority : PRIMARY RUNTIME AUTHORITY
- * ============================================================
+ * ------------------------------------------------------------
  *
  * Mission:
- *   Provide the single authoritative runtime lifecycle for
- *   SKOS Mission Control.
+ *   Provide the single authoritative runtime kernel for the
+ *   Mission Control browser environment.
  *
- * Responsibilities:
- *   - Runtime Boot
- *   - Runtime Initialization
- *   - Registry Loading
- *   - Module Loading
- *   - Status Loading
- *   - Service / Engine coordination
- *   - Health state
- *   - Diagnostics hooks
- *   - SDKC connection
- *   - Runtime shutdown
- *   - Idempotent lifecycle control
+ * Architecture:
+ *
+ *   bootstrap.js
+ *        ↓
+ *   BootSequence
+ *        ↓
+ *   SystemBootstrap
+ *        ↓
+ *   SKOSKernelRuntime
+ *        ↓
+ *   Runtime / Registry / Services / Engines
  *
  * IMPORTANT:
- *   No other browser component may independently boot SKOS.
+ *   This file MUST NOT create another kernel.
+ *   This file owns the single browser runtime kernel instance.
  *
  * ============================================================
  */
@@ -44,54 +43,98 @@ class SKOSKernel {
 
         this.config = config;
 
+        /*
+         * ------------------------------------------------------
+         * Lifecycle
+         * ------------------------------------------------------
+         */
+
         this.status = "CREATED";
 
         this.initialized = false;
         this.running = false;
 
+        this.bootStartedAt = null;
+        this.bootCompletedAt = null;
+        this.shutdownAt = null;
+
+        /*
+         * ------------------------------------------------------
+         * Runtime State
+         * ------------------------------------------------------
+         */
+
         this.bootState = "IDLE";
 
-        this.bootTime = null;
-        this.shutdownTime = null;
+        /*
+         * ------------------------------------------------------
+         * Registries
+         * ------------------------------------------------------
+         */
 
         this.engines = new Map();
         this.services = new Map();
 
-        this.modules = [];
+        /*
+         * ------------------------------------------------------
+         * Event History
+         * ------------------------------------------------------
+         */
 
         this.events = [];
 
+        /*
+         * ------------------------------------------------------
+         * Error State
+         * ------------------------------------------------------
+         */
+
+        this.lastError = null;
+
+        /*
+         * ------------------------------------------------------
+         * Statistics
+         * ------------------------------------------------------
+         */
+
         this.statistics = {
+
+            initializeAttempts: 0,
+            initializeSuccesses: 0,
+
             bootAttempts: 0,
             successfulBoots: 0,
             failedBoots: 0,
-            shutdowns: 0,
-            modulesLoaded: 0,
-            servicesRegistered: 0,
-            enginesRegistered: 0,
-            healthChecks: 0
-        };
 
-        this.context = {
-            registryReady: false,
-            modulesReady: false,
-            servicesReady: false,
-            enginesReady: false,
-            healthReady: false,
-            sdkcConnected: false
+            shutdownAttempts: 0,
+            successfulShutdowns: 0,
+
+            enginesRegistered: 0,
+            servicesRegistered: 0,
+
+            eventsEmitted: 0,
+            errors: 0
         };
     }
 
 
     /**
-     * --------------------------------------------------------
+     * =========================================================
      * INITIALIZE
-     * --------------------------------------------------------
+     * =========================================================
      */
 
     async initialize() {
 
+        this.statistics.initializeAttempts++;
+
+        /*
+         * Idempotency:
+         * Initialization may safely be requested more than once.
+         */
+
         if (this.initialized) {
+
             return true;
         }
 
@@ -101,531 +144,280 @@ class SKOSKernel {
         this.emit(
             "KERNEL_INITIALIZING",
             {
-                build: this.build
+                build: this.build,
+                version: this.version
             }
         );
 
-        this.initialized = true;
-        this.status = "INITIALIZED";
+        try {
 
-        this.emit(
-            "KERNEL_INITIALIZED",
-            {
-                build: this.build
+            /*
+             * Runtime State
+             */
+
+            if (
+                typeof window !== "undefined" &&
+                window.RuntimeState &&
+                typeof window.RuntimeState.set === "function"
+            ) {
+
+                window.RuntimeState.set(
+                    "kernel",
+                    "INITIALIZING"
+                );
             }
-        );
 
-        return true;
+
+            /*
+             * Runtime
+             */
+
+            if (
+                typeof window !== "undefined" &&
+                window.Runtime &&
+                typeof window.Runtime.initialize === "function"
+            ) {
+
+                await window.Runtime.initialize();
+            }
+
+
+            this.initialized = true;
+            this.status = "INITIALIZED";
+
+            this.statistics.initializeSuccesses++;
+
+            this.emit(
+                "KERNEL_INITIALIZED",
+                {
+                    build: this.build,
+                    version: this.version
+                }
+            );
+
+            return true;
+
+        }
+        catch (error) {
+
+            this.handleError(
+                "KERNEL_INITIALIZE_FAILED",
+                error
+            );
+
+            this.status = "FAILED";
+            this.bootState = "FAILED";
+
+            return false;
+        }
     }
 
 
     /**
-     * --------------------------------------------------------
+     * =========================================================
      * BOOT
-     * --------------------------------------------------------
+     * =========================================================
+     *
+     * This is the SINGLE authoritative runtime boot method.
      */
 
     async boot() {
 
+        this.statistics.bootAttempts++;
+
         /*
-         * Idempotency:
-         * A second boot request must never create a second
-         * runtime instance or repeat the boot chain.
+         * Already operational:
+         * Never execute the boot sequence twice.
          */
 
-        if (this.running) {
+        if (
+            this.running &&
+            this.status === "RUNNING"
+        ) {
+
             return this.getStatus();
         }
 
-        this.statistics.bootAttempts++;
+
+        /*
+         * Initialize first.
+         */
+
+        if (!this.initialized) {
+
+            const initialized =
+                await this.initialize();
+
+            if (!initialized) {
+
+                this.statistics.failedBoots++;
+
+                return false;
+            }
+        }
+
+
+        this.bootStartedAt = new Date();
+        this.bootState = "BOOTING";
+        this.status = "BOOTING";
+
+        this.emit(
+            "KERNEL_BOOT_STARTED",
+            {
+                build: this.build,
+                version: this.version
+            }
+        );
+
 
         try {
 
-            await this.initialize();
+            /*
+             * --------------------------------------------------
+             * Service Manager
+             * --------------------------------------------------
+             */
 
-            this.bootState = "BOOTING";
-            this.status = "BOOTING";
+            if (
+                typeof window !== "undefined" &&
+                window.ServiceManager
+            ) {
 
-            this.bootTime = new Date();
+                if (
+                    typeof window.ServiceManager.initialize ===
+                    "function"
+                ) {
 
-            this.emit(
-                "KERNEL_BOOT_STARTED",
-                {
-                    build: this.build
+                    await window.ServiceManager.initialize();
                 }
-            );
+            }
 
 
             /*
-             * ------------------------------------------------
-             * PHASE 1 — REGISTRY
-             * ------------------------------------------------
+             * --------------------------------------------------
+             * Engine Manager
+             * --------------------------------------------------
              */
 
-            await this.loadRegistry();
+            if (
+                typeof window !== "undefined" &&
+                window.EngineManager
+            ) {
+
+                if (
+                    typeof window.EngineManager.initialize ===
+                    "function"
+                ) {
+
+                    await window.EngineManager.initialize();
+                }
+            }
 
 
             /*
-             * ------------------------------------------------
-             * PHASE 2 — MODULES
-             * ------------------------------------------------
+             * --------------------------------------------------
+             * Runtime State
+             * --------------------------------------------------
              */
 
-            await this.loadModules();
+            if (
+                typeof window !== "undefined" &&
+                window.RuntimeState &&
+                typeof window.RuntimeState.set === "function"
+            ) {
+
+                window.RuntimeState.set(
+                    "kernel",
+                    "READY"
+                );
+            }
 
 
             /*
-             * ------------------------------------------------
-             * PHASE 3 — STATUS
-             * ------------------------------------------------
+             * --------------------------------------------------
+             * Runtime Operational
+             * --------------------------------------------------
              */
 
-            await this.loadStatus();
+            if (
+                typeof window !== "undefined" &&
+                window.Runtime &&
+                typeof window.Runtime.setState === "function"
+            ) {
 
+                window.Runtime.setState(
+                    "OPERATIONAL"
+                );
+            }
 
-            /*
-             * ------------------------------------------------
-             * PHASE 4 — SERVICES
-             * ------------------------------------------------
-             */
-
-            await this.initializeServices();
-
-
-            /*
-             * ------------------------------------------------
-             * PHASE 5 — ENGINES
-             * ------------------------------------------------
-             */
-
-            await this.initializeEngines();
-
-
-            /*
-             * ------------------------------------------------
-             * PHASE 6 — HEALTH
-             * ------------------------------------------------
-             */
-
-            await this.healthCheck();
-
-
-            /*
-             * ------------------------------------------------
-             * FINALIZE
-             * ------------------------------------------------
-             */
 
             this.running = true;
 
             this.status = "RUNNING";
+
             this.bootState = "READY";
+
+            this.bootCompletedAt = new Date();
 
             this.statistics.successfulBoots++;
 
+
             this.emit(
                 "KERNEL_BOOT_COMPLETED",
-                this.getStatus()
+                {
+                    build: this.build,
+                    version: this.version,
+                    bootCompletedAt:
+                        this.bootCompletedAt
+                }
             );
 
-            this.updateRuntimeState(
-                "kernel",
-                "READY"
-            );
-
-            this.updateRuntimeState(
-                "system",
-                "OPERATIONAL"
-            );
 
             return this.getStatus();
 
         }
         catch (error) {
+
+            this.statistics.failedBoots++;
 
             this.running = false;
 
             this.status = "FAILED";
             this.bootState = "FAILED";
 
-            this.statistics.failedBoots++;
-
-            this.updateRuntimeState(
-                "kernel",
-                "FAILED"
-            );
-
-            this.updateRuntimeState(
-                "system",
-                "FAILED"
-            );
-
-            this.emit(
+            this.handleError(
                 "KERNEL_BOOT_FAILED",
-                {
-                    message: error.message
-                }
+                error
             );
 
+
             if (
-                typeof Logger !== "undefined" &&
-                Logger.error
+                typeof window !== "undefined" &&
+                window.RuntimeState &&
+                typeof window.RuntimeState.set === "function"
             ) {
-                Logger.error(
-                    "SKOS Kernel Boot Failed:",
-                    error
+
+                window.RuntimeState.set(
+                    "kernel",
+                    "FAILED"
+                );
+
+                window.RuntimeState.set(
+                    "system",
+                    "FAILED"
                 );
             }
 
-            throw error;
+
+            return false;
         }
     }
 
 
     /**
-     * --------------------------------------------------------
-     * REGISTRY
-     * --------------------------------------------------------
-     */
-
-    async loadRegistry() {
-
-        if (this.context.registryReady) {
-            return true;
-        }
-
-        this.updateRuntimeState(
-            "registry",
-            "INITIALIZING"
-        );
-
-        if (
-            typeof Registry !== "undefined" &&
-            typeof Registry.load === "function"
-        ) {
-
-            const result =
-                await Registry.load();
-
-            if (result === false) {
-                throw new Error(
-                    "Registry loading failed."
-                );
-            }
-        }
-
-        this.context.registryReady = true;
-
-        this.updateRuntimeState(
-            "registry",
-            "READY"
-        );
-
-        this.emit(
-            "REGISTRY_READY"
-        );
-
-        return true;
-    }
-
-
-    /**
-     * --------------------------------------------------------
-     * MODULES
-     * --------------------------------------------------------
-     */
-
-    async loadModules() {
-
-        if (this.context.modulesReady) {
-            return true;
-        }
-
-        this.updateRuntimeState(
-            "moduleLoader",
-            "INITIALIZING"
-        );
-
-        let modules = [];
-
-        if (
-            typeof Registry !== "undefined" &&
-            typeof Registry.getModules === "function"
-        ) {
-
-            modules =
-                await Registry.getModules();
-
-            if (!Array.isArray(modules)) {
-                modules = [];
-            }
-        }
-
-        for (const moduleDefinition of modules) {
-
-            if (!moduleDefinition) {
-                continue;
-            }
-
-            const moduleName =
-                typeof moduleDefinition === "string"
-                    ? moduleDefinition
-                    : moduleDefinition.name;
-
-            if (!moduleName) {
-                continue;
-            }
-
-            if (
-                this.modules.includes(moduleName)
-            ) {
-                continue;
-            }
-
-            if (
-                typeof ModuleLoader !== "undefined" &&
-                typeof ModuleLoader.loadModule === "function"
-            ) {
-
-                const loaded =
-                    await ModuleLoader.loadModule(
-                        moduleName
-                    );
-
-                if (loaded !== false) {
-
-                    this.modules.push(
-                        moduleName
-                    );
-
-                    this.statistics.modulesLoaded++;
-                }
-            }
-        }
-
-        this.context.modulesReady = true;
-
-        this.updateRuntimeState(
-            "moduleLoader",
-            "READY"
-        );
-
-        this.emit(
-            "MODULES_READY",
-            {
-                count: this.modules.length
-            }
-        );
-
-        return true;
-    }
-
-
-    /**
-     * --------------------------------------------------------
-     * STATUS
-     * --------------------------------------------------------
-     */
-
-    async loadStatus() {
-
-        try {
-
-            if (
-                typeof fetch !== "function" ||
-                typeof CONFIG === "undefined"
-            ) {
-                return true;
-            }
-
-            const response =
-                await fetch(
-                    CONFIG.paths.data +
-                    CONFIG.files.status
-                );
-
-            if (!response.ok) {
-                return true;
-            }
-
-            const status =
-                await response.json();
-
-            this.emit(
-                "STATUS_LOADED",
-                status
-            );
-
-        }
-        catch (error) {
-
-            /*
-             * STATUS is informational.
-             * Failure here must not destroy the Kernel.
-             */
-
-            if (
-                typeof Logger !== "undefined" &&
-                Logger.warn
-            ) {
-                Logger.warn(
-                    "Runtime status loading skipped."
-                );
-            }
-        }
-
-        return true;
-    }
-
-
-    /**
-     * --------------------------------------------------------
-     * SERVICES
-     * --------------------------------------------------------
-     */
-
-    async initializeServices() {
-
-        if (this.context.servicesReady) {
-            return true;
-        }
-
-        if (
-            typeof ServiceManager !== "undefined"
-        ) {
-
-            if (
-                typeof ServiceManager.initialize ===
-                "function"
-            ) {
-
-                await ServiceManager.initialize();
-            }
-
-            if (
-                typeof ServiceManager.list ===
-                "function"
-            ) {
-
-                const services =
-                    ServiceManager.list();
-
-                if (Array.isArray(services)) {
-
-                    for (const service of services) {
-
-                        if (
-                            service &&
-                            service.name
-                        ) {
-
-                            this.services.set(
-                                service.name,
-                                service
-                            );
-                        }
-                    }
-                }
-            }
-        }
-
-        this.statistics.servicesRegistered =
-            this.services.size;
-
-        this.context.servicesReady = true;
-
-        this.updateRuntimeState(
-            "services",
-            "READY"
-        );
-
-        this.emit(
-            "SERVICES_READY",
-            {
-                count: this.services.size
-            }
-        );
-
-        return true;
-    }
-
-
-    /**
-     * --------------------------------------------------------
-     * ENGINES
-     * --------------------------------------------------------
-     */
-
-    async initializeEngines() {
-
-        if (this.context.enginesReady) {
-            return true;
-        }
-
-        if (
-            typeof EngineManager !== "undefined"
-        ) {
-
-            if (
-                typeof EngineManager.initialize ===
-                "function"
-            ) {
-
-                await EngineManager.initialize();
-            }
-
-            if (
-                typeof EngineManager.list ===
-                "function"
-            ) {
-
-                const engines =
-                    EngineManager.list();
-
-                if (Array.isArray(engines)) {
-
-                    for (const engine of engines) {
-
-                        if (
-                            engine &&
-                            engine.name
-                        ) {
-
-                            this.engines.set(
-                                engine.name,
-                                engine
-                            );
-                        }
-                    }
-                }
-            }
-        }
-
-        this.statistics.enginesRegistered =
-            this.engines.size;
-
-        this.context.enginesReady = true;
-
-        this.updateRuntimeState(
-            "engines",
-            "READY"
-        );
-
-        this.emit(
-            "ENGINES_READY",
-            {
-                count: this.engines.size
-            }
-        );
-
-        return true;
-    }
-
-
-    /**
-     * --------------------------------------------------------
-     * ENGINE REGISTRATION
-     * --------------------------------------------------------
+     * =========================================================
+     * REGISTER ENGINE
+     * =========================================================
      */
 
     registerEngine(
@@ -634,18 +426,39 @@ class SKOSKernel {
     ) {
 
         if (!engineId) {
+
             throw new Error(
-                "Engine id required."
+                "Engine id is required."
             );
         }
+
+        if (!engine) {
+
+            throw new Error(
+                "Engine instance is required."
+            );
+        }
+
+
+        /*
+         * Replace safely if already registered.
+         */
+
+        const alreadyRegistered =
+            this.engines.has(engineId);
+
 
         this.engines.set(
             engineId,
             engine
         );
 
-        this.statistics.enginesRegistered =
-            this.engines.size;
+
+        if (!alreadyRegistered) {
+
+            this.statistics.enginesRegistered++;
+        }
+
 
         this.emit(
             "ENGINE_REGISTERED",
@@ -654,14 +467,15 @@ class SKOSKernel {
             }
         );
 
+
         return true;
     }
 
 
     /**
-     * --------------------------------------------------------
-     * SERVICE REGISTRATION
-     * --------------------------------------------------------
+     * =========================================================
+     * REGISTER SERVICE
+     * =========================================================
      */
 
     registerService(
@@ -670,18 +484,35 @@ class SKOSKernel {
     ) {
 
         if (!serviceId) {
+
             throw new Error(
-                "Service id required."
+                "Service id is required."
             );
         }
+
+        if (!service) {
+
+            throw new Error(
+                "Service instance is required."
+            );
+        }
+
+
+        const alreadyRegistered =
+            this.services.has(serviceId);
+
 
         this.services.set(
             serviceId,
             service
         );
 
-        this.statistics.servicesRegistered =
-            this.services.size;
+
+        if (!alreadyRegistered) {
+
+            this.statistics.servicesRegistered++;
+        }
+
 
         this.emit(
             "SERVICE_REGISTERED",
@@ -690,14 +521,15 @@ class SKOSKernel {
             }
         );
 
+
         return true;
     }
 
 
     /**
-     * --------------------------------------------------------
-     * ENGINE ACCESS
-     * --------------------------------------------------------
+     * =========================================================
+     * GET ENGINE
+     * =========================================================
      */
 
     getEngine(engineId) {
@@ -710,9 +542,9 @@ class SKOSKernel {
 
 
     /**
-     * --------------------------------------------------------
-     * SERVICE ACCESS
-     * --------------------------------------------------------
+     * =========================================================
+     * GET SERVICE
+     * =========================================================
      */
 
     getService(serviceId) {
@@ -725,76 +557,103 @@ class SKOSKernel {
 
 
     /**
-     * --------------------------------------------------------
-     * HEALTH
-     * --------------------------------------------------------
+     * =========================================================
+     * START ENGINE
+     * =========================================================
      */
 
-    async healthCheck() {
+    async startEngine(engineId) {
 
-        this.statistics.healthChecks++;
+        const engine =
+            this.getEngine(engineId);
 
-        this.context.healthReady = true;
 
-        this.updateRuntimeState(
-            "health",
-            "READY"
-        );
+        if (!engine) {
 
-        const report = {
+            throw new Error(
+                `Engine not found: ${engineId}`
+            );
+        }
 
-            kernel: this.name,
 
-            version: this.version,
+        if (
+            typeof engine.initialize ===
+            "function"
+        ) {
 
-            build: this.build,
+            await engine.initialize();
+        }
 
-            status: this.status,
-
-            bootState: this.bootState,
-
-            initialized:
-                this.initialized,
-
-            running:
-                this.running,
-
-            modules:
-                this.modules.length,
-
-            services:
-                this.services.size,
-
-            engines:
-                this.engines.size,
-
-            context:
-                {
-                    ...this.context
-                },
-
-            statistics:
-                {
-                    ...this.statistics
-                }
-        };
 
         this.emit(
-            "HEALTH_CHECK",
-            report
+            "ENGINE_STARTED",
+            {
+                engineId
+            }
         );
 
-        return report;
+
+        return true;
     }
 
 
     /**
-     * --------------------------------------------------------
-     * RUNTIME STATUS
-     * --------------------------------------------------------
+     * =========================================================
+     * START SERVICE
+     * =========================================================
      */
 
-    getStatus() {
+    async startService(serviceId) {
+
+        const service =
+            this.getService(serviceId);
+
+
+        if (!service) {
+
+            throw new Error(
+                `Service not found: ${serviceId}`
+            );
+        }
+
+
+        if (
+            typeof service.initialize ===
+            "function"
+        ) {
+
+            await service.initialize();
+        }
+
+
+        if (
+            typeof service.start ===
+            "function"
+        ) {
+
+            await service.start();
+        }
+
+
+        this.emit(
+            "SERVICE_STARTED",
+            {
+                serviceId
+            }
+        );
+
+
+        return true;
+    }
+
+
+    /**
+     * =========================================================
+     * HEALTH CHECK
+     * =========================================================
+     */
+
+    healthCheck() {
 
         return {
 
@@ -804,9 +663,10 @@ class SKOSKernel {
 
             build: this.build,
 
-            status: this.status,
+            authority:
+                "PRIMARY_RUNTIME_KERNEL",
 
-            bootState: this.bootState,
+            status: this.status,
 
             initialized:
                 this.initialized,
@@ -814,25 +674,26 @@ class SKOSKernel {
             running:
                 this.running,
 
-            bootTime:
-                this.bootTime,
+            bootState:
+                this.bootState,
 
-            shutdownTime:
-                this.shutdownTime,
+            bootStartedAt:
+                this.bootStartedAt,
 
-            modules:
-                [...this.modules],
+            bootCompletedAt:
+                this.bootCompletedAt,
 
-            services:
-                this.services.size,
+            shutdownAt:
+                this.shutdownAt,
 
             engines:
                 this.engines.size,
 
-            context:
-                {
-                    ...this.context
-                },
+            services:
+                this.services.size,
+
+            lastError:
+                this.lastError,
 
             statistics:
                 {
@@ -843,9 +704,21 @@ class SKOSKernel {
 
 
     /**
-     * --------------------------------------------------------
-     * EVENT
-     * --------------------------------------------------------
+     * =========================================================
+     * STATUS
+     * =========================================================
+     */
+
+    getStatus() {
+
+        return this.healthCheck();
+    }
+
+
+    /**
+     * =========================================================
+     * EVENT EMITTER
+     * =========================================================
      */
 
     emit(
@@ -857,84 +730,144 @@ class SKOSKernel {
 
             event,
 
-            payload,
-
             timestamp:
-                new Date().toISOString()
+                new Date().toISOString(),
+
+            payload
         };
+
 
         this.events.push(record);
 
+        this.statistics.eventsEmitted++;
+
+
+        /*
+         * Keep history bounded.
+         */
+
+        if (this.events.length > 500) {
+
+            this.events.shift();
+        }
+
+
+        /*
+         * Forward to EventBus when available.
+         */
+
         if (
-            typeof EventBus !== "undefined" &&
-            typeof EventBus.publish === "function"
+            typeof window !== "undefined" &&
+            window.EventBus &&
+            typeof window.EventBus.publish ===
+            "function"
         ) {
 
             try {
 
-                EventBus.publish(
+                window.EventBus.publish(
                     event,
-                    record
+                    payload
                 );
 
             }
-            catch (error) {
+            catch (eventError) {
 
-                /*
-                 * Event transport must never
-                 * destroy the Kernel.
-                 */
+                console.warn(
+                    "SKOS EventBus publish failed:",
+                    eventError
+                );
             }
         }
+
 
         return record;
     }
 
 
     /**
-     * --------------------------------------------------------
-     * RUNTIME STATE BRIDGE
-     * --------------------------------------------------------
+     * =========================================================
+     * ERROR HANDLER
+     * =========================================================
      */
 
-    updateRuntimeState(
-        engine,
-        status
+    handleError(
+        code,
+        error
     ) {
 
+        this.statistics.errors++;
+
+
+        this.lastError = {
+
+            code,
+
+            message:
+                error instanceof Error
+                    ? error.message
+                    : String(error),
+
+            timestamp:
+                new Date().toISOString()
+        };
+
+
+        this.emit(
+            code,
+            this.lastError
+        );
+
+
         if (
-            typeof RuntimeState !== "undefined" &&
-            typeof RuntimeState.set === "function"
+            typeof Logger !== "undefined" &&
+            Logger.error
         ) {
 
-            try {
+            Logger.error(
+                `[${code}] ${this.lastError.message}`
+            );
 
-                RuntimeState.set(
-                    engine,
-                    status
-                );
+        }
+        else {
 
-            }
-            catch (error) {
-
-                /*
-                 * RuntimeState is observational.
-                 * Kernel remains authoritative.
-                 */
-            }
+            console.error(
+                `[${code}]`,
+                this.lastError.message
+            );
         }
     }
 
 
     /**
-     * --------------------------------------------------------
+     * =========================================================
+     * GET EVENTS
+     * =========================================================
+     */
+
+    getEvents() {
+
+        return [
+            ...this.events
+        ];
+    }
+
+
+    /**
+     * =========================================================
      * SHUTDOWN
-     * --------------------------------------------------------
+     * =========================================================
      */
 
     async shutdown() {
 
-        if (!this.running) {
+        this.statistics.shutdownAttempts++;
+
+
+        if (
+            !this.running &&
+            this.status !== "RUNNING"
+        ) {
 
             this.status = "STOPPED";
             this.bootState = "STOPPED";
@@ -942,104 +875,163 @@ class SKOSKernel {
             return true;
         }
 
+
         this.emit(
             "KERNEL_SHUTDOWN_STARTED"
         );
 
-        /*
-         * Engines
-         */
 
-        if (
-            typeof EngineManager !== "undefined" &&
-            typeof EngineManager.shutdown === "function"
-        ) {
+        try {
 
-            await EngineManager.shutdown();
+            /*
+             * Shutdown engines in reverse registration order.
+             */
+
+            const engines =
+                Array.from(
+                    this.engines.values()
+                ).reverse();
+
+
+            for (
+                const engine of engines
+            ) {
+
+                if (
+                    engine &&
+                    typeof engine.shutdown ===
+                    "function"
+                ) {
+
+                    await engine.shutdown();
+                }
+            }
+
+
+            /*
+             * Shutdown services in reverse order.
+             */
+
+            const services =
+                Array.from(
+                    this.services.values()
+                ).reverse();
+
+
+            for (
+                const service of services
+            ) {
+
+                if (
+                    service &&
+                    typeof service.shutdown ===
+                    "function"
+                ) {
+
+                    await service.shutdown();
+                }
+            }
+
+
+            this.running = false;
+
+            this.status = "STOPPED";
+
+            this.bootState = "STOPPED";
+
+            this.shutdownAt = new Date();
+
+            this.statistics.successfulShutdowns++;
+
+
+            if (
+                typeof window !== "undefined" &&
+                window.RuntimeState &&
+                typeof window.RuntimeState.set ===
+                "function"
+            ) {
+
+                window.RuntimeState.set(
+                    "kernel",
+                    "STOPPED"
+                );
+            }
+
+
+            this.emit(
+                "KERNEL_SHUTDOWN_COMPLETED",
+                {
+                    shutdownAt:
+                        this.shutdownAt
+                }
+            );
+
+
+            return true;
+
         }
+        catch (error) {
 
-        /*
-         * Services
-         */
+            this.handleError(
+                "KERNEL_SHUTDOWN_FAILED",
+                error
+            );
 
-        if (
-            typeof ServiceManager !== "undefined" &&
-            typeof ServiceManager.shutdown === "function"
-        ) {
-
-            await ServiceManager.shutdown();
+            return false;
         }
-
-        this.running = false;
-
-        this.status = "STOPPED";
-
-        this.bootState = "STOPPED";
-
-        this.shutdownTime = new Date();
-
-        this.statistics.shutdowns++;
-
-        this.updateRuntimeState(
-            "kernel",
-            "STOPPED"
-        );
-
-        this.updateRuntimeState(
-            "system",
-            "STOPPED"
-        );
-
-        this.emit(
-            "KERNEL_SHUTDOWN_COMPLETED"
-        );
-
-        return true;
     }
 
 
     /**
-     * --------------------------------------------------------
+     * =========================================================
      * RESET
-     * --------------------------------------------------------
+     * =========================================================
+     *
+     * Intended for controlled testing/reinitialization.
+     * It does NOT run during normal startup.
      */
 
-    reset() {
+    async reset() {
+
+        await this.shutdown();
+
+
+        this.engines.clear();
+        this.services.clear();
+        this.events = [];
 
         this.initialized = false;
-
         this.running = false;
 
         this.status = "CREATED";
-
         this.bootState = "IDLE";
 
-        this.bootTime = null;
+        this.bootStartedAt = null;
+        this.bootCompletedAt = null;
+        this.shutdownAt = null;
 
-        this.shutdownTime = null;
+        this.lastError = null;
 
-        this.modules = [];
 
-        this.engines.clear();
+        this.statistics = {
 
-        this.services.clear();
+            initializeAttempts: 0,
+            initializeSuccesses: 0,
 
-        this.events = [];
+            bootAttempts: 0,
+            successfulBoots: 0,
+            failedBoots: 0,
 
-        this.context = {
+            shutdownAttempts: 0,
+            successfulShutdowns: 0,
 
-            registryReady: false,
+            enginesRegistered: 0,
+            servicesRegistered: 0,
 
-            modulesReady: false,
-
-            servicesReady: false,
-
-            enginesReady: false,
-
-            healthReady: false,
-
-            sdkcConnected: false
+            eventsEmitted: 0,
+            errors: 0
         };
+
 
         return true;
     }
@@ -1051,15 +1043,26 @@ class SKOSKernel {
  * SINGLETON RUNTIME AUTHORITY
  * ============================================================
  *
- * There must be exactly one browser runtime kernel instance.
+ * IMPORTANT:
+ *
+ * No other browser module should execute:
+ *
+ *     new SKOSKernel()
+ *
+ * The singleton below is the only runtime instance.
  * ============================================================
  */
 
 let SKOSKernelRuntime;
 
-if (typeof window !== "undefined") {
 
-    if (window.SKOSKernelRuntime) {
+if (
+    typeof window !== "undefined"
+) {
+
+    if (
+        window.SKOSKernelRuntime
+    ) {
 
         SKOSKernelRuntime =
             window.SKOSKernelRuntime;
@@ -1074,20 +1077,50 @@ if (typeof window !== "undefined") {
                     : {}
             );
 
-        window.SKOSKernelRuntime =
-            SKOSKernelRuntime;
+        Object.defineProperty(
+            window,
+            "SKOSKernelRuntime",
+            {
+                value:
+                    SKOSKernelRuntime,
+
+                writable: false,
+
+                configurable: false,
+
+                enumerable: true
+            }
+        );
     }
 }
 
 
 /**
- * Node / CommonJS
+ * ============================================================
+ * NODE / COMMONJS SUPPORT
+ * ============================================================
  */
 
-if (typeof module !== "undefined") {
+if (
+    typeof module !== "undefined" &&
+    module.exports
+) {
 
-    module.exports = SKOSKernel;
+    module.exports = {
 
-    module.exports.SKOSKernelRuntime =
-        SKOSKernelRuntime;
+        SKOSKernel,
+
+        get SKOSKernelRuntime() {
+
+            if (
+                !SKOSKernelRuntime
+            ) {
+
+                SKOSKernelRuntime =
+                    new SKOSKernel();
+            }
+
+            return SKOSKernelRuntime;
+        }
+    };
 }
