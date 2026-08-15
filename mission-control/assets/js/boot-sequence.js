@@ -1,117 +1,21 @@
-/*
-====================================================
-SKOS Mission Control
-
-Boot Sequence Engine
-
-File:
-boot-sequence.js
-
-Version:
-1.0
-
-Status:
-ACTIVE
-====================================================
-*/
+/**
+ * ============================================================
+ * SKOS Mission Control
+ * Boot Sequence Compatibility Adapter
+ * ------------------------------------------------------------
+ * File      : boot-sequence.js
+ * Build     : BUILD-000423
+ * Version   : 2.0.0
+ * Role      : COMPATIBILITY ADAPTER
+ * ============================================================
+ */
 
 const BootSequence = {
-
-    steps: [
-
-        {
-            name: "Logger",
-            action: async () => {
-
-                RuntimeState.set(
-                    "logger",
-                    "READY"
-                );
-
-                return true;
-
-            }
-
-        },
-
-        {
-            name: "Registry",
-            action: async () => {
-
-                return await KernelAPI.Registry.Load();
-
-            }
-
-        },
-
-        {
-            name: "Event Bus",
-            action: async () => {
-
-                RuntimeState.set(
-                    "eventBus",
-                    "READY"
-                );
-
-                return true;
-
-            }
-
-        },
-
-        {
-            name: "Command Engine",
-            action: async () => {
-
-                RuntimeState.set(
-                    "commandEngine",
-                    "READY"
-                );
-
-                return true;
-
-            }
-
-        },
-
-        {
-            name: "Modules",
-            action: async () => {
-
-                return await SKOS.loadModules();
-
-            }
-
-        },
-
-        {
-            name: "Status",
-            action: async () => {
-
-                return await SKOS.loadStatus();
-
-            }
-
-        },
-
-        {
-            name: "Dashboard",
-            action: async () => {
-
-                SKOS.renderDashboard();
-
-                return true;
-
-            }
-
-        }
-
-    ],
 
     async start() {
 
         Logger.info(
-            "Boot Sequence Started"
+            "BootSequence delegated to Primary Kernel."
         );
 
         RuntimeState.set(
@@ -119,61 +23,33 @@ const BootSequence = {
             "INITIALIZING"
         );
 
-        for (const step of this.steps) {
+        try {
 
-            Logger.info(
-                "Starting: " + step.name
+            await SKOSKernelRuntime.boot();
+
+            RuntimeState.set(
+                "system",
+                "OPERATIONAL"
             );
 
-            try {
+            return true;
 
-                const ok = await step.action();
+        } catch (error) {
 
-                if (ok === false) {
+            RuntimeState.set(
+                "system",
+                "FAILED"
+            );
 
-                    throw new Error(
-                        step.name + " failed."
-                    );
+            Logger.error(
+                error.message
+            );
 
-                }
-
-                Logger.info(
-                    step.name + " Ready"
-                );
-
-            }
-
-            catch (error) {
-
-                RuntimeState.set(
-                    "system",
-                    "FAILED"
-                );
-
-                Logger.error(
-                    error.message
-                );
-
-                return false;
-
-            }
-
+            return false;
         }
-
-        RuntimeState.set(
-            "system",
-            "OPERATIONAL"
-        );
-
-        Logger.info(
-            "Boot Sequence Finished"
-        );
-
-        return true;
-
     }
-
 };
+
 
 window.BootSequence = BootSequence;
 
