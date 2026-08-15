@@ -1,186 +1,105 @@
-/*
-====================================================
-SKOS Mission Control
-
-Kernel
-
-File:
-kernel.js
-
-Version:
-1.1
-
-Status:
-ACTIVE
-====================================================
-*/
+/**
+ * ============================================================
+ * SKOS Mission Control
+ * Legacy Kernel Compatibility Facade
+ * ------------------------------------------------------------
+ * File      : kernel.js
+ * Build     : BUILD-000423
+ * Version   : 2.0.0
+ * Authority : SKOSKernelRuntime
+ *
+ * IMPORTANT:
+ * This file MUST NOT create or own a runtime.
+ * ============================================================
+ */
 
 const SKOS = {
 
-    version: CONFIG.system.version,
+    get version() {
+        return SKOSKernelRuntime.version;
+    },
 
-    initialized: false,
+    get initialized() {
+        return SKOSKernelRuntime.initialized;
+    },
 
-    modules: [],
-
-
-
-    async initialize() {
-// alert("Kernel Started");
-    
-        console.log("================================");
-        console.log(CONFIG.system.name);
-        Logger.info("Kernel Initializing...");
-        console.log("================================");
-
-        await this.loadRegistry();
-
-        await this.loadModules();
-
-        await this.loadStatus();
-
-        this.renderDashboard();
-
-        this.initialized = true;
-
-        console.log("================================");
-        Logger.info("Kernel Ready");
-        console.log("Version:", this.version);
-        console.log("================================");
-
+    get modules() {
+        return Array.from(
+            SKOSKernelRuntime.modules.keys()
+        );
     },
 
 
+    async initialize() {
+        return await SKOSKernelRuntime.boot();
+    },
+
+
+    async start() {
+        return await SKOSKernelRuntime.boot();
+    },
+
 
     async loadRegistry() {
-
-    console.log("Loading Registry...");
-
-    const loaded = await Registry.load();
-
-    if (!loaded) {
-
-        console.error(
-
-            "Registry could not be loaded."
-
-        );
-
-    }
-
-},
-
+        return await SKOSKernelRuntime.loadRegistry();
+    },
 
 
     async loadModules() {
-
-    console.log("Loading Modules...");
-
-    const modules = await Registry.getModules();
-
-    for (const module of modules) {
-
-        const loaded = await ModuleLoader.loadModule(
-
-            module.name
-
-        );
-
-        if (loaded) {
-
-            this.modules.push(
-
-                module.name
-
-            );
-
-        }
-
-    }
-
-},
-
+        return await SKOSKernelRuntime.initializeModules();
+    },
 
 
     async loadStatus() {
 
-        console.log("Loading Status...");
-
-        try {
-
-            const response = await fetch(
-
-                CONFIG.paths.data +
-                CONFIG.files.status
-
-            );
-
-            if (!response.ok) {
-
-                throw new Error("STATUS.json not found");
-
-            }
-
-            const status = await response.json();
-
-            console.log(
-
-                "Latest Build:",
-                status.latestBuild
-
-            );
-
-        }
-
-        catch (error) {
-
-            console.warn(
-
-                "Status loading skipped."
-
-            );
-
-        }
-
+        return SKOSKernelRuntime.getStatus();
     },
-
 
 
     renderDashboard() {
 
         console.log(
-
             "Rendering Dashboard..."
-
         );
 
-    },
+        if (
+            typeof DashboardService !== "undefined" &&
+            typeof DashboardService.getDashboard === "function"
+        ) {
 
+            return DashboardService.getDashboard();
+        }
+
+        return true;
+    },
 
 
     getLoadedModules() {
 
-        return this.modules;
-
+        return Array.from(
+            SKOSKernelRuntime.modules.keys()
+        );
     },
-
 
 
     isInitialized() {
 
-        return this.initialized;
-
+        return SKOSKernelRuntime.initialized;
     },
 
 
+    getStatus() {
 
-        start() {
+        return SKOSKernelRuntime.getStatus();
+    },
 
-        this.initialize();
 
+    shutdown() {
+
+        return SKOSKernelRuntime.shutdown();
     }
-
 };
+
 
 window.SKOS = SKOS;
 
