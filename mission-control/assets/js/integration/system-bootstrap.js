@@ -1,245 +1,88 @@
-/**
- * ============================================================
- * SKOS - Smaily Knowledge Operating System
- * System Bootstrap
- * ------------------------------------------------------------
- * File      : system-bootstrap.js
- * Operation : OP-021
- * Build     : BUILD-000425
- * Version   : 1.0.0
- * Status    : ACTIVE
- * ============================================================
- *
- * Mission:
- * Bootstraps the complete SKOS ecosystem.
- *
- * Responsibilities:
- * - Load configuration
- * - Initialize kernel
- * - Register engines
- * - Register services
- * - Resolve dependencies
- * - Configure communication
- * - Start pipelines
- * - Execute health checks
- * - Report system readiness
- *
- * ============================================================
- */
-
 class SystemBootstrap {
 
     constructor(config = {}) {
 
         this.name = "SystemBootstrap";
-        this.version = "1.0.0";
+        this.version = "2.0.0";
+        this.build = "BUILD-000423";
 
         this.config = config;
 
         this.initialized = false;
         this.running = false;
-
-        this.components = {};
-
         this.bootState = "IDLE";
-
-        this.bootHistory = [];
-
-        this.statistics = {
-
-            bootAttempts: 0,
-            successfulBoots: 0,
-            failedBoots: 0,
-            componentsInitialized: 0,
-            healthChecks: 0
-
-        };
-
     }
 
-    /**
-     * Register Components
-     */
-    registerComponents(components = {}) {
 
-        this.components = {
-
-            ...this.components,
-
-            ...components
-
-        };
-
-        return true;
-
-    }
-
-    /**
-     * Initialize
-     */
-    initialize() {
+    async initialize() {
 
         if (this.initialized) {
-
             return true;
-
         }
-
-        this.bootState = "INITIALIZING";
 
         this.initialized = true;
 
         return true;
-
     }
 
-    /**
-     * Execute Bootstrap
-     */
-    execute() {
 
-        this.statistics.bootAttempts++;
+    async execute() {
 
-        this.initialize();
+        await this.initialize();
+
+        this.bootState = "DELEGATED";
+
+        const result =
+            await SKOSKernelRuntime.boot();
 
         this.running = true;
-
-        this.bootState = "BOOTING";
-
-        this.executeStage("Configuration");
-
-        this.executeStage("Kernel");
-
-        this.executeStage("EngineRegistry");
-
-        this.executeStage("ServiceRegistry");
-
-        this.executeStage("DependencyResolver");
-
-        this.executeStage("CommunicationRouter");
-
-        this.executeStage("Pipeline");
-
-        this.executeStage("HealthCheck");
-
         this.bootState = "READY";
 
-        this.statistics.successfulBoots++;
-
-        this.bootHistory.push({
-
-            timestamp: new Date(),
-
-            state: this.bootState
-
-        });
-
-        return true;
-
+        return result;
     }
 
-    /**
-     * Execute Stage
-     */
-    executeStage(stage) {
 
-        this.statistics.componentsInitialized++;
-
-        return {
-
-            stage,
-
-            status: "SUCCESS",
-
-            timestamp: new Date()
-
-        };
-
-    }
-
-    /**
-     * Health Check
-     */
     healthCheck() {
 
-        this.statistics.healthChecks++;
-
         return {
-
-            bootstrap: this.name,
-
+            name: this.name,
             version: this.version,
+            build: this.build,
 
-            initialized: this.initialized,
+            role: "ORCHESTRATION_ADAPTER",
 
-            running: this.running,
+            kernel:
+                SKOSKernelRuntime.getStatus(),
 
-            bootState: this.bootState,
+            initialized:
+                this.initialized,
 
-            registeredComponents:
+            running:
+                this.running,
 
-                Object.keys(this.components).length,
-
-            statistics: this.statistics
-
+            bootState:
+                this.bootState
         };
-
     }
 
-    /**
-     * Shutdown
-     */
-    shutdown() {
+
+    async shutdown() {
+
+        await SKOSKernelRuntime.shutdown();
 
         this.running = false;
-
         this.bootState = "STOPPED";
 
         return true;
-
     }
-
-    /**
-     * Reset
-     */
-    reset() {
-
-        this.components = {};
-
-        this.bootHistory = [];
-
-        this.initialized = false;
-
-        this.running = false;
-
-        this.bootState = "IDLE";
-
-        this.statistics = {
-
-            bootAttempts: 0,
-            successfulBoots: 0,
-            failedBoots: 0,
-            componentsInitialized: 0,
-            healthChecks: 0
-
-        };
-
-    }
-
 }
 
-/**
- * Export
- */
 
 if (typeof module !== "undefined") {
-
     module.exports = SystemBootstrap;
-
 }
 
+
 if (typeof window !== "undefined") {
-
     window.SystemBootstrap = SystemBootstrap;
-
 }
