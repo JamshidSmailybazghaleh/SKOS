@@ -1,72 +1,86 @@
-/*
-====================================================
-SKOS Mission Control
-
-Runtime Engine
-
-File:
-runtime.js
-
-Version:
-1.0
-
-Status:
-ACTIVE
-====================================================
-*/
+/**
+ * ============================================================
+ * SKOS Mission Control
+ * Runtime Compatibility Layer
+ * ------------------------------------------------------------
+ * File      : runtime.js
+ * Build     : BUILD-000423
+ * Version   : 2.0.0
+ * Role      : COMPATIBILITY / OBSERVABILITY
+ * ============================================================
+ */
 
 const Runtime = {
 
-    state: "BOOT",
+    getState() {
 
-    build: "",
+        if (
+            typeof SKOSKernelRuntime ===
+            "undefined"
+        ) {
 
-    release: "",
+            return "UNKNOWN";
+        }
 
-    sprint: "",
-
-    modulesLoaded: 0,
-
-    errors: 0,
-
-    initialize() {
-
-        Logger.info(
-            "Runtime Initialized"
-        );
-
+        return
+            SKOSKernelRuntime.status;
     },
+
 
     setState(state) {
 
-        this.state = state;
+        if (
+            typeof RuntimeState !==
+            "undefined"
+        ) {
 
-        Logger.info(
-            "State -> " + state
-        );
+            RuntimeState.set(
+                "system",
+                state
+            );
+        }
 
+        return true;
     },
 
-    getState() {
 
-        return this.state;
+    getStatus() {
 
+        if (
+            typeof SKOSKernelRuntime ===
+            "undefined"
+        ) {
+
+            return null;
+        }
+
+        return
+            SKOSKernelRuntime.getStatus();
     },
 
-    incrementModules() {
 
-        this.modulesLoaded++;
+    async initialize() {
 
-    },
+        if (
+            typeof SKOSKernelRuntime ===
+            "undefined"
+        ) {
 
-    incrementErrors() {
+            throw new Error(
+                "SKOSKernelRuntime unavailable."
+            );
+        }
 
-        this.errors++;
-
+        return await
+            SKOSKernelRuntime.initialize();
     }
-
 };
 
-window.Runtime = Runtime;
+
+if (typeof window !== "undefined") {
+
+    window.Runtime =
+        Runtime;
+}
 
 Object.freeze(Runtime);
