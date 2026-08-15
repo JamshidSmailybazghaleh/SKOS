@@ -14,43 +14,56 @@ const BootSequence = {
 
     async start() {
 
-        Logger.info(
-            "BootSequence delegated to Primary Kernel."
-        );
+        if (
+            typeof SKOSKernelRuntime ===
+            "undefined"
+        ) {
 
-        RuntimeState.set(
-            "system",
-            "INITIALIZING"
-        );
-
-        try {
-
-            await SKOSKernelRuntime.boot();
-
-            RuntimeState.set(
-                "system",
-                "OPERATIONAL"
+            throw new Error(
+                "SKOSKernelRuntime is not available."
             );
+        }
 
-            return true;
+        return await
+            SKOSKernelRuntime.boot();
+    },
 
-        } catch (error) {
 
-            RuntimeState.set(
-                "system",
-                "FAILED"
-            );
+    async stop() {
 
-            Logger.error(
-                error.message
-            );
+        if (
+            typeof SKOSKernelRuntime ===
+            "undefined"
+        ) {
 
             return false;
         }
+
+        return await
+            SKOSKernelRuntime.shutdown();
+    },
+
+
+    getStatus() {
+
+        if (
+            typeof SKOSKernelRuntime ===
+            "undefined"
+        ) {
+
+            return null;
+        }
+
+        return
+            SKOSKernelRuntime.getStatus();
     }
 };
 
 
-window.BootSequence = BootSequence;
+if (typeof window !== "undefined") {
+
+    window.BootSequence =
+        BootSequence;
+}
 
 Object.freeze(BootSequence);
