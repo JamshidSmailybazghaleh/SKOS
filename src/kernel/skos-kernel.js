@@ -15,7 +15,8 @@
  *
  * ==========================================================
  */
-
+const KnowledgeQueryEngine =
+    require("../engines/knowledge-query-engine/knowledge-query-engine");
 
 class SKOSKernel {
 
@@ -311,23 +312,67 @@ class SKOSKernel {
 
     activateKnowledgeRuntime() {
 
-
-        this.context.knowledgeReady =
-            true;
-
-
-
-        this.emit(
-
-            "KNOWLEDGE_RUNTIME_READY"
-
-        );
-
-
-        return true;
-
+    if (!this.knowledgeRuntime) {
+        this.knowledgeRuntime =
+            new KnowledgeRuntime();
     }
 
+    if (!this.sdkc) {
+        throw new Error(
+            "SDKC connector not attached to Kernel."
+        );
+    }
+
+    this.knowledgeRuntime.attachSDKC(
+        this.sdkc
+    );
+
+    /*
+     * ==================================================
+     * MON-001.92
+     * CANONICAL QUERY REPOSITORY ADAPTER
+     * ==================================================
+     *
+     * KnowledgeQueryEngine requires only:
+     *   repository.list()
+     *   repository.load(id)
+     *
+     * SDKC Runtime Connector remains the runtime
+     * authority and forwards these operations to
+     * the canonical RepositoryService.
+     * ==================================================
+     */
+
+    const queryRepository = {
+        list: () =>
+            this.sdkc.listKnowledgeObjects(),
+
+        load: (id) =>
+            this.sdkc.loadKnowledgeObject(id)
+    };
+
+    this.knowledgeQueryEngine =
+        new KnowledgeQueryEngine({
+            repository: queryRepository
+        });
+
+    this.knowledgeQueryEngine.initialize();
+
+    this.knowledgeRuntime.initialize();
+
+    this.context.knowledgeReady =
+        true;
+
+    this.emit(
+        "KNOWLEDGE_RUNTIME_READY"
+    );
+
+    this.emit(
+        "KNOWLEDGE_QUERY_ENGINE_READY"
+    );
+
+    return true;
+}
 
 
 
