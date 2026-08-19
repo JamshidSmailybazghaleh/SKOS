@@ -89,9 +89,24 @@ const ModuleLoader = {
             const html = await response.text();
             Logger.info("HTML Loaded: " + moduleName);
 
+            const moduleConfig =
+                await Registry.getModule(moduleName);
+
+            if (!moduleConfig) {
+                throw new Error(
+                    "Module not registered: " + moduleName
+                );
+            }
+
+            if (!moduleConfig.container) {
+                throw new Error(
+                    "Module container not defined: " + moduleName
+                );
+            }
+
             const container =
                 document.getElementById(
-                    CONFIG.dashboard.containerId
+                    moduleConfig.container
                 );
 
             if (!container) {

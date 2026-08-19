@@ -92,4 +92,5 @@ const BuildCenter = {
 
 };
 
+window.BuildCenter = BuildCenter;
 Object.freeze(BuildCenter);
