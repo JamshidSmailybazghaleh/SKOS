@@ -77,7 +77,7 @@ class SKOSAlphaRuntime {
         return true;
     }
 
-    /**
+        /**
      * ==================================================
      * ILR-001.75-D10-P4-C9-F1-K
      * OPERATIONAL RECONCILIATION INVOCATION
@@ -88,15 +88,6 @@ class SKOSAlphaRuntime {
      * ==================================================
      */
     reconcile(options = {}) {
-        if (
-            this.status !== "INITIALIZED" &&
-            this.status !== "RUNNING"
-        ) {
-            throw new Error(
-                `Repository reconciliation is not permitted while runtime status is ${this.status}.`
-            );
-        }
-
         return this.reconciliation.enforcePolicy(options);
     }
 
