@@ -616,6 +616,123 @@ class EngineOrchestrator {
 
     /**
      * ======================================================
+     * RECOVER ENGINE
+     * ======================================================
+     *
+     * Reconcile FSP-006 recovery capability with the
+     * canonical Remote Monitoring Contract.
+     */
+
+    recoverEngine(
+        engineId
+    ) {
+
+        const engine =
+            this.engines.get(
+                engineId
+            );
+
+        if (!engine) {
+
+            throw new Error(
+                `Engine not found: ${engineId}`
+            );
+
+        }
+
+        if (
+            typeof engine.initialize
+                !== "function"
+        ) {
+
+            throw new Error(
+                `Engine cannot be recovered: ${engineId}`
+            );
+
+        }
+
+        try {
+
+            engine.initialize();
+
+            /*
+             * Canonical monitoring health.
+             */
+
+            this.updateMonitoringHealth(
+                engineId,
+                "HEALTHY"
+            );
+
+            /*
+             * Internal lifecycle event.
+             */
+
+            this.emit(
+                "ENGINE_RECOVERED",
+                {
+                    engineId
+                }
+            );
+
+            /*
+             * Canonical monitoring event.
+             */
+
+            this.recordMonitoringEvent(
+                "ENGINE_RECOVERED",
+                {
+                    engineId
+                }
+            );
+
+            return true;
+
+        } catch (error) {
+
+            /*
+             * Recovery failure must remain visible
+             * through the canonical monitoring contract.
+             */
+
+            this.updateMonitoringHealth(
+                engineId,
+                "FAILED"
+            );
+
+            this.emit(
+                "ENGINE_RECOVERY_FAILED",
+                {
+                    engineId,
+                    error:
+                        error &&
+                        error.message
+                            ? error.message
+                            : String(error)
+                }
+            );
+
+            this.recordMonitoringEvent(
+                "ENGINE_RECOVERY_FAILED",
+                {
+                    engineId,
+                    error:
+                        error &&
+                        error.message
+                            ? error.message
+                            : String(error)
+                }
+            );
+
+            throw error;
+
+        }
+
+    }
+
+
+    /**
+     * ======================================================
      * SHUTDOWN ALL ENGINES
      * ======================================================
      */
