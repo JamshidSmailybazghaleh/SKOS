@@ -30,6 +30,8 @@ class EngineOrchestrator {
         this.events = [];
 
         this.options = options;
+        this.monitoring =
+            options.monitoring || null;
     }
 
 
@@ -62,6 +64,18 @@ class EngineOrchestrator {
             engineId,
             engine
         );
+
+        if (
+            this.monitoring &&
+            typeof this.monitoring.registerComponent === "function"
+        ) {
+            this.monitoring.registerComponent(
+                engineId,
+                {
+                    name: engineId
+                }
+            );
+        }
 
         if (!this.dependencies.has(engineId)) {
 
@@ -137,9 +151,7 @@ class EngineOrchestrator {
     startAll() {
 
         if (this.executionOrder.length === 0) {
-
             this.buildExecutionOrder();
-
         }
 
         for (const engineId of this.executionOrder) {
@@ -152,17 +164,54 @@ class EngineOrchestrator {
                 typeof engine.initialize === "function"
             ) {
 
-                engine.initialize();
+                try {
 
-                this.emit(
-                    "ENGINE_STARTED",
-                    {
-                        engineId
+                    engine.initialize();
+
+                    if (
+                        this.monitoring &&
+                        typeof this.monitoring.updateHealth === "function"
+                    ) {
+                        this.monitoring.updateHealth(
+                            engineId,
+                            "HEALTHY"
+                        );
                     }
-                );
 
+                    this.emit(
+                        "ENGINE_STARTED",
+                        {
+                            engineId
+                        }
+                    );
+
+                } catch (error) {
+
+                    if (
+                        this.monitoring &&
+                        typeof this.monitoring.updateHealth === "function"
+                    ) {
+                        this.monitoring.updateHealth(
+                            engineId,
+                            "FAILED"
+                        );
+                    }
+
+                    this.emit(
+                        "ENGINE_FAILED",
+                        {
+                            engineId,
+                            error:
+                                error &&
+                                error.message
+                                    ? error.message
+                                    : String(error)
+                        }
+                    );
+
+                    throw error;
+                }
             }
-
         }
 
         this.status = "RUNNING";
@@ -170,6 +219,74 @@ class EngineOrchestrator {
         return true;
     }
 
+    recoverEngine(engineId) {
+
+        const engine =
+            this.engines.get(engineId);
+
+        if (!engine) {
+            throw new Error(
+                `Engine not found: ${engineId}`
+            );
+        }
+
+        if (
+            typeof engine.initialize !== "function"
+        ) {
+            throw new Error(
+                `Engine cannot be recovered: ${engineId}`
+            );
+        }
+
+        try {
+
+            engine.initialize();
+
+            if (
+                this.monitoring &&
+                typeof this.monitoring.updateHealth === "function"
+            ) {
+                this.monitoring.updateHealth(
+                    engineId,
+                    "HEALTHY"
+                );
+            }
+
+            this.emit(
+                "ENGINE_RECOVERED",
+                {
+                    engineId
+                }
+            );
+
+            return true;
+
+        } catch (error) {
+
+            if (
+                this.monitoring &&
+                typeof this.monitoring.updateHealth === "function"
+            ) {
+                this.monitoring.updateHealth(
+                    engineId,
+                    "FAILED"
+                );
+            }
+
+            this.emit(
+                "ENGINE_RECOVERY_FAILED",
+                {
+                    engineId,
+                    error:
+                        error && error.message
+                            ? error.message
+                            : String(error)
+                }
+            );
+
+            throw error;
+        }
+    }
 
     shutdownAll() {
 
@@ -217,16 +334,23 @@ class EngineOrchestrator {
         data = {}
     ) {
 
-        this.events.push({
-
+        const record = {
             event,
-
             data,
+            timestamp: new Date()
+        };
 
-            timestamp:
-                new Date()
+        this.events.push(record);
 
-        });
+        if (
+            this.monitoring &&
+            typeof this.monitoring.recordEvent === "function"
+        ) {
+            this.monitoring.recordEvent(
+                event,
+                data
+            );
+        }
 
     }
 
