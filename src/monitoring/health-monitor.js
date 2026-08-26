@@ -522,7 +522,25 @@ class HealthMonitor {
 
 
 
+    health() {
 
+        if (this.status === "SHUTDOWN") {
+            return "FAILED";
+        }
+
+        if (this.components.size === 0) {
+            return "WARNING";
+        }
+
+        const unhealthy =
+            this.getUnhealthyComponents().length;
+
+        if (unhealthy > 0) {
+            return "WARNING";
+        }
+
+        return "HEALTHY";
+    }
 
     getStatistics() {
 
