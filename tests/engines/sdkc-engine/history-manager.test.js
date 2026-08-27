@@ -5,6 +5,10 @@
  */
 
 
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+
 const HistoryManager =
 require(
 "../../../src/engines/sdkc-engine/history-manager"
@@ -22,10 +26,22 @@ test(
 "History event should register",
 ()=>{
 
+const testRoot =
+fs.mkdtempSync(
+    path.join(
+        os.tmpdir(),
+        "skos-history-test-"
+    )
+);
 
 const repository =
-new RepositoryManager();
-
+new RepositoryManager({
+    rootPath: path.join(
+        testRoot,
+        "repository",
+        "objects"
+    )
+});
 
 repository.initialize();
 
