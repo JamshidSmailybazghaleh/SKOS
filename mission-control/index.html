@@ -307,6 +307,10 @@ footer p{
 
 </style>
 
+        <link rel="canonical" href="https://jamshidsmailybazghaleh.github.io/SKOS/mission-control/">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <meta name="theme-color" content="#13283b">
+
 </head>
 <body>
 
@@ -339,6 +343,8 @@ footer p{
             Loading Executive Summary...
 
         </div>
+        <div id="build-center-container" class="loading"></div>
+
 
     </div>
 
@@ -368,7 +374,7 @@ footer p{
 
 
             <a class="module-card"
-               href="#">
+               href="monitoring/index.html">
 
                 <h3>⚙ Engine Monitor</h3>
 
@@ -594,9 +600,189 @@ footer p{
 
 <script src="assets/js/kernel.js"></script>
 
+
+<script src="assets/js/kernel/boot-authority.js"></script>
 <script src="assets/js/bootstrap.js"></script>
+
+<script>
+/* FSP-029.62 INTERNAL EXECUTION PROBE — OBSERVATION ONLY */
+(function () {
+    const state = {
+        bootstrap: "unknown",
+        bootAuthority: "unknown",
+        kernel: "unknown",
+        registry: "unknown",
+        registryModules: "unknown",
+        moduleLoader: "unknown",
+        loadedModules: "unknown",
+        executiveSummary: "unknown",
+        buildCenter: "unknown"
+    };
+
+    function snapshot() {
+        try {
+            state.bootstrap =
+                typeof Bootstrap !== "undefined" ? "object" : "undefined";
+
+            state.bootAuthority =
+                typeof BootAuthority !== "undefined" ? "object" : "undefined";
+
+            state.kernel =
+                typeof SKOSKernelRuntime !== "undefined"
+                    ? (typeof SKOSKernelRuntime.getStatus === "function"
+                        ? JSON.stringify(SKOSKernelRuntime.getStatus())
+                        : "object")
+                    : "undefined";
+
+            state.registry =
+                typeof Registry !== "undefined"
+                    ? (Registry.data ? "loaded" : "object-not-loaded")
+                    : "undefined";
+
+            if (typeof Registry !== "undefined" &&
+                typeof Registry.getModules === "function") {
+                Promise.resolve(Registry.getModules()).then(function (modules) {
+                    state.registryModules =
+                        JSON.stringify(modules.map(function (m) {
+                            return m && m.name;
+                        }));
+                    render();
+                }).catch(function (e) {
+                    state.registryModules = "ERROR:" + e;
+                    render();
+                });
+            }
+
+            state.moduleLoader =
+                typeof ModuleLoader !== "undefined" ? "object" : "undefined";
+
+            if (typeof ModuleLoader !== "undefined" &&
+                typeof ModuleLoader.list === "function") {
+                state.loadedModules =
+                    JSON.stringify(ModuleLoader.list());
+            }
+
+            state.executiveSummary =
+                typeof ExecutiveSummary !== "undefined" ? "object" : "undefined";
+
+            state.buildCenter =
+                typeof BuildCenter !== "undefined" ? "object" : "undefined";
+
+            render();
+        } catch (e) {
+            state.error = String(e);
+            render();
+        }
+    }
+
+    function render() {
+        let node = document.getElementById("skos-fsp-02962-probe");
+
+        if (!node) {
+            node = document.createElement("pre");
+            node.id = "skos-fsp-02962-probe";
+            node.style.cssText =
+                "position:fixed;left:0;right:0;bottom:0;" +
+                "z-index:2147483647;margin:0;padding:8px;" +
+                "background:#fff;color:#000;" +
+                "font:11px monospace;white-space:pre-wrap;" +
+                "border-top:2px solid #000;";
+            document.body.appendChild(node);
+        }
+
+        node.textContent =
+            "FSP-029.62 INTERNAL PROBE\n" +
+            "Bootstrap=" + state.bootstrap + "\n" +
+            "BootAuthority=" + state.bootAuthority + "\n" +
+            "Kernel=" + state.kernel + "\n" +
+            "Registry=" + state.registry + "\n" +
+            "RegistryModules=" + state.registryModules + "\n" +
+            "ModuleLoader=" + state.moduleLoader + "\n" +
+            "LoadedModules=" + state.loadedModules + "\n" +
+            "ExecutiveSummary=" + state.executiveSummary + "\n" +
+            "BuildCenter=" + state.buildCenter +
+            (state.error ? "\nERROR=" + state.error : "");
+    }
+
+    window.addEventListener("load", function () {
+        snapshot();
+        setTimeout(snapshot, 1000);
+        setTimeout(snapshot, 3000);
+        setTimeout(snapshot, 5000);
+    });
+})();
+</script>
+
 
     <script src="assets/js/kernel/runtime-smoke-test.js"></script>
 
+
+<!-- FSP-029.34-BROWSER-RUNTIME-PROBE -->
+<script>
+(function () {
+    function probe() {
+        try {
+            const kernelStatus =
+                typeof SKOSKernelRuntime !== "undefined" &&
+                typeof SKOSKernelRuntime.getStatus === "function"
+                    ? JSON.stringify(SKOSKernelRuntime.getStatus())
+                    : "UNAVAILABLE";
+
+            const modules =
+                typeof ModuleLoader !== "undefined" &&
+                typeof ModuleLoader.list === "function"
+                    ? JSON.stringify(ModuleLoader.list())
+                    : "UNAVAILABLE";
+
+            const text =
+                "BROWSER PROBE | " +
+                "Bootstrap=" + typeof Bootstrap +
+                " | BootstrapInitialized=" +
+                (typeof Bootstrap !== "undefined" ? Bootstrap.initialized : "NA") +
+                " | BootAuthority=" + typeof BootAuthority +
+                " | Kernel=" + typeof SKOSKernelRuntime +
+                " | KernelStatus=" + kernelStatus +
+                " | ModuleLoader=" + typeof ModuleLoader +
+                " | LoadedModules=" + modules +
+                " | ExecutiveSummary=" + typeof ExecutiveSummary;
+
+            document.title = "SKOS Browser Probe";
+
+            const markerNode = document.createElement("div");
+            markerNode.id = "skos-browser-runtime-probe";
+            markerNode.textContent = text;
+            markerNode.style.cssText =
+                "position:fixed;left:0;right:0;bottom:0;" +
+                "z-index:2147483647;padding:8px;" +
+                "background:#fff;color:#000;" +
+                "font:12px monospace;" +
+                "border-top:2px solid #000;";
+
+            document.body.appendChild(markerNode);
+
+            console.log(text);
+        } catch (error) {
+            const markerNode = document.createElement("div");
+            markerNode.id = "skos-browser-runtime-probe";
+            markerNode.textContent =
+                "BROWSER PROBE ERROR | " + error;
+            document.body.appendChild(markerNode);
+        }
+    }
+
+    window.addEventListener("load", function () {
+        setTimeout(probe, 1000);
+    });
+})();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+            .catch(error => console.error("SKOS Service Worker:", error));
+    });
+}
+</script>
 </body>
 </html>

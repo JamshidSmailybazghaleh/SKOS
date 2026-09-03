@@ -1,0 +1,25 @@
+{
+  "name": "SKOS Mission Control",
+  "short_name": "SKOS",
+  "start_url": "https://jamshidsmailybazghaleh.github.io/SKOS/mission-control/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0b1724",
+  "theme_color": "#13283b",
+  "description": "Smaily Knowledge Operating System — Mission Control",
+  "icons": [
+    {
+      "src": "./assets/icons/skos-launcher-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/skos-launcher-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
