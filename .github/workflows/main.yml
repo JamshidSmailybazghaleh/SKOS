@@ -1,0 +1,23 @@
+name: Deploy Smaily Commerce Worker
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'cloudflare/smaily-commerce-api/**'
+      - '.github/workflows/main.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config cloudflare/smaily-commerce-api/wrangler.toml
