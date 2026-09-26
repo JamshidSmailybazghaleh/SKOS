@@ -13,51 +13,73 @@ body{
     background:#101820;
     color:white;
 }
+
 header{
     background:#1b2838;
     padding:25px;
     text-align:center;
 }
+
 header h1{
     margin:0;
     font-size:32px;
 }
+
 header p{
     color:#b0bec5;
 }
+
 .container{
     width:90%;
     max-width:1000px;
     margin:auto;
 }
+
 .card{
     background:#1f2d3d;
     margin-top:20px;
     padding:20px;
     border-radius:10px;
 }
+
 h2{
     color:#4fc3f7;
 }
+
 .status{
     font-size:22px;
 }
+
 .value{
     font-weight:bold;
 }
+
+.operation{
+    border-bottom:1px solid #455a64;
+    padding-bottom:15px;
+    margin-bottom:18px;
+}
+
+.operation:last-child{
+    border-bottom:none;
+}
+
 a{
     color:#4fc3f7;
     text-decoration:none;
 }
+
 a:hover{
     text-decoration:underline;
 }
+
 footer{
     margin-top:40px;
     padding:20px;
     text-align:center;
     color:#90a4ae;
 }
+
 .error{
     color:#ffb74d;
 }
@@ -73,27 +95,42 @@ footer{
 
 <div class="container">
 
+    <!-- SYSTEM STATUS -->
     <div class="card">
         <h2>System Status</h2>
         <div id="systemStatus">Loading...</div>
     </div>
 
+    <!-- ACTIVE MISSION -->
     <div class="card">
         <h2>Active Mission</h2>
         <div id="missionStatus">Loading...</div>
     </div>
 
+    <!-- OPERATIONS -->
+    <div class="card">
+        <h2>Operations</h2>
+        <div id="operationsStatus">Loading...</div>
+    </div>
+
+    <!-- REPOSITORY -->
     <div class="card">
         <h2>Repository</h2>
         <p>
-            <a href="https://github.com/JamshidSmailybazghaleh/SKOS" target="_blank">
+            <a
+                href="https://github.com/JamshidSmailybazghaleh/SKOS"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
                 Open SKOS Repository
             </a>
         </p>
     </div>
 
+    <!-- CORE CONTROL AREAS -->
     <div class="card">
         <h2>Core Control Areas</h2>
+
         <ul>
             <li>System</li>
             <li>Missions</li>
@@ -113,10 +150,19 @@ footer{
 </footer>
 
 <script>
+
+/* =========================================
+   JSON DATA LOADER
+   ========================================= */
+
 async function loadJSON(path) {
-    const response = await fetch(path + "?t=" + Date.now(), {
-        cache: "no-store"
-    });
+
+    const response = await fetch(
+        path + "?t=" + Date.now(),
+        {
+            cache: "no-store"
+        }
+    );
 
     if (!response.ok) {
         throw new Error("HTTP " + response.status);
@@ -125,7 +171,12 @@ async function loadJSON(path) {
     return await response.json();
 }
 
-async function loadGateway() {
+
+/* =========================================
+   SYSTEM STATUS
+   ========================================= */
+
+async function loadSystemStatus() {
 
     try {
 
@@ -134,17 +185,48 @@ async function loadGateway() {
         );
 
         document.getElementById("systemStatus").innerHTML = `
-            <p class="status">🟢 ${status.organization || "UNKNOWN"}</p>
-            <p>System: <span class="value">${status.system || "UNKNOWN"}</span></p>
-            <p>Platforms: <span class="value">${status.platforms ?? 0}</span></p>
-            <p>Missions: <span class="value">${status.missions ?? 0}</span></p>
+
+            <p class="status">
+                🟢 ${status.organization || "UNKNOWN"}
+            </p>
+
+            <p>
+                System:
+                <span class="value">
+                    ${status.system || "UNKNOWN"}
+                </span>
+            </p>
+
+            <p>
+                Platforms:
+                <span class="value">
+                    ${status.platforms ?? 0}
+                </span>
+            </p>
+
+            <p>
+                Missions:
+                <span class="value">
+                    ${status.missions ?? 0}
+                </span>
+            </p>
+
         `;
 
     } catch (error) {
 
         document.getElementById("systemStatus").innerHTML =
             `<p class="error">Status data unavailable.</p>`;
+
     }
+}
+
+
+/* =========================================
+   ACTIVE MISSION
+   ========================================= */
+
+async function loadMission() {
 
     try {
 
@@ -153,24 +235,165 @@ async function loadGateway() {
         );
 
         document.getElementById("missionStatus").innerHTML = `
-            <p><strong>${mission.id || "Mission"}</strong></p>
-            <p>${mission.title || "No mission title"}</p>
-            <p>Status:
-                <span class="value">${mission.status || "UNKNOWN"}</span>
+
+            <p>
+                <strong>
+                    ${mission.id || "Mission"}
+                </strong>
             </p>
-            <p>Progress:
-                <span class="value">${mission.progress ?? 0}%</span>
+
+            <p>
+                ${mission.title || "No mission title"}
             </p>
+
+            <p>
+                Status:
+                <span class="value">
+                    ${mission.status || "UNKNOWN"}
+                </span>
+            </p>
+
+            <p>
+                Progress:
+                <span class="value">
+                    ${mission.progress ?? 0}%
+                </span>
+            </p>
+
         `;
 
     } catch (error) {
 
         document.getElementById("missionStatus").innerHTML =
             `<p class="error">Mission data unavailable.</p>`;
+
     }
 }
 
+
+/* =========================================
+   OPERATIONS
+   ========================================= */
+
+async function loadOperations() {
+
+    try {
+
+        const data = await loadJSON(
+            "./executive-command-center/data/operations.json"
+        );
+
+        const operations = data.operations || [];
+
+        if (operations.length === 0) {
+
+            document.getElementById("operationsStatus").innerHTML =
+                `<p class="error">No operations found.</p>`;
+
+            return;
+        }
+
+        document.getElementById("operationsStatus").innerHTML =
+            operations.map(operation => `
+
+                <div class="operation">
+
+                    <p>
+                        <strong>
+                            ${operation.id || "Operation"}
+                        </strong>
+                        —
+                        ${operation.name || "Unnamed Operation"}
+                    </p>
+
+                    <p>
+                        Category:
+                        <span class="value">
+                            ${operation.category || "N/A"}
+                        </span>
+                    </p>
+
+                    <p>
+                        Status:
+                        <span class="value">
+                            ${operation.status || "UNKNOWN"}
+                        </span>
+                    </p>
+
+                    <p>
+                        Progress:
+                        <span class="value">
+                            ${operation.progress ?? 0}%
+                        </span>
+                    </p>
+
+                    <p>
+                        Priority:
+                        <span class="value">
+                            ${operation.priority || "N/A"}
+                        </span>
+                    </p>
+
+                    ${
+                        operation.relatedMission
+                        ?
+                        `<p>
+                            Related Mission:
+                            <span class="value">
+                                ${operation.relatedMission}
+                            </span>
+                        </p>`
+                        :
+                        ""
+                    }
+
+                    ${
+                        operation.relatedProduct
+                        ?
+                        `<p>
+                            Related Product:
+                            <span class="value">
+                                ${operation.relatedProduct}
+                            </span>
+                        </p>`
+                        :
+                        ""
+                    }
+
+                </div>
+
+            `).join("");
+
+    } catch (error) {
+
+        document.getElementById("operationsStatus").innerHTML =
+            `<p class="error">Operations data unavailable.</p>`;
+
+    }
+}
+
+
+/* =========================================
+   GATEWAY START
+   ========================================= */
+
+async function loadGateway() {
+
+    await Promise.all([
+        loadSystemStatus(),
+        loadMission(),
+        loadOperations()
+    ]);
+
+}
+
+
+/* =========================================
+   INITIALIZE
+   ========================================= */
+
 loadGateway();
+
 </script>
 
 </body>
