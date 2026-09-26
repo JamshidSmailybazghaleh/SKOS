@@ -4,221 +4,174 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SKOS Mission Control</title>
+<title>SKOS Owner Gateway</title>
 
 <style>
-
 body{
     margin:0;
     font-family:Arial,Helvetica,sans-serif;
     background:#101820;
     color:white;
 }
-
 header{
     background:#1b2838;
     padding:25px;
     text-align:center;
 }
-
 header h1{
     margin:0;
-    font-size:36px;
+    font-size:32px;
 }
-
 header p{
     color:#b0bec5;
 }
-
 .container{
     width:90%;
+    max-width:1000px;
     margin:auto;
 }
-
 .card{
-
     background:#1f2d3d;
-
     margin-top:20px;
-
     padding:20px;
-
     border-radius:10px;
-
 }
-
 h2{
-
     color:#4fc3f7;
-
 }
-
-table{
-
-    width:100%;
-
-    border-collapse:collapse;
-
+.status{
+    font-size:22px;
 }
-
-td{
-
-    padding:10px;
-
-    border-bottom:1px solid #455a64;
-
+.value{
+    font-weight:bold;
 }
-
 a{
-
     color:#4fc3f7;
-
     text-decoration:none;
-
 }
-
 a:hover{
-
     text-decoration:underline;
-
 }
-
 footer{
-
     margin-top:40px;
-
     padding:20px;
-
     text-align:center;
-
     color:#90a4ae;
-
 }
-
+.error{
+    color:#ffb74d;
+}
 </style>
-
 </head>
 
 <body>
 
 <header>
-
-<h1>SKOS Mission Control</h1>
-
-<p>Smaily Knowledge Operating System</p>
-
+    <h1>SKOS Owner Gateway</h1>
+    <p>Smaily Knowledge Operating System</p>
 </header>
 
 <div class="container">
 
-<div class="card">
+    <div class="card">
+        <h2>System Status</h2>
+        <div id="systemStatus">Loading...</div>
+    </div>
 
-<h2>System Status</h2>
+    <div class="card">
+        <h2>Active Mission</h2>
+        <div id="missionStatus">Loading...</div>
+    </div>
 
-<table>
+    <div class="card">
+        <h2>Repository</h2>
+        <p>
+            <a href="https://github.com/JamshidSmailybazghaleh/SKOS" target="_blank">
+                Open SKOS Repository
+            </a>
+        </p>
+    </div>
 
-<tr><td>Status</td><td>🟢 ACTIVE</td></tr>
-
-<tr><td>Current Version</td><td>Alpha</td></tr>
-
-<tr><td>Latest Build</td><td>BUILD-RECOVERY-001</td></tr>
-
-<tr><td>Repository</td>
-
-<td>
-
-<a href="https://github.com/JamshidSmailybazghaleh/SKOS">
-
-GitHub Repository
-
-</a>
-
-</td>
-
-</tr>
-
-</table>
-
-</div>
-
-<div class="card">
-
-<h2>Mission</h2>
-
-<p>
-
-Creating the world's first Knowledge Operating System.
-
-</p>
-
-</div>
-
-<div class="card">
-
-<h2>Build Center</h2>
-
-<ul>
-
-<li>
-
-<a href="https://github.com/JamshidSmailybazghaleh/SKOS/tree/main/build">
-
-Open Build Center
-
-</a>
-
-</li>
-
-</ul>
-
-</div>
-
-<div class="card">
-
-<h2>Documentation</h2>
-
-<ul>
-
-<li><a href="README.md">README</a></li>
-
-<li><a href="CHANGELOG.md">CHANGELOG</a></li>
-
-<li><a href="MANIFEST.md">MANIFEST</a></li>
-
-</ul>
-
-</div>
-
-<div class="card">
-
-<h2>Future Modules</h2>
-
-<ul>
-
-<li>Executive Dashboard</li>
-
-<li>Engine Monitor</li>
-
-<li>SKE Explorer</li>
-
-<li>Knowledge Graph</li>
-
-<li>Mission Timeline</li>
-
-<li>Roadmap</li>
-
-</ul>
-
-</div>
+    <div class="card">
+        <h2>Core Control Areas</h2>
+        <ul>
+            <li>System</li>
+            <li>Missions</li>
+            <li>Operations</li>
+            <li>Knowledge</li>
+            <li>Projects</li>
+            <li>Assets</li>
+            <li>Commerce</li>
+            <li>Recovery</li>
+        </ul>
+    </div>
 
 </div>
 
 <footer>
-
-SKOS Mission Control Center
-
+    SKOS Owner Gateway
 </footer>
 
-</body>
+<script>
+async function loadJSON(path) {
+    const response = await fetch(path + "?t=" + Date.now(), {
+        cache: "no-store"
+    });
 
+    if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+    }
+
+    return await response.json();
+}
+
+async function loadGateway() {
+
+    try {
+
+        const status = await loadJSON(
+            "./executive-command-center/data/status.json"
+        );
+
+        document.getElementById("systemStatus").innerHTML = `
+            <p class="status">🟢 ${status.organization || "UNKNOWN"}</p>
+            <p>System: <span class="value">${status.system || "UNKNOWN"}</span></p>
+            <p>Platforms: <span class="value">${status.platforms ?? 0}</span></p>
+            <p>Missions: <span class="value">${status.missions ?? 0}</span></p>
+        `;
+
+    } catch (error) {
+
+        document.getElementById("systemStatus").innerHTML =
+            `<p class="error">Status data unavailable.</p>`;
+    }
+
+    try {
+
+        const mission = await loadJSON(
+            "./executive-command-center/data/missions.json"
+        );
+
+        document.getElementById("missionStatus").innerHTML = `
+            <p><strong>${mission.id || "Mission"}</strong></p>
+            <p>${mission.title || "No mission title"}</p>
+            <p>Status:
+                <span class="value">${mission.status || "UNKNOWN"}</span>
+            </p>
+            <p>Progress:
+                <span class="value">${mission.progress ?? 0}%</span>
+            </p>
+        `;
+
+    } catch (error) {
+
+        document.getElementById("missionStatus").innerHTML =
+            `<p class="error">Mission data unavailable.</p>`;
+    }
+}
+
+loadGateway();
+</script>
+
+</body>
 </html>
