@@ -1,3 +1,20 @@
+name: SKOS Worker Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "cloudflare/smaily-commerce-api/**"
+      - ".github/workflows/main.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v4
         with:
