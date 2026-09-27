@@ -5,7 +5,7 @@ export default {
     const h = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Headers": "Content-Type,Authorization",
       "Content-Type": "application/json;charset=UTF-8"
     };
 
@@ -15,7 +15,10 @@ export default {
         headers: h
       });
 
-    if (request.method === "GET" && url.pathname === "/")
+    if (
+      request.method === "GET" &&
+      url.pathname === "/"
+    )
       return Response.json({
         status: "success",
         service: "Smaily Commerce API",
@@ -23,9 +26,12 @@ export default {
         runtime: "Cloudflare Worker",
         endpoints: {
           status: "/commerce/status",
-          orders: "/commerce/orders"
+          orders: "/commerce/orders",
+          paymentVerify: "/commerce/payments/verify"
         }
-      }, { headers: h });
+      }, {
+        headers: h
+      });
 
     if (
       request.method === "GET" &&
@@ -37,10 +43,17 @@ export default {
         version: "1.0.0",
         runtime: "Cloudflare Worker",
         orderEngine: "READY",
-        orderPersistence: env.DB ? "CONNECTED" : "NOT_CONNECTED",
+        orderPersistence:
+          env.DB ? "CONNECTED" : "NOT_CONNECTED",
         paymentGateway: "NOT_CONNECTED",
+        paymentVerification:
+          env.COMMERCE_ADMIN_TOKEN
+            ? "READY"
+            : "NOT_CONFIGURED",
         fulfillment: "MANUAL"
-      }, { headers: h });
+      }, {
+        headers: h
+      });
 
     if (
       request.method === "POST" &&
@@ -113,8 +126,10 @@ export default {
         productId: String(b.productId),
         productTitle: b.productTitle || "",
         amount: Number(b.amount),
-        currency: String(b.currency).toUpperCase(),
-        quantity: Number(b.quantity || 1),
+        currency:
+          String(b.currency).toUpperCase(),
+        quantity:
+          Number(b.quantity || 1),
 
         buyer: {
           name: buyer.name || "",
@@ -122,10 +137,14 @@ export default {
           phone: buyer.phone || ""
         },
 
-        paymentMethod: b.paymentMethod || "",
-        cryptoCurrency: b.cryptoCurrency || "",
+        paymentMethod:
+          b.paymentMethod || "",
 
-        createdAt: new Date().toISOString(),
+        cryptoCurrency:
+          b.cryptoCurrency || "",
+
+        createdAt:
+          new Date().toISOString(),
 
         paidAt: "",
         deliveredAt: "",
@@ -135,22 +154,36 @@ export default {
         deliveryLink: "",
         notes: b.notes || "",
 
-        source: b.source || "SMAILY_BOOKSTORE",
+        source:
+          b.source || "SMAILY_BOOKSTORE",
 
         displayAmount:
-          Number(b.displayAmount ?? b.amount),
+          Number(
+            b.displayAmount ??
+            b.amount
+          ),
 
         displayCurrency:
           b.displayCurrency ||
           String(b.currency).toUpperCase(),
 
-        checkoutBook: b.checkoutBook || "",
-        checkoutMarket: b.checkoutMarket || "",
-        productFile: b.productFile || "",
+        checkoutBook:
+          b.checkoutBook || "",
 
-        persistence: "CONNECTED",
-        paymentVerification: "PENDING",
-        fulfillmentStatus: "PENDING"
+        checkoutMarket:
+          b.checkoutMarket || "",
+
+        productFile:
+          b.productFile || "",
+
+        persistence:
+          "CONNECTED",
+
+        paymentVerification:
+          "PENDING",
+
+        fulfillmentStatus:
+          "PENDING"
       };
 
       try {
@@ -229,8 +262,10 @@ export default {
 
         return Response.json({
           status: "error",
-          message: "Order persistence failed.",
-          error: error.message
+          message:
+            "Order persistence failed.",
+          error:
+            error.message
         }, {
           status: 500,
           headers: h
@@ -239,7 +274,8 @@ export default {
 
       return Response.json({
         status: "success",
-        message: "Order received and persisted successfully.",
+        message:
+          "Order received and persisted successfully.",
         result: order
       }, {
         status: 201,
@@ -247,10 +283,134 @@ export default {
       });
     }
 
+    if (
+      request.method === "POST" &&
+      url.pathname ===
+        "/commerce/payments/verify"
+    ) {
+
+      const auth =
+        request.headers.get(
+          "Authorization"
+        ) || "";
+
+      if (
+        !env.COMMERCE_ADMIN_TOKEN ||
+        auth !==
+          `Bearer ${env.COMMERCE_ADMIN_TOKEN}`
+      ) {
+        return Response.json({
+          status: "error",
+          message: "Unauthorized."
+        }, {
+          status: 401,
+          headers: h
+        });
+      }
+
+      let b;
+
+      try {
+        b = await request.json();
+      } catch {
+        return Response.json({
+          status: "error",
+          message:
+            "Invalid JSON body."
+        }, {
+          status: 400,
+          headers: h
+        });
+      }
+
+      if (
+        !b?.orderId ||
+        !b?.paymentReference
+      ) {
+        return Response.json({
+          status: "error",
+          message:
+            "orderId and paymentReference are required."
+        }, {
+          status: 400,
+          headers: h
+        });
+      }
+
+      try {
+
+        const result =
+          await env.DB.prepare(`
+            UPDATE orders
+            SET
+              status = 'PAID',
+              payment_reference = ?,
+              paid_at = ?,
+              payment_verification = 'VERIFIED'
+            WHERE
+              order_id = ?
+              AND status = 'PENDING'
+          `)
+          .bind(
+            String(b.paymentReference),
+            new Date().toISOString(),
+            String(b.orderId)
+          )
+          .run();
+
+        if (
+          !result.meta ||
+          !result.meta.changes
+        ) {
+          return Response.json({
+            status: "error",
+            message:
+              "Order not found or is not PENDING."
+          }, {
+            status: 404,
+            headers: h
+          });
+        }
+
+        return Response.json({
+          status: "success",
+          message:
+            "Payment verified successfully.",
+          orderId:
+            String(b.orderId),
+          paymentReference:
+            String(
+              b.paymentReference
+            ),
+          status: "PAID",
+          paymentVerification:
+            "VERIFIED"
+        }, {
+          status: 200,
+          headers: h
+        });
+
+      } catch (error) {
+
+        return Response.json({
+          status: "error",
+          message:
+            "Payment verification failed.",
+          error:
+            error.message
+        }, {
+          status: 500,
+          headers: h
+        });
+      }
+    }
+
     return Response.json({
       status: "error",
-      message: "Unknown commerce endpoint.",
-      path: url.pathname
+      message:
+        "Unknown commerce endpoint.",
+      path:
+        url.pathname
     }, {
       status: 404,
       headers: h
