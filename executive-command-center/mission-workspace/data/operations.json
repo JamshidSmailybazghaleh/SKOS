@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "workspace": "Mission Workspace",
+  "organization": "SKOS",
+  "lastUpdated": "2026-09-28T00:00:00Z",
+  "operations": [
+    {
+      "id": "OP-WCEA-001",
+      "name": "WCEA Institutional Outreach",
+      "category": "External Engagement",
+      "status": "PLANNED",
+      "priority": "HIGH",
+      "progress": 0
+    }
+  ]
+}
