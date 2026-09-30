@@ -17,7 +17,7 @@
 
 const KnowledgeSecurityPolicyEngine =
     require(
-        "../../src/engines/knowledge-graph-engine/knowledge-security-policy-engine"
+        "../../../src/engines/knowledge-graph-engine/knowledge-security-policy-engine"
     );
 
 
