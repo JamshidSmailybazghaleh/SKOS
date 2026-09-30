@@ -17,7 +17,7 @@
 
 const GraphAdaptationEngine =
     require(
-        "../../src/engines/knowledge-graph-engine/graph-adaptation-engine"
+        "../../../src/engines/knowledge-graph-engine/graph-adaptation-engine"
     );
 
 
@@ -61,86 +61,6 @@ beforeEach(() => {
 
 
 
-        const graph = {
-
-
-            nodes:
-
-                [
-
-                    {
-
-                        id:
-
-                            "A"
-
-                    },
-
-
-                    {
-
-                        id:
-
-                            "B"
-
-                    },
-
-
-                    {
-
-                        id:
-
-                            "C"
-
-                    }
-
-                ],
-
-
-            edges:
-
-                [
-
-                    {
-
-                        from:
-
-                            "A",
-
-
-                        to:
-
-                            "B",
-
-
-                        type:
-
-                            "RELATED"
-
-                    },
-
-
-                    {
-
-                        from:
-
-                            "A",
-
-
-                        to:
-
-                            "B",
-
-
-                        type:
-
-                            "RELATED"
-
-                    }
-
-                ]
-
-        };
 
 
 
