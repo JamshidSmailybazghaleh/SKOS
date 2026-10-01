@@ -41,7 +41,7 @@ const KnowledgeQueryEngine = {
 
         const index =
 
-            await RepositoryEngine.getIndex();
+            RepositoryService.loadIndex();
 
         if (!index) {
 
