@@ -263,9 +263,6 @@ describe(
         test(
             "Should generate executive summary",
               () => {
-      ...
-  }
-);
 
                 panel.registerSource(
                     "A",
@@ -326,7 +323,7 @@ describe(
                     snapshot
                 )
                 .toHaveProperty(
-                    "timestamp"
+                    "generatedAt"
                 );
 
             }
