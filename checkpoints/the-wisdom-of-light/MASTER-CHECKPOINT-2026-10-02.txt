@@ -1,0 +1,9 @@
+SKOS CHECKPOINT — THE WISDOM OF LIGHT
+Asset: حکمت نور.pdf
+Status: MASTER REFERENCE — 20 CHAPTERS
+Pages: 54
+Author: جمشید اسماعیلی / Jamshid Smaily
+Source: /mnt/data/حکمت نور.pdf
+Target: SKOS-DATA/05-PROJECTS/THE-WISDOM-OF-LIGHT/CHECKPOINTS/
+Rule: MASTER FILE MUST NOT BE OVERWRITTEN OR DELETED
+Checkpoint Date: 2026-10-02
