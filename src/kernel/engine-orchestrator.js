@@ -108,6 +108,17 @@ class EngineOrchestrator {
         this.monitoring =
             options.monitoring || null;
 
+        /*
+         * ==================================================
+         * CANONICAL RUNTIME EVENT BRIDGE
+         *
+         * Runtime event propagation must be injected by
+         * the canonical runtime.
+         * ==================================================
+         */
+        this.eventBridge =
+            options.eventBridge || null;
+
         this.options =
             options;
 
@@ -133,6 +144,36 @@ class EngineOrchestrator {
 
     }
 
+
+    /**
+     * ======================================================
+     * SET RUNTIME EVENT BRIDGE
+     * ======================================================
+     *
+     * Inject the canonical RuntimeEventBridge.
+     */
+
+    setEventBridge(eventBridge) {
+
+        if (!eventBridge) {
+            throw new Error(
+                "Runtime Event Bridge instance required."
+            );
+        }
+
+        if (
+            typeof eventBridge.publish !== "function"
+        ) {
+            throw new Error(
+                "Invalid Runtime Event Bridge contract: missing publish()."
+            );
+        }
+
+        this.eventBridge =
+            eventBridge;
+
+        return true;
+    }
 
     /**
      * ======================================================
@@ -937,6 +978,20 @@ class EngineOrchestrator {
         this.events.push(
             record
         );
+
+        /*
+         * ==================================================
+         * CANONICAL RUNTIME EVENT PROPAGATION
+         *
+         * The exact local record is forwarded.
+         * No second event record is created here.
+         * ==================================================
+         */
+        if (this.eventBridge) {
+            this.eventBridge.publish(
+                record
+            );
+        }
 
         return record;
 

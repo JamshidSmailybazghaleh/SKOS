@@ -164,7 +164,19 @@ class StartupManager {
                 }
 
 
-                return this.sdkc.initialize();
+                const result =
+                    this.sdkc.initialize();
+
+                if (
+                    this.kernel &&
+                    typeof this.kernel.attachSDKC === "function"
+                ) {
+                    this.kernel.attachSDKC(
+                        this.sdkc
+                    );
+                }
+
+                return result;
 
             }
 
@@ -196,6 +208,43 @@ class StartupManager {
 
         );
 
+
+
+        this.executeStep(
+
+            "KNOWLEDGE_QUERY_ENGINE_REGISTRATION",
+
+            () => {
+
+                if (
+                    !this.kernel ||
+                    !this.kernel.knowledgeQueryEngine
+                ) {
+
+                    throw new Error(
+                        "Knowledge Query Engine is not available for orchestration"
+                    );
+
+                }
+
+                if (
+                    !this.orchestrator
+                ) {
+
+                    throw new Error(
+                        "Engine orchestrator is not attached"
+                    );
+
+                }
+
+                return this.orchestrator.registerEngine(
+                    "KNOWLEDGE_QUERY_ENGINE",
+                    this.kernel.knowledgeQueryEngine
+                );
+
+            }
+
+        );
 
 
         this.executeStep(
@@ -257,6 +306,14 @@ class StartupManager {
 
 
 
+
+    restart() {
+        this.status = "RESTARTING";
+
+        this.shutdown();
+
+        return this.run();
+    }
 
     executeStep(name, callback) {
 

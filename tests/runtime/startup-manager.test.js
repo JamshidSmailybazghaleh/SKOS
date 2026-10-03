@@ -56,6 +56,11 @@ class MockKernel {
 
         this.autonomousReady = false;
 
+        this.knowledgeQueryEngine = {
+            name: "Knowledge Query Engine",
+            version: "1.0.0"
+        };
+
     }
 
     initialize() {
@@ -102,11 +107,50 @@ class MockKernel {
 
 
 
+class MockSDKC {
+
+    constructor() {
+
+        this.status = "DISCONNECTED";
+
+    }
+
+    initialize() {
+
+        this.status = "CONNECTED";
+
+        return true;
+
+    }
+
+    shutdown() {
+
+        this.status = "DISCONNECTED";
+
+        return true;
+
+    }
+
+}
+
 class MockOrchestrator {
 
     constructor() {
 
         this.status = "CREATED";
+
+    }
+
+    registerEngine(engineId, engine) {
+
+        if (!engineId || !engine) {
+            throw new Error("Invalid engine registration");
+        }
+
+        this.engineId = engineId;
+        this.engine = engine;
+
+        return true;
 
     }
 
@@ -215,6 +259,10 @@ describe(
                     new MockOrchestrator()
                 );
 
+                startup.attachSDKC(
+                    new MockSDKC()
+                );
+
                 expect(
                     startup.run()
                 ).toBe(true);
@@ -304,6 +352,10 @@ describe(
                     new MockOrchestrator()
                 );
 
+                startup.attachSDKC(
+                    new MockSDKC()
+                );
+
                 startup.run();
 
                 expect(
@@ -330,7 +382,7 @@ describe(
 
                 expect(
                     status.version
-                ).toBe("1.0.0");
+                ).toBe("1.0.1");
 
             }
         );

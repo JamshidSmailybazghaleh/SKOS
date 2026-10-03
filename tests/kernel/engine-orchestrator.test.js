@@ -304,7 +304,151 @@ describe(
 
                 expect(
                     status.version
-                ).toBe("1.0.0");
+                ).toBe("1.1.0");
+
+            }
+        );
+
+
+        test(
+            "Should recover failed engine and restore HEALTHY monitoring state",
+            () => {
+
+                const monitoring = {
+
+                    updateHealth:
+                        jest.fn(),
+
+                    recordEvent:
+                        jest.fn()
+
+                };
+
+                orchestrator =
+                    new EngineOrchestrator({
+                        monitoring
+                    });
+
+                const engine = {
+
+                    initialize:
+                        jest.fn(() => true)
+
+                };
+
+                orchestrator.registerEngine(
+                    "RECOVER_ENGINE",
+                    engine
+                );
+
+                expect(
+                    orchestrator.recoverEngine(
+                        "RECOVER_ENGINE"
+                    )
+                ).toBe(true);
+
+                expect(
+                    engine.initialize
+                ).toHaveBeenCalledTimes(1);
+
+                expect(
+                    monitoring.updateHealth
+                ).toHaveBeenCalledWith(
+                    "RECOVER_ENGINE",
+                    "HEALTHY"
+                );
+
+                expect(
+                    monitoring.recordEvent
+                ).toHaveBeenCalledWith(
+                    "ENGINE_RECOVERED",
+                    {
+                        engineId:
+                            "RECOVER_ENGINE"
+                    }
+                );
+
+            }
+        );
+
+
+        test(
+            "Should propagate recovery failure as FAILED monitoring state",
+            () => {
+
+                const monitoring = {
+
+                    updateHealth:
+                        jest.fn(),
+
+                    recordEvent:
+                        jest.fn()
+
+                };
+
+                orchestrator =
+                    new EngineOrchestrator({
+                        monitoring
+                    });
+
+                const engine = {
+
+                    initialize:
+                        jest.fn(() => {
+                            throw new Error(
+                                "RECOVERY_FAILURE"
+                            );
+                        })
+
+                };
+
+                orchestrator.registerEngine(
+                    "BROKEN_ENGINE",
+                    engine
+                );
+
+                expect(
+                    () =>
+                        orchestrator.recoverEngine(
+                            "BROKEN_ENGINE"
+                        )
+                ).toThrow(
+                    "RECOVERY_FAILURE"
+                );
+
+                expect(
+                    monitoring.updateHealth
+                ).toHaveBeenCalledWith(
+                    "BROKEN_ENGINE",
+                    "FAILED"
+                );
+
+                expect(
+                    monitoring.recordEvent
+                ).toHaveBeenCalledWith(
+                    "ENGINE_RECOVERY_FAILED",
+                    expect.objectContaining({
+                        engineId:
+                            "BROKEN_ENGINE",
+                        error:
+                            "RECOVERY_FAILURE"
+                    })
+                );
+
+            }
+        );
+
+
+        test(
+            "Should reject recovery of unknown engine",
+            () => {
+
+                expect(
+                    () =>
+                        orchestrator.recoverEngine(
+                            "UNKNOWN_ENGINE"
+                        )
+                ).toThrow();
 
             }
         );
