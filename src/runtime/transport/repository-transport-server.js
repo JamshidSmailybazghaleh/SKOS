@@ -4,7 +4,7 @@ class RepositoryTransportServer {
     constructor(options = {}) {
         this.connector = options.connector || null;
         this.host = options.host || "127.0.0.1";
-        this.port = options.port || 4780;
+        this.port = options.port ?? 4780;
         this.server = null;
         this.status = "CREATED";
     }
