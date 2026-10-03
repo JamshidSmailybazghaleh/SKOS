@@ -4,205 +4,181 @@
  * Smaily Knowledge Operating System
  * ==========================================================
  *
- * Test      : SKOS End-to-End Boot
+ * Test      : Canonical System Launcher
  * File      : skos.test.js
- *
- * Build     : BUILD-000908.3
- * Version   : 1.0.0
  *
  * ==========================================================
  */
 
-const SKOS =
-    require("../src/skos");
-
-
+const SKOSSystemLauncher =
+    require("../src/runtime/skos-system-launcher");
 
 describe(
-    "SKOS End-to-End Boot Tests",
+    "SKOS Canonical System Launcher",
     () => {
 
-
-
         test(
-            "Should create SKOS instance",
+            "Should create launcher instance",
             () => {
 
-                expect(SKOS)
+                const launcher =
+                    new SKOSSystemLauncher();
+
+                expect(launcher)
                     .toBeDefined();
 
-
-                expect(SKOS.name)
-                    .toBe(
-                        "Smaily Knowledge Operating System"
-                    );
-
+                expect(launcher.getStatus().launcher)
+                    .toBe("CREATED");
             }
         );
-
-
-
 
 
         test(
             "Should initialize successfully",
-            async () => {
+            () => {
+
+                const launcher =
+                    new SKOSSystemLauncher();
 
                 const result =
-                    await SKOS.initialize();
-
+                    launcher.initialize();
 
                 expect(result)
                     .toBe(true);
 
+                expect(
+                    launcher.getStatus().launcher
+                ).toBe("INITIALIZED");
+
+                launcher.shutdown();
             }
         );
 
 
+        test(
+            "Should perform canonical full launch",
+            async () => {
 
+                const launcher =
+                    new SKOSSystemLauncher();
 
+                const result =
+                    await launcher.launch();
 
+                const status =
+                    launcher.getStatus();
+
+                expect(result)
+                    .toBe(true);
+
+                expect(status.launcher)
+                    .toBe("RUNNING");
+
+                expect(status.startup)
+                    .toBe("READY");
+
+                expect(status.sdkc)
+                    .toBe("CONNECTED");
+
+                expect(status.orchestrator)
+                    .toBe("RUNNING");
+
+                launcher.shutdown();
+            }
+        );
 
 
         test(
-            "Should perform full boot sequence",
+            "Should expose canonical runtime status",
             async () => {
 
-                const report =
-                    await SKOS.start();
+                const launcher =
+                    new SKOSSystemLauncher();
 
+                await launcher.launch();
 
-                expect(report)
+                const status =
+                    launcher.getStatus();
+
+                expect(status)
                     .toBeDefined();
 
+                expect(status.launcher)
+                    .toBe("RUNNING");
 
-                expect(report.success)
-                    .toBe(true);
+                expect(status.bootstrap)
+                    .toBeDefined();
 
+                expect(status.kernel)
+                    .toBeDefined();
+
+                expect(status.orchestrator)
+                    .toBeDefined();
+
+                expect(status.sdkc)
+                    .toBeDefined();
+
+                launcher.shutdown();
             }
         );
 
 
-
-
-
-
-
         test(
-            "Should become operational",
-            () => {
-
-                const status =
-                    SKOS.getStatus();
-
-
-                expect(status.status)
-                    .toBe(
-                        "RUNNING"
-                    );
-
-            }
-        );
-
-
-
-
-
-
-
-
-        test(
-            "Should expose version",
-            () => {
-
-                const status =
-                    SKOS.getStatus();
-
-
-                expect(status.version)
-                    .toBe(
-                        "1.0.0"
-                    );
-
-            }
-        );
-
-
-
-
-
-
-
-
-        test(
-            "Should expose build",
-            () => {
-
-                const status =
-                    SKOS.getStatus();
-
-
-                expect(
-                    status.build
-                )
-                .toBeDefined();
-
-
-                expect(
-                    status.build
-                )
-                .toMatch(
-                    /^BUILD-\d{6}\.\d+$/
-                );
-
-            }
-        );
-
-
-
-
-
-
-
-
-        test(
-            "Should shutdown successfully",
+            "Should expose visibility chain",
             async () => {
 
-                const result =
-                    await SKOS.shutdown();
+                const launcher =
+                    new SKOSSystemLauncher();
 
+                await launcher.launch();
+
+                const status =
+                    launcher.getStatus();
+
+                expect(status.visibility)
+                    .toBeDefined();
+
+                expect(status.visibility.bridge)
+                    .toBeDefined();
+
+                expect(status.visibility.adapter)
+                    .toBeDefined();
+
+                expect(status.visibility.client)
+                    .toBeDefined();
+
+                expect(status.visibility.livePanel)
+                    .toBeDefined();
+
+                launcher.shutdown();
+            }
+        );
+
+
+        test(
+            "Should shutdown cleanly",
+            async () => {
+
+                const launcher =
+                    new SKOSSystemLauncher();
+
+                await launcher.launch();
+
+                const result =
+                    await launcher.shutdown();
 
                 expect(result)
                     .toBe(true);
 
+                expect(
+                    launcher.getStatus().launcher
+                ).toBe("SHUTDOWN");
+
+                expect(
+                    launcher.getStatus().startup
+                ).toBe("SHUTDOWN");
             }
         );
-
-
-
-
-
-
-
-
-        test(
-            "Should stop runtime",
-            () => {
-
-                const status =
-                    SKOS.getStatus();
-
-
-                expect(status.status)
-                    .toBe(
-                        "STOPPED"
-                    );
-
-            }
-        );
-
-
 
     }
 );

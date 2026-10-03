@@ -31,6 +31,20 @@ describe(
     });
 
 
+    afterEach(async () => {
+
+        if (
+            launcher &&
+            launcher.status === "RUNNING"
+        ) {
+
+            await launcher.shutdown();
+
+        }
+
+    });
+
+
     test(
     "Should create launcher",
     () => {
@@ -63,30 +77,30 @@ describe(
 
     test(
     "Should launch SKOS",
-    () => {
+    async () => {
 
         launcher.initialize();
 
         expect(
-            launcher.launch()
+            await launcher.launch()
         ).toBe(true);
 
         expect(
-    launcher.status
-)
-.toBe(
-    "READY"
-    
+            launcher.status
+        ).toBe(
+            "RUNNING"
+        );
+
     });
 
 
     test(
     "Should return runtime status",
-    () => {
+    async () => {
 
         launcher.initialize();
 
-        launcher.launch();
+        await launcher.launch();
 
         const status =
             launcher.getStatus();
@@ -100,14 +114,14 @@ describe(
 
     test(
     "Should shutdown SKOS",
-    () => {
+    async () => {
 
         launcher.initialize();
 
-        launcher.launch();
+        await launcher.launch();
 
         expect(
-            launcher.shutdown()
+            await launcher.shutdown()
         ).toBe(true);
 
         expect(
@@ -119,10 +133,10 @@ describe(
 
     test(
     "Should launch without manual initialize",
-    () => {
+    async () => {
 
         expect(
-            launcher.launch()
+            await launcher.launch()
         ).toBe(true);
 
         expect(
