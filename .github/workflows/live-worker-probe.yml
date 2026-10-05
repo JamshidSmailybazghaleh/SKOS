@@ -13,7 +13,9 @@ jobs:
           curl -4 --http1.1 --silent --show-error \
             --max-time 20 \
             --dump-header /tmp/headers \
-            --output /dev/null \
-            'https://smaily-commerce-api.iran-jsbsmaily1.workers.dev/'
+            'https://smaily-commerce-api.iran-jsbsmaily1.workers.dev/commerce/status' \
+            -o /tmp/body
           echo '=== HTTP HEADERS ==='
           sed -n '1,40p' /tmp/headers
+          echo '=== RESPONSE BODY ==='
+          cat /tmp/body
