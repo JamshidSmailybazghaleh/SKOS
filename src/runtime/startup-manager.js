@@ -164,7 +164,7 @@ class StartupManager {
                 }
 
 
-                return this.sdkc.initialize();
+                return this.sdkc.connect();
 
             }
 

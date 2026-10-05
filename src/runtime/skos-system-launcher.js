@@ -69,6 +69,10 @@ class SKOSSystemLauncher {
             this.kernel
         );
 
+        this.startup.attachSDKC(
+            this.sdkc
+        );
+
         this.startup.attachOrchestrator(
             this.orchestrator
         );

@@ -12,14 +12,8 @@ class RepositoryManager {
 
     constructor(options = {}) {
 
-        this.rootPath =
-            options.rootPath ||
-            path.join(
-                process.cwd(),
-                "sdkc",
-                "repository",
-                "objects"
-            );
+        this.rootPath = path.join(options.rootPath || path.join(process.cwd(), "sdkc"), "repository", "objects");
+
 
     }
 

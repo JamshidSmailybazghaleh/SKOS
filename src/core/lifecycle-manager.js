@@ -81,6 +81,8 @@ class LifecycleManager {
 
         };
 
+          this.timeline = [];
+
 
     }
 /**
@@ -182,7 +184,8 @@ setState(
 initialize(){
 
     if(
-        this.state !== "CREATED"
+        this.state !== "CREATED" &&
+        this.state !== "STOPPED"
     ){
         return false;
     }
@@ -383,12 +386,6 @@ restart(){
 
 }
 
-start()
-
-this.registry.startResolved();
-
-
-restart()
 
 /**
  * ==========================================================
@@ -474,7 +471,6 @@ snapshot(){
 
 }
 
-this.timeline = [];
     
 /**
  * ==========================================================
@@ -504,27 +500,6 @@ record(
 
 }
 
-initialize()
-
-start()
-
-pause()
-
-resume()
-
-stop()
-
-restart()    
-
-this.record(
-    "INITIALIZE"
-);
-
-START
-PAUSE
-RESUME
-STOP
-RESTART    
 
 getTimeline(){
 
@@ -658,3 +633,7 @@ report(){
 
     
     
+
+}
+
+module.exports = LifecycleManager;
