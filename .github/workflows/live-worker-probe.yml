@@ -1,0 +1,19 @@
+name: SKOS Live Worker Probe
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe Live Worker
+        run: |
+          set -e
+          curl -4 --http1.1 --silent --show-error \
+            --max-time 20 \
+            --dump-header /tmp/headers \
+            --output /dev/null \
+            'https://smaily-commerce-api.iran-jsbsmaily1.workers.dev/'
+          echo '=== HTTP HEADERS ==='
+          sed -n '1,40p' /tmp/headers
