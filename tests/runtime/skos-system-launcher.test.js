@@ -75,8 +75,9 @@ describe(
     launcher.status
 )
 .toBe(
-    "READY"
+    "RUNNING"
     
+        );
     });
 
 

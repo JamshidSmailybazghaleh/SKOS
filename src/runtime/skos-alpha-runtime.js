@@ -32,7 +32,7 @@ const SDKCRuntimeConnector =
 
 class SKOSAlphaRuntime {
 
-    constructor() {
+    constructor(options = {}) {
 
         this.name = "SKOS Alpha Runtime";
         this.version = "1.0.0";
@@ -53,6 +53,12 @@ class SKOSAlphaRuntime {
         this.sdkc =
             new SDKCRuntimeConnector();
 
+        this.repository = options.repository || null;
+
+        if (this.repository) {
+            this.sdkc.attachRepository(this.repository);
+        }
+
         this.startedAt = null;
     }
 
@@ -70,6 +76,9 @@ class SKOSAlphaRuntime {
 
         this.startup.attachOrchestrator(
             this.orchestrator
+        );
+        this.startup.attachSDKC(
+            this.sdkc
         );
 
         this.status = "INITIALIZED";
@@ -115,7 +124,6 @@ class SKOSAlphaRuntime {
     }
 
     start() {
-start() {
 
     if (
         this.status !== "INITIALIZED"

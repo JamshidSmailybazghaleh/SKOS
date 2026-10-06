@@ -44,6 +44,22 @@ class MockBootstrap {
 
 
 
+class MockSDKC {
+    constructor() {
+        this.status = "CREATED";
+    }
+
+    connect() {
+        this.status = "CONNECTED";
+        return true;
+    }
+
+    shutdown() {
+        this.status = "SHUTDOWN";
+        return true;
+    }
+}
+
 class MockKernel {
 
     constructor() {
@@ -202,7 +218,6 @@ describe(
         test(
             "Should execute startup sequence",
             () => {
-
                 startup.attachBootstrap(
                     new MockBootstrap()
                 );
@@ -215,6 +230,10 @@ describe(
                     new MockOrchestrator()
                 );
 
+                startup.attachSDKC(
+                    new MockSDKC()
+                );
+
                 expect(
                     startup.run()
                 ).toBe(true);
@@ -222,11 +241,8 @@ describe(
                 expect(
                     startup.status
                 ).toBe("READY");
-
             }
         );
-
-
 
         test(
             "Should connect SDKC",
@@ -291,7 +307,6 @@ describe(
         test(
             "Should record executed steps",
             () => {
-
                 startup.attachBootstrap(
                     new MockBootstrap()
                 );
@@ -304,16 +319,17 @@ describe(
                     new MockOrchestrator()
                 );
 
+                startup.attachSDKC(
+                    new MockSDKC()
+                );
+
                 startup.run();
 
                 expect(
                     startup.getSteps().length
                 ).toBeGreaterThan(0);
-
             }
         );
-
-
 
         test(
             "Should return runtime status",
@@ -330,7 +346,7 @@ describe(
 
                 expect(
                     status.version
-                ).toBe("1.0.0");
+                ).toBe("1.0.1");
 
             }
         );

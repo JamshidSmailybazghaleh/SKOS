@@ -30,6 +30,9 @@ const StartupManager =
 const SDKCRuntimeConnector =
     require("./sdkc-runtime-connector");
 
+const RepositoryService =
+    require("../engines/sdkc-engine/repository-service");
+
 
 
 class SKOSSystemLauncher {
@@ -51,6 +54,13 @@ class SKOSSystemLauncher {
 
         this.sdkc =
             new SDKCRuntimeConnector();
+
+        this.repository =
+            new RepositoryService();
+
+        this.sdkc.attachRepository(
+            this.repository
+        );
 
         this.startup =
             new StartupManager();
@@ -94,6 +104,7 @@ class SKOSSystemLauncher {
 
         }
 
+        this.repository.connect();
         this.startup.run();
 
         this.status = "RUNNING";
