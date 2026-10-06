@@ -1,0 +1,4 @@
+node_modules/
+monitoring/logs/
+*.pre-*
+*.bak-*
