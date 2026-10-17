@@ -59,10 +59,38 @@ small{color:#526579}
  <small>ترسیم مفهومی است؛ نقشه اجرایی یا تأییدیه ساختمانی نیست.</small>
 </section>
 
+
+<section id="building-model-panel"
+ style="background:#fff;color:#0a2342;padding:16px;margin:16px 0;border-radius:12px">
+<h2>پلان چندفضایی ساختمان</h2>
+<p>مدل مفهومی اولیه؛ ابعاد بر حسب متر.</p>
+<label>انتخاب فضا
+<select id="bm-room" style="display:block;width:100%;padding:10px"></select>
+</label>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<label>نام<input id="bm-name" style="display:block;width:95%"></label>
+<label>X<input id="bm-x" type="number" step="0.1" style="width:95%"></label>
+<label>Y<input id="bm-y" type="number" step="0.1" style="width:95%"></label>
+<label>عرض<input id="bm-w" type="number" min="0.1" step="0.1" style="width:95%"></label>
+<label>عمق<input id="bm-d" type="number" min="0.1" step="0.1" style="width:95%"></label>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<button id="bm-update" type="button">ثبت ویرایش</button>
+<button id="bm-add" type="button">افزودن فضا</button>
+<button id="bm-delete" type="button">حذف فضا</button>
+<button id="bm-save" type="button">دریافت پلان SVG</button>
+</div>
+<p id="bm-status" role="status">آماده‌سازی...</p>
+<div id="bm-view" style="width:100%;overflow:auto"></div>
+<p id="bm-area"></p>
+<small>این نسخه هنوز نقشه اجرایی، در و پنجره، برش، نما یا فایل BIM تولید نمی‌کند.</small>
+</section>
+
 <button id="save">دریافت مدل SVG</button>
 <p><small>نسخهٔ اولیه؛ مدل حجمی مفهومی است و هنوز نقشهٔ اجرایی یا فایل BIM/GLB تولید نمی‌کند.</small></p>
 <script src="floor-plan-browser.js"></script>
 <script src="site-feasibility.js"></script>
+<script src="building-model-browser.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 function render(){
@@ -180,4 +208,163 @@ $("check-feasibility").addEventListener("click",()=>{
 });
 
 </script>
+
+<script>
+(function () {
+  'use strict';
+  const api = window.SKOSBuildingModel;
+  const $ = id => document.getElementById(id);
+  if (!api) {
+    $('bm-status').textContent = 'خطا در بارگذاری موتور چندفضایی.';
+    return;
+  }
+
+  let model = api.createDefaultModel();
+  let serial = 1;
+
+  function selected() {
+    return model.rooms.find(r => r.id === $('bm-room').value);
+  }
+
+  function fill() {
+    const r = selected();
+    if (!r) return;
+    $('bm-name').value = r.name;
+    $('bm-x').value = r.x;
+    $('bm-y').value = r.y;
+    $('bm-w').value = r.width;
+    $('bm-d').value = r.depth;
+  }
+
+  function draw(message) {
+    const select = $('bm-room');
+    const previous = select.value;
+    select.replaceChildren();
+    model.rooms.forEach(r => {
+      const option = document.createElement('option');
+      option.value = r.id;
+      option.textContent = r.name;
+      select.appendChild(option);
+    });
+    if (model.rooms.some(r => r.id === previous)) select.value = previous;
+    fill();
+
+    const errors = api.validateModel(model);
+    if (errors.length) {
+      $('bm-status').textContent = errors.join(' ');
+      $('bm-view').replaceChildren();
+      return false;
+    }
+    $('bm-view').innerHTML = api.renderFloorPlanSvg(model);
+    $('bm-area').textContent =
+      'مساحت محدوده ساختمان: ' +
+      (model.width * model.depth).toFixed(2) +
+      ' مترمربع | تعداد فضاها: ' + model.rooms.length;
+    $('bm-status').textContent = message || 'پلان آماده است.';
+    return true;
+  }
+
+  function overlaps(a, b) {
+    return a.x < b.x + b.width && a.x + a.width > b.x &&
+      a.y < b.y + b.depth && a.y + a.depth > b.y;
+  }
+
+  $('bm-room').addEventListener('change', fill);
+
+  $('bm-update').addEventListener('click', () => {
+    const old = selected();
+    if (!old) return;
+    const r = {
+      id: old.id,
+      name: $('bm-name').value.trim(),
+      x: Number($('bm-x').value),
+      y: Number($('bm-y').value),
+      width: Number($('bm-w').value),
+      depth: Number($('bm-d').value)
+    };
+    const candidate = {
+      ...model,
+      rooms: model.rooms.map(item => item.id === old.id ? r : item)
+    };
+    const errors = api.validateModel(candidate);
+    if (errors.length) {
+      $('bm-status').textContent = errors.join(' ');
+      return;
+    }
+    if (candidate.rooms.some(item =>
+      item.id !== r.id && overlaps(r, item))) {
+      $('bm-status').textContent =
+        'این فضا با فضای دیگری هم‌پوشانی دارد؛ موقعیت یا ابعاد را تغییر دهید.';
+      return;
+    }
+    model = candidate;
+    draw('ویرایش ثبت شد.');
+  });
+
+  $('bm-add').addEventListener('click', () => {
+    const w = Math.min(2, model.width - 0.4);
+    const d = Math.min(2, model.depth - 0.4);
+    let room = null;
+    if (w <= 0 || d <= 0) {
+      $('bm-status').textContent = 'ابعاد ساختمان کافی نیست.';
+      return;
+    }
+    for (let y = 0.2; y + d <= model.depth && !room; y += 0.25) {
+      for (let x = 0.2; x + w <= model.width; x += 0.25) {
+        const r = {
+          id: 'new-room-' + serial,
+          name: 'فضای جدید ' + serial,
+          x: Number(x.toFixed(2)),
+          y: Number(y.toFixed(2)),
+          width: w, depth: d
+        };
+        if (!model.rooms.some(item => overlaps(r, item))) {
+          room = r;
+          break;
+        }
+      }
+    }
+    if (!room) {
+      $('bm-status').textContent = 'فضای خالی مناسب پیدا نشد.';
+      return;
+    }
+    serial++;
+    model.rooms.push(room);
+    draw('فضای جدید اضافه شد.');
+    $('bm-room').value = room.id;
+    fill();
+  });
+
+  $('bm-delete').addEventListener('click', () => {
+    const r = selected();
+    if (!r) return;
+    if (model.rooms.length <= 1) {
+      $('bm-status').textContent = 'حداقل یک فضا باید باقی بماند.';
+      return;
+    }
+    model.rooms = model.rooms.filter(item => item.id !== r.id);
+    draw('فضا حذف شد.');
+  });
+
+  $('bm-save').addEventListener('click', () => {
+    try {
+      const svg = api.renderFloorPlanSvg(model);
+      const url = URL.createObjectURL(
+        new Blob([svg], {type: 'image/svg+xml;charset=utf-8'})
+      );
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'SKOS-multispace-floor-plan.svg';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      $('bm-status').textContent = 'درخواست دریافت SVG انجام شد.';
+    } catch (e) {
+      $('bm-status').textContent = 'خطا: ' + e.message;
+    }
+  });
+
+  draw('مدل اولیه بارگذاری شد.');
+})();
+</script>
+
 </html>
