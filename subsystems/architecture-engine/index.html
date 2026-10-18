@@ -79,6 +79,11 @@ small{color:#526579}
 <button id="bm-add" type="button">افزودن فضا</button>
 <button id="bm-delete" type="button">حذف فضا</button>
 <button id="bm-save" type="button">دریافت پلان SVG</button>
+<button id="bm-export-json" type="button">ذخیره پروژه JSON</button>
+<button id="bm-import-json" type="button">بارگذاری پروژه JSON</button>
+<input id="bm-json-file" type="file" accept=".json,application/json"
+ style="display:none">
+
 </div>
 <p id="bm-status" role="status">آماده‌سازی...</p>
 <div id="bm-view" style="width:100%;overflow:auto"></div>
@@ -302,8 +307,8 @@ $("check-feasibility").addEventListener("click",()=>{
   });
 
   $('bm-add').addEventListener('click', () => {
-    const w = Math.min(2, model.width - 0.4);
-    const d = Math.min(2, model.depth - 0.4);
+    const w = Math.min(1, model.width - 0.4);
+    const d = Math.min(1, model.depth - 0.4);
     let room = null;
     if (w <= 0 || d <= 0) {
       $('bm-status').textContent = 'ابعاد ساختمان کافی نیست.';
@@ -360,6 +365,65 @@ $("check-feasibility").addEventListener("click",()=>{
       $('bm-status').textContent = 'درخواست دریافت SVG انجام شد.';
     } catch (e) {
       $('bm-status').textContent = 'خطا: ' + e.message;
+    }
+  });
+
+
+  $('bm-export-json').addEventListener('click', () => {
+    try {
+      const errors = api.validateModel(model);
+      if (errors.length) {
+        $('bm-status').textContent = errors.join(' ');
+        return;
+      }
+      const blob = new Blob(
+        [JSON.stringify(model, null, 2)],
+        { type: 'application/json;charset=utf-8' }
+      );
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'SKOS-building-project.json';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      $('bm-status').textContent = 'درخواست دریافت فایل پروژه JSON انجام شد.';
+    } catch (e) {
+      $('bm-status').textContent = 'خطای ذخیره: ' + e.message;
+    }
+  });
+
+  $('bm-import-json').addEventListener('click', () => {
+    $('bm-json-file').click();
+  });
+
+  $('bm-json-file').addEventListener('change', async event => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    try {
+      const candidate = JSON.parse(await file.text());
+      if (!candidate || !Array.isArray(candidate.rooms)) {
+        throw new Error('ساختار فایل پروژه معتبر نیست.');
+      }
+      const errors = api.validateModel(candidate);
+      if (errors.length) {
+        throw new Error(errors.join(' '));
+      }
+      if (!Array.isArray(candidate.openings)) {
+        throw new Error('اطلاعات درها و پنجره‌ها موجود نیست.');
+      }
+      model = candidate;
+      const serials = model.rooms.map(r => {
+        const m = /^new-room-(\d+)$/.exec(r.id || '');
+        return m ? Number(m[1]) : 0;
+      });
+      serial = Math.max(serial, ...serials.map(n => n + 1));
+      if (draw('پروژه با موفقیت بارگذاری شد.')) {
+        $('bm-status').textContent = 'پروژه بارگذاری شد.';
+      }
+    } catch (e) {
+      $('bm-status').textContent = 'بارگذاری ناموفق: ' + e.message;
+    } finally {
+      event.target.value = '';
     }
   });
 
