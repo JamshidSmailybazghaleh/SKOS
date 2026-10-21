@@ -35,9 +35,9 @@ class RepositoryService {
 
     constructor(options = {}) {
 
-        this.rootPath =
-            options.rootPath ||
-            path.join(
+        this.rootPath = options.rootPath
+            ? path.join(options.rootPath, "repository", "objects")
+            : path.join(
                 process.cwd(),
                 "sdkc",
                 "repository",
