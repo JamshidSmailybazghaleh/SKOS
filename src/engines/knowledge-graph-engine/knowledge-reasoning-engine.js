@@ -219,6 +219,18 @@ class KnowledgeReasoningEngine {
     /**
      * Register knowledge fact
      */
+    addFact(factId, data = {}) {
+        if (!factId) {
+            throw new Error("Fact id required.");
+        }
+        return this.addKnowledge(factId, data);
+    }
+
+    getFacts() {
+        return Array.from(this.knowledgeBase.values());
+    }
+
+
 
 
     addKnowledge(
@@ -249,6 +261,9 @@ class KnowledgeReasoningEngine {
             id:
 
                 knowledgeId,
+            subject: data.subject,
+            predicate: data.predicate,
+            object: data.object,
 
 
             attributes:
@@ -261,9 +276,7 @@ class KnowledgeReasoningEngine {
                 data.source || "UNKNOWN",
 
 
-            confidence:
-
-                data.confidence || 0.5,
+            confidence: data.confidence ?? 0.5,
 
 
             createdAt:
@@ -288,6 +301,21 @@ class KnowledgeReasoningEngine {
         return record;
 
     }
+    disableRule(ruleId) {
+        const rule = this.rules.get(ruleId);
+        if (!rule) return false;
+        rule.enabled = false;
+        return true;
+    }
+
+    enableRule(ruleId) {
+        const rule = this.rules.get(ruleId);
+        if (!rule) return false;
+        rule.enabled = true;
+        return true;
+    }
+
+
 
 
 
@@ -364,20 +392,10 @@ class KnowledgeReasoningEngine {
      */
 
 
-    reason(
-
-        sessionId
-
-    ){
-
-
-        const session =
-
-            this.sessions.get(
-
-                sessionId
-
-            );
+    reason(inputOrSessionId = {}) {
+        const session = typeof inputOrSessionId === "string"
+            ? this.sessions.get(inputOrSessionId)
+            : this.createSession(inputOrSessionId);
 
 
 
@@ -476,9 +494,7 @@ class KnowledgeReasoningEngine {
         const result = {
 
 
-            sessionId,
-
-
+            sessionId: session.id,
             appliedRules,
 
 
@@ -529,7 +545,7 @@ class KnowledgeReasoningEngine {
 
 
 
-        return result;
+        return conclusions;
 
     }
 
@@ -676,6 +692,17 @@ class KnowledgeReasoningEngine {
 
 
 
+    getReasoningTrace() {
+        return this.reasoningHistory;
+    }
+
+    getInferences() {
+        return this.reasoningHistory.flatMap(
+            entry => Array.isArray(entry.conclusions) ? entry.conclusions : []
+        );
+    }
+
+
     getHistory(){
 
 
@@ -713,9 +740,8 @@ class KnowledgeReasoningEngine {
                 this.rules.size,
 
 
-            knowledgeObjects:
-
-                this.knowledgeBase.size,
+            knowledgeObjects: this.knowledgeBase.size,
+            facts: this.knowledgeBase.size,
 
 
             sessions:
