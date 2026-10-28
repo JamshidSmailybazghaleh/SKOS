@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SKOS Architecture Engine v0.1</title>
+<style>
+body{font-family:sans-serif;max-width:850px;margin:auto;padding:16px;background:#f3f5f8;color:#102a43}
+h2{color:#0a2342}label{display:block;margin:14px 0}
+input{width:100%;max-width:420px}button{padding:10px;margin:5px;border:0;border-radius:7px;background:#0a2342;color:white}
+#view{background:white;border-radius:12px;padding:8px;margin-top:14px}
+small{color:#526579}
+</style>
+<h2>SKOS Architecture Engine v0.1</h2>
+<p>مدل‌سازی اولیهٔ حجم ساختمان، بدون نصب کتابخانه</p>
+<label>عرض ساختمان: <b id="wv">12</b> متر
+<input id="w" type="range" min="6" max="30" value="12"></label>
+<label>عمق ساختمان: <b id="dv">10</b> متر
+<input id="d" type="range" min="6" max="25" value="10"></label>
+<label>تعداد طبقات: <b id="fv">4</b>
+<input id="f" type="range" min="1" max="15" value="4"></label>
+<div id="view"></div>
+
+<section id="site-feasibility-panel"
+ style="background:white;padding:12px;margin-top:12px;border-radius:10px">
+ <h3>امکان‌سنجی اولیه زمین</h3>
+ <label>مساحت زمین (مترمربع)
+  <input id="plotArea" type="number" min="1" step="0.01" value="571.09">
+ </label>
+ <label>حداکثر سطح اشغال (درصد)
+  <input id="coverage" type="number" min="1" max="100" value="40">
+ </label>
+ <label>تراکم مجاز نمونه (درصد)
+  <input id="far" type="number" min="0" step="1" value="220">
+ </label>
+ <label>حداکثر تعداد طبقات مجاز
+  <input id="maxFloors" type="number" min="1" step="1" value="5">
+ </label>
+ <button id="check-feasibility" type="button">محاسبه امکان‌سنجی</button>
+ <div id="feasibility-result" aria-live="polite"></div>
+ <small>برآورد مقدماتی است؛ جایگزین استعلام ضوابط یا مجوز قانونی نیست.</small>
+</section>
+
+
+<section id="floor-plan-panel"
+ style="background:white;padding:12px;margin-top:12px;border-radius:10px">
+ <h3>پلان دوبعدی اتاق</h3>
+ <label>عرض اتاق (متر)
+  <input id="roomWidth" type="number" min="0.1" step="0.1" value="5">
+ </label>
+ <label>عمق اتاق (متر)
+  <input id="roomDepth" type="number" min="0.1" step="0.1" value="4">
+ </label>
+ <label>ضخامت دیوار (متر)
+  <input id="wallThickness" type="number" min="0.05" step="0.05" value="0.2">
+ </label>
+ <button id="draw-floor-plan" type="button">ترسیم پلان دوبعدی</button>
+ <button id="save-floor-plan" type="button">دریافت پلان SVG</button>
+ <div id="floor-plan-view" aria-live="polite"></div>
+ <small>ترسیم مفهومی است؛ نقشه اجرایی یا تأییدیه ساختمانی نیست.</small>
+</section>
+
+
+<section id="building-model-panel"
+ style="background:#fff;color:#0a2342;padding:16px;margin:16px 0;border-radius:12px">
+<h2>پلان چندفضایی ساختمان</h2>
+<p>مدل مفهومی اولیه؛ ابعاد بر حسب متر.</p>
+<label>انتخاب فضا
+<select id="bm-room" style="display:block;width:100%;padding:10px"></select>
+</label>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<label>نام<input id="bm-name" style="display:block;width:95%"></label>
+<label>X<input id="bm-x" type="number" step="0.1" style="width:95%"></label>
+<label>Y<input id="bm-y" type="number" step="0.1" style="width:95%"></label>
+<label>عرض<input id="bm-w" type="number" min="0.1" step="0.1" style="width:95%"></label>
+<label>عمق<input id="bm-d" type="number" min="0.1" step="0.1" style="width:95%"></label>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+<button id="bm-update" type="button">ثبت ویرایش</button>
+<button id="bm-add" type="button">افزودن فضا</button>
+<button id="bm-delete" type="button">حذف فضا</button>
+<button id="bm-save" type="button">دریافت پلان SVG</button>
+<button id="bm-export-json" type="button">ذخیره پروژه JSON</button>
+<button id="bm-import-json" type="button">بارگذاری پروژه JSON</button>
+<input id="bm-json-file" type="file" accept=".json,application/json"
+ style="display:none">
+
+</div>
+<p id="bm-status" role="status">آماده‌سازی...</p>
+<div id="bm-view" style="width:100%;overflow:auto"></div>
+<p id="bm-area"></p>
+<small>این نسخه هنوز نقشه اجرایی، در و پنجره، برش، نما یا فایل BIM تولید نمی‌کند.</small>
+</section>
+
+<button id="save">دریافت مدل SVG</button>
+<p><small>نسخهٔ اولیه؛ مدل حجمی مفهومی است و هنوز نقشهٔ اجرایی یا فایل BIM/GLB تولید نمی‌کند.</small></p>
+<script src="floor-plan-browser.js"></script>
+<script src="site-feasibility.js"></script>
+<script src="building-model-browser.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+function render(){
+ const w=+$("w").value,d=+$("d").value,f=+$("f").value;
+ $("wv").textContent=w;$("dv").textContent=d;$("fv").textContent=f;
+ const area=w*d;
+const totalArea=area*f;
+let report=document.getElementById("area-report");
+if(!report){
+report=document.createElement("div");
+report.id="area-report";
+report.style.cssText="background:white;padding:12px;margin-top:12px;border-radius:10px;color:#0a2342";
+$("view").insertAdjacentElement("afterend",report);
+}
+report.innerHTML=`<strong>گزارش مساحت</strong><p>مساحت هر طبقه: ${area} مترمربع</p><p>زیربنای ناخالص کل: ${totalArea} مترمربع</p><small>با فرض ابعاد یکسان تمام طبقات؛ بدون کسر نورگیر، حیاط یا فضاهای خالی.</small>`;
+const W=460,H=390, sx= Math.min(13,250/(w+d)), sy=sx*.48, sh=Math.min(18,230/f);
+ const ox=230, oy=65+f*sh;
+ const A=[ox,oy], B=[ox+w*sx/2,oy+w*sy/2],
+ C=[ox+(w-d)*sx/2,oy+(w+d)*sy/2],
+ D=[ox-d*sx/2,oy+d*sy/2];
+ const top=(p,z)=>[p[0],p[1]-z];
+ const pts=a=>a.map(p=>p.join(",")).join(" ");
+ const poly=(a,c)=>`<polygon points="${pts(a)}" fill="${c}" stroke="#243b53" stroke-width="1.4"/>`;
+ let s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" role="img">`;
+ s+='<rect width="100%" height="100%" fill="#fff"/>';
+ s+=poly([A,B,C,D],"#dce6ef");
+ s+=poly([A,B,top(B,f*sh),top(A,f*sh)],"#d4af37");
+ s+=poly([B,C,top(C,f*sh),top(B,f*sh)],"#8ba7c0");
+ s+=poly([C,D,top(D,f*sh),top(C,f*sh)],"#dce6ef");
+ for(let i=1;i<f;i++){
+   let z=i*sh;
+   s+=`<path d="M ${A[0]} ${A[1]-z} L ${B[0]} ${B[1]-z} L ${C[0]} ${C[1]-z} M ${B[0]} ${B[1]-z} L ${C[0]} ${C[1]-z}" fill="none" stroke="#526579" stroke-width="1"/>`;
+ }
+ for(let i=0;i<f;i++){
+   let z=(i+.22)*sh;
+   for(let j=0;j<Math.max(1,Math.floor(w/3));j++){
+     let t=(j+.5)/Math.max(1,Math.floor(w/3));
+     let x=A[0]+(B[0]-A[0])*t,y=A[1]+(B[1]-A[1])*t-z;
+     s+=`<rect x="${x-3}" y="${y-4}" width="6" height="8" fill="#0a2342"/>`;
+   }
+ }
+ s+=`<text x="230" y="24" font-size="14" text-anchor="middle" fill="#0a2342">ساختمان ${f} طبقه | ${w} × ${d} متر</text></svg>`;
+ $("view").innerHTML=s;
+}
+["w","d","f"].forEach(id=>$(id).addEventListener("input",render));
+$("save").onclick=()=>{
+ const svg=$("view").innerHTML;
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"}));
+ a.download="SKOS-building-model.svg";a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+};
+render();
+
+
+function renderFloorPlan(){
+ const width = Number($("roomWidth").value);
+ const depth = Number($("roomDepth").value);
+ const thickness = Number($("wallThickness").value);
+ const out = $("floor-plan-view");
+ try {
+  if (![width,depth,thickness].every(Number.isFinite))
+   throw new Error("همه ابعاد باید عدد معتبر باشند.");
+  out.innerHTML = SKOSFloorPlan.createFloorPlanSvg(width,depth,thickness);
+ } catch(e) {
+  out.textContent = "ابعاد نامعتبر: " + e.message;
+ }
+}
+$("draw-floor-plan").addEventListener("click",renderFloorPlan);
+$("save-floor-plan").addEventListener("click",()=>{
+ renderFloorPlan();
+ const svg = $("floor-plan-view").querySelector("svg");
+ if(!svg) return;
+ const a = document.createElement("a");
+ a.href = URL.createObjectURL(new Blob(
+  [svg.outerHTML],{type:"image/svg+xml"}
+ ));
+ a.download = "SKOS-floor-plan.svg";
+ a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+});
+renderFloorPlan();
+
+const feasibilityInputs = ["plotArea","coverage","far","maxFloors"];
+$("check-feasibility").addEventListener("click",()=>{
+ const read=id=>$(id).value.trim()===""?NaN:Number($(id).value);
+ const plotAreaM2=read("plotArea");
+ const coveragePercent=read("coverage");
+ const farPercent=read("far");
+ const maxFloors=read("maxFloors");
+ const out=$("feasibility-result");
+ try {
+  if (![plotAreaM2,coveragePercent,farPercent,maxFloors].every(Number.isFinite))
+   throw new Error("همه ورودی‌ها باید عدد معتبر باشند.");
+  if (!Number.isInteger(maxFloors))
+   throw new Error("تعداد طبقات باید عدد صحیح باشد.");
+  const r=calculateSiteFeasibility({
+   plotAreaM2,
+   coverageRatio:coveragePercent/100,
+   farRatio:farPercent/100,
+   maxFloors
+  });
+  const fmt=n=>n.toLocaleString("fa-IR",{maximumFractionDigits:2});
+  out.innerHTML=
+   `<p>حداکثر سطح اشغال محاسباتی: ${fmt(r.footprintCapM2)} مترمربع</p>`+
+   `<p>فضای باز محاسباتی: ${fmt(r.openAreaM2)} مترمربع</p>`+
+   `<p>سقف زیربنا بر اساس تراکم: ${fmt(r.farCapM2)} مترمربع</p>`+
+   `<p>سقف زیربنا بر اساس طبقات: ${fmt(r.floorCapM2)} مترمربع</p>`+
+   `<p><strong>حداکثر زیربنای محاسباتی: ${fmt(r.maxBuildableGfaM2)} مترمربع</strong></p>`+
+   `<p>عامل محدودکننده: ${r.limitingConstraint}</p>`+
+   `<small>برآورد مقدماتی؛ بدون تأیید قانونی.</small>`;
+ } catch(e) {
+  out.textContent="خطای ورودی: "+e.message;
+ }
+});
+
+</script>
+
+<script>
+(function () {
+  'use strict';
+  const api = window.SKOSBuildingModel;
+  const $ = id => document.getElementById(id);
+  if (!api) {
+    $('bm-status').textContent = 'خطا در بارگذاری موتور چندفضایی.';
+    return;
+  }
+
+  let model = api.createDefaultModel();
+  let serial = 1;
+
+  function selected() {
+    return model.rooms.find(r => r.id === $('bm-room').value);
+  }
+
+  function fill() {
+    const r = selected();
+    if (!r) return;
+    $('bm-name').value = r.name;
+    $('bm-x').value = r.x;
+    $('bm-y').value = r.y;
+    $('bm-w').value = r.width;
+    $('bm-d').value = r.depth;
+  }
+
+  function draw(message) {
+    const select = $('bm-room');
+    const previous = select.value;
+    select.replaceChildren();
+    model.rooms.forEach(r => {
+      const option = document.createElement('option');
+      option.value = r.id;
+      option.textContent = r.name;
+      select.appendChild(option);
+    });
+    if (model.rooms.some(r => r.id === previous)) select.value = previous;
+    fill();
+
+    const errors = api.validateModel(model);
+    if (errors.length) {
+      $('bm-status').textContent = errors.join(' ');
+      $('bm-view').replaceChildren();
+      return false;
+    }
+    $('bm-view').innerHTML = api.renderFloorPlanSvg(model);
+    $('bm-area').textContent =
+      'مساحت محدوده ساختمان: ' +
+      (model.width * model.depth).toFixed(2) +
+      ' مترمربع | تعداد فضاها: ' + model.rooms.length;
+    $('bm-status').textContent = message || 'پلان آماده است.';
+    return true;
+  }
+
+  function overlaps(a, b) {
+    return a.x < b.x + b.width && a.x + a.width > b.x &&
+      a.y < b.y + b.depth && a.y + a.depth > b.y;
+  }
+
+  $('bm-room').addEventListener('change', fill);
+
+  $('bm-update').addEventListener('click', () => {
+    const old = selected();
+    if (!old) return;
+    const r = {
+      id: old.id,
+      name: $('bm-name').value.trim(),
+      x: Number($('bm-x').value),
+      y: Number($('bm-y').value),
+      width: Number($('bm-w').value),
+      depth: Number($('bm-d').value)
+    };
+    const candidate = {
+      ...model,
+      rooms: model.rooms.map(item => item.id === old.id ? r : item)
+    };
+    const errors = api.validateModel(candidate);
+    if (errors.length) {
+      $('bm-status').textContent = errors.join(' ');
+      return;
+    }
+    if (candidate.rooms.some(item =>
+      item.id !== r.id && overlaps(r, item))) {
+      $('bm-status').textContent =
+        'این فضا با فضای دیگری هم‌پوشانی دارد؛ موقعیت یا ابعاد را تغییر دهید.';
+      return;
+    }
+    model = candidate;
+    draw('ویرایش ثبت شد.');
+  });
+
+  $('bm-add').addEventListener('click', () => {
+    const w = Math.min(1, model.width - 0.4);
+    const d = Math.min(1, model.depth - 0.4);
+    let room = null;
+    if (w <= 0 || d <= 0) {
+      $('bm-status').textContent = 'ابعاد ساختمان کافی نیست.';
+      return;
+    }
+    for (let y = 0.2; y + d <= model.depth && !room; y += 0.25) {
+      for (let x = 0.2; x + w <= model.width; x += 0.25) {
+        const r = {
+          id: 'new-room-' + serial,
+          name: 'فضای جدید ' + serial,
+          x: Number(x.toFixed(2)),
+          y: Number(y.toFixed(2)),
+          width: w, depth: d
+        };
+        if (!model.rooms.some(item => overlaps(r, item))) {
+          room = r;
+          break;
+        }
+      }
+    }
+    if (!room) {
+      $('bm-status').textContent = 'فضای خالی مناسب پیدا نشد.';
+      return;
+    }
+    serial++;
+    model.rooms.push(room);
+    draw('فضای جدید اضافه شد.');
+    $('bm-room').value = room.id;
+    fill();
+  });
+
+  $('bm-delete').addEventListener('click', () => {
+    const r = selected();
+    if (!r) return;
+    if (model.rooms.length <= 1) {
+      $('bm-status').textContent = 'حداقل یک فضا باید باقی بماند.';
+      return;
+    }
+    model.rooms = model.rooms.filter(item => item.id !== r.id);
+    draw('فضا حذف شد.');
+  });
+
+  $('bm-save').addEventListener('click', () => {
+    try {
+      const svg = api.renderFloorPlanSvg(model);
+      const url = URL.createObjectURL(
+        new Blob([svg], {type: 'image/svg+xml;charset=utf-8'})
+      );
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'SKOS-multispace-floor-plan.svg';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      $('bm-status').textContent = 'درخواست دریافت SVG انجام شد.';
+    } catch (e) {
+      $('bm-status').textContent = 'خطا: ' + e.message;
+    }
+  });
+
+
+  $('bm-export-json').addEventListener('click', () => {
+    try {
+      const errors = api.validateModel(model);
+      if (errors.length) {
+        $('bm-status').textContent = errors.join(' ');
+        return;
+      }
+      const blob = new Blob(
+        [JSON.stringify(model, null, 2)],
+        { type: 'application/json;charset=utf-8' }
+      );
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'SKOS-building-project.json';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      $('bm-status').textContent = 'درخواست دریافت فایل پروژه JSON انجام شد.';
+    } catch (e) {
+      $('bm-status').textContent = 'خطای ذخیره: ' + e.message;
+    }
+  });
+
+  $('bm-import-json').addEventListener('click', () => {
+    $('bm-json-file').click();
+  });
+
+  $('bm-json-file').addEventListener('change', async event => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    try {
+      const candidate = JSON.parse(await file.text());
+      if (!candidate || !Array.isArray(candidate.rooms)) {
+        throw new Error('ساختار فایل پروژه معتبر نیست.');
+      }
+      const errors = api.validateModel(candidate);
+      if (errors.length) {
+        throw new Error(errors.join(' '));
+      }
+      if (!Array.isArray(candidate.openings)) {
+        throw new Error('اطلاعات درها و پنجره‌ها موجود نیست.');
+      }
+      model = candidate;
+      const serials = model.rooms.map(r => {
+        const m = /^new-room-(\d+)$/.exec(r.id || '');
+        return m ? Number(m[1]) : 0;
+      });
+      serial = Math.max(serial, ...serials.map(n => n + 1));
+      if (draw('پروژه با موفقیت بارگذاری شد.')) {
+        $('bm-status').textContent = 'پروژه بارگذاری شد.';
+      }
+    } catch (e) {
+      $('bm-status').textContent = 'بارگذاری ناموفق: ' + e.message;
+    } finally {
+      event.target.value = '';
+    }
+  });
+
+  draw('مدل اولیه بارگذاری شد.');
+})();
+</script>
+
+</html>

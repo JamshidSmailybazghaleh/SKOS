@@ -152,6 +152,13 @@ class SKOSSystemLauncher {
                 connector: this.sdkc
             });
 
+        this.repository =
+            new RepositoryService();
+
+        this.sdkc.attachRepository(
+            this.repository
+        );
+
         this.startup =
             new StartupManager();
 
@@ -199,6 +206,10 @@ class SKOSSystemLauncher {
 
         this.startup.attachKernel(
             this.kernel
+        );
+
+        this.startup.attachSDKC(
+            this.sdkc
         );
 
         this.startup.attachOrchestrator(

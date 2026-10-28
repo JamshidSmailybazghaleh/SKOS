@@ -1,6 +1,5 @@
 node_modules/
 .skos-toolchain/
-
 # Generated / runtime artifacts
 SKOS-Android/.gradle/
 SKOS-Android/build/
@@ -9,3 +8,5 @@ coverage/
 logs/
 monitoring/logs/
 *.tmp.js
+*.pre-*
+*.bak-*

@@ -83,6 +83,18 @@ class ModuleRegistry {
         };
 
 
+        this.pluginPaths = [];
+        this.loadedPlugins = new Map();
+        this.pluginMetadata = new Map();
+        this.securityContext = {
+            permissions: new Map(),
+            policies: new Map()
+        };
+        this.eventBus =
+            null;
+
+        this.eventSubscriptions =
+            new Map();
     }
 
 /**
@@ -692,7 +704,6 @@ list(){
 
 
 
-        module.enable();
 
 
 
@@ -1672,12 +1683,7 @@ list(){
 
 
     }
-    
-this.pluginPaths = [];
 
-this.loadedPlugins = new Map();
-
-this.pluginMetadata = new Map();
 
 /**
  * ==========================================================
@@ -2034,14 +2040,6 @@ getPluginReport(){
 
 }
 
-this.eventBus =
-
-    null;
-
-
-this.eventSubscriptions =
-
-    new Map();
 
  /**
  * ==========================================================
@@ -2450,13 +2448,6 @@ getEventSubscriptions(){
 
 }
 
-this.securityContext = {
-
-    permissions: new Map(),
-
-    policies: new Map()
-
-};
 
 /**
  * ==========================================================
@@ -2860,5 +2851,6 @@ destroy(){
     return true;
 
 
+}
 }
 module.exports = ModuleRegistry;    

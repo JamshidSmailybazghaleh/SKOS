@@ -18,6 +18,9 @@
 const KnowledgeQueryEngine =
     require("../engines/knowledge-query-engine/knowledge-query-engine");
 
+const KnowledgeRuntime = require("../knowledge/knowledge-runtime");
+const KnowledgeReasoningEngine = require("../engines/knowledge-graph-engine/knowledge-reasoning-engine");
+
 class SKOSKernel {
 
 
@@ -47,6 +50,10 @@ class SKOSKernel {
         this.events =
             [];
 
+        this.eventBridge =
+            options.eventBridge || null;
+
+this.sdkc = null;
 
         this.context = {
 
@@ -287,6 +294,29 @@ class SKOSKernel {
 
 
 
+    attachSDKC(sdkc) {
+
+        if (!sdkc) {
+            throw new Error(
+                "SDKC connector is required."
+            );
+        }
+
+        this.sdkc = sdkc;
+
+        this.context.sdkcConnected =
+            typeof sdkc.isConnected === "function"
+                ? sdkc.isConnected()
+                : true;
+
+        this.emit(
+            "SDKC_ATTACHED"
+        );
+
+        return true;
+    }
+
+
     connectSDKC() {
 
 
@@ -357,6 +387,11 @@ class SKOSKernel {
         });
 
     this.knowledgeQueryEngine.initialize();
+        this.knowledgeReasoningEngine =
+            new KnowledgeReasoningEngine();
+
+        this.knowledgeReasoningEngine.initialize();
+
 
     this.knowledgeRuntime.initialize();
 
@@ -431,9 +466,13 @@ class SKOSKernel {
 
         );
 
+        if (this.eventBridge) {
+            this.eventBridge.publish(
+                record
+            );
+        }
 
-
-        return record;
+return record;
 
     }
 
@@ -517,6 +556,26 @@ class SKOSKernel {
         }
 
 
+
+        /*
+         * ==================================================
+         * ILR-002.55-C
+         * KERNEL LIFECYCLE CONTEXT RESET
+         * ==================================================
+         *
+         * Shutdown must invalidate all active runtime
+         * capability flags.
+         * ==================================================
+         */
+
+        this.context.sdkcConnected =
+            false;
+
+        this.context.knowledgeReady =
+            false;
+
+        this.context.autonomousReady =
+            false;
 
         this.status =
             "SHUTDOWN";

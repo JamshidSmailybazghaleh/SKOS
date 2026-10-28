@@ -28,6 +28,9 @@ class SDKCRuntimeConnector {
 
         this.events = [];
 
+        this.eventBridge =
+            options.eventBridge || null;
+
         this.options = options;
     }
 
@@ -40,6 +43,22 @@ class SDKCRuntimeConnector {
         return true;
     }
 
+
+
+
+    initialize() {
+
+        if (!this.repository) {
+
+            throw new Error(
+                "SDKC repository must be attached before initialization."
+            );
+
+        }
+
+        return this.connect();
+
+    }
 
 
     connect() {
@@ -124,6 +143,71 @@ class SDKCRuntimeConnector {
 
 
 
+    existsKnowledgeObject(id) {
+        if (!this.isConnected()) {
+            throw new Error(
+                "SDKC not connected."
+            );
+        }
+
+        if (
+            this.repository &&
+            typeof this.repository.exists === "function"
+        ) {
+            return this.repository.exists(id);
+        }
+
+        return false;
+    }
+
+    updateKnowledgeObject(id, object) {
+
+        if (!this.isConnected()) {
+
+            throw new Error(
+                "SDKC not connected."
+            );
+
+        }
+
+
+        if (
+            this.repository &&
+            typeof this.repository.update ===
+                "function"
+        ) {
+
+            return this.repository.update(
+                id,
+                object
+            );
+
+        }
+
+
+        return null;
+
+    }
+
+
+
+    loadKnowledgeObjectContent(id) {
+        if (!this.isConnected()) {
+            throw new Error(
+                "SDKC not connected."
+            );
+        }
+
+        if (
+            this.repository &&
+            typeof this.repository.loadContent === "function"
+        ) {
+            return this.repository.loadContent(id);
+        }
+
+        return null;
+    }
+
     loadKnowledgeObject(id) {
 
         if (!this.isConnected()) {
@@ -172,21 +256,100 @@ class SDKCRuntimeConnector {
 
 
 
+    removeKnowledgeObject(id) {
+        if (!this.isConnected()) {
+            throw new Error(
+                "SDKC not connected."
+            );
+        }
+
+        if (
+            this.repository &&
+            typeof this.repository.remove === "function"
+        ) {
+            return this.repository.remove(id);
+        }
+
+        return false;
+    }
+
     emit(event, data = {}) {
 
-        this.events.push({
-
+        const record = {
             event,
-
             data,
-
             timestamp:
                 new Date()
+        };
 
-        });
+        this.events.push(
+            record
+        );
+
+        if (this.eventBridge) {
+            this.eventBridge.publish(
+                record
+            );
+        }
+
+        return record;
 
     }
 
+
+    resolveAsset(relativePath, rootName) {
+        if (!this.isConnected()) {
+            throw new Error("SDKC not connected.");
+        }
+
+        if (
+            this.repository &&
+            typeof this.repository.resolveAsset === "function"
+        ) {
+            return this.repository.resolveAsset(relativePath, rootName);
+        }
+
+        throw new Error("Repository asset resolver unavailable.");
+    }
+
+    listAssets() {
+        if (!this.isConnected()) {
+            throw new Error("SDKC not connected.");
+        }
+
+        if (
+            this.repository &&
+            typeof this.repository.listAssets === "function"
+        ) {
+            return this.repository.listAssets();
+        }
+
+        return [];
+    }
+
+
+    synchronizeRepository() {
+        if (!this.isConnected()) {
+            throw new Error(
+                "SDKC not connected."
+            );
+        }
+
+        if (
+            this.repository &&
+            typeof this.repository.synchronize === "function"
+        ) {
+            return this.repository.synchronize();
+        }
+
+        return false;
+    }
+
+    shutdown() {
+
+        return this.disconnect();
+
+    }
 
 
     getEvents() {

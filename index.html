@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SKOS Owner Gateway</title>
+
+<style>
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #101820;
+    color: white;
+}
+
+header {
+    background: #1b2838;
+    padding: 25px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+header p {
+    color: #b0bec5;
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.card {
+    background: #1f2d3d;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+h2 {
+    color: #4fc3f7;
+}
+
+.value {
+    font-weight: bold;
+}
+
+.operation {
+    border-bottom: 1px solid #455a64;
+    padding: 12px 0;
+}
+
+.operation:last-child {
+    border-bottom: none;
+}
+
+.error {
+    color: #ffb74d;
+}
+
+.warning {
+    color: #ffd54f;
+}
+
+.success {
+    color: #81c784;
+}
+
+.unknown {
+    color: #b0bec5;
+}
+
+.pulse {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.metric {
+    margin: 10px 0;
+}
+
+.recommendation {
+    background: #263746;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+a {
+    color: #4fc3f7;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+footer {
+    margin-top: 40px;
+    padding: 20px;
+    text-align: center;
+    color: #90a4ae;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <h1>SKOS Owner Gateway</h1>
+
+    <p>
+        Smaily Knowledge Operating System
+    </p>
+
+</header>
+
+
+<div class="container">
+
+
+<!-- =====================================
+     EXECUTIVE PULSE
+     ===================================== -->
+
+<div class="card">
+
+    <h2>SKOS Executive Pulse</h2>
+
+    <div class="metric">
+        Date:
+        <span id="currentDate" class="value">
+            Loading...
+        </span>
+    </div>
+
+    <div class="metric">
+        Time:
+        <span id="currentTime" class="value">
+            Loading...
+        </span>
+    </div>
+
+    <div class="metric">
+        Continuous Flow:
+        <span id="flowStatus" class="value">
+            CONTINUOUS
+        </span>
+    </div>
+
+    <div class="metric">
+        Data Freshness:
+        <span id="dataFreshness" class="unknown">
+            Checking...
+        </span>
+    </div>
+
+    <div class="metric">
+        Alerts:
+        <span id="alertStatus" class="unknown">
+            Checking...
+        </span>
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     RESULTS
+     ===================================== -->
+
+<div class="card">
+
+    <h2>Results</h2>
+
+    <div class="metric">
+        Operational Result:
+        <span id="operationalResult" class="unknown">
+            UNKNOWN
+        </span>
+    </div>
+
+    <div class="metric">
+        Revenue:
+        <span id="revenueStatus" class="unknown">
+            UNKNOWN
+        </span>
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     RECOMMENDED ACTION
+     ===================================== -->
+
+<div class="card">
+
+    <h2>Recommended Next Action</h2>
+
+    <div id="recommendedAction" class="recommendation">
+        Evaluating current state...
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     SYSTEM STATUS
+     ===================================== -->
+
+<div class="card">
+
+    <h2>System Status</h2>
+
+    <div id="systemStatus">
+        Loading...
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     ACTIVE MISSION
+     ===================================== -->
+
+<div class="card">
+
+    <h2>Active Mission</h2>
+
+    <div id="missionStatus">
+        Loading...
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     OPERATIONS
+     ===================================== -->
+
+<div class="card">
+
+    <h2>Operations</h2>
+
+    <div id="operationsStatus">
+        Loading...
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     REPOSITORY
+     ===================================== -->
+
+<div class="card">
+
+    <h2>Repository</h2>
+
+    <p>
+
+        <a
+            href="https://github.com/JamshidSmailybazghaleh/SKOS"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            Open SKOS Repository
+        </a>
+
+    </p>
+
+</div>
+
+
+<!-- =====================================
+     CORE CONTROL AREAS
+     ===================================== -->
+
+<div class="card">
+
+    <h2>Core Control Areas</h2>
+
+    <ul>
+
+        <li>System</li>
+
+        <li>Missions</li>
+
+        <li>Operations</li>
+
+        <li>Knowledge</li>
+
+        <li>Projects</li>
+
+        <li>Assets</li>
+
+        <li>Commerce</li>
+
+        <li>Recovery</li>
+
+    </ul>
+
+</div>
+
+
+</div>
+
+
+<footer>
+
+    SKOS Owner Gateway
+
+</footer>
+
+
+<script>
+
+
+/* =====================================
+   CONFIGURATION
+   ===================================== */
+
+const BASE_PATH =
+    "./executive-command-center/data/";
+
+const STALE_LIMIT_DAYS = 7;
+
+
+/* =====================================
+   DATA LOADER
+   ===================================== */
+
+async function getData(file) {
+
+    const response = await fetch(
+        BASE_PATH + file + "?v=" + Date.now(),
+        {
+            cache: "no-store"
+        }
+    );
+
+    if (!response.ok) {
+
+        throw new Error(
+            file + " HTTP " + response.status
+        );
+
+    }
+
+    return await response.json();
+
+}
+
+
+/* =====================================
+   LIVE DATE & TIME
+   ===================================== */
+
+function updateClock() {
+
+    const now = new Date();
+
+    document.getElementById(
+        "currentDate"
+    ).textContent =
+        now.toLocaleDateString();
+
+    document.getElementById(
+        "currentTime"
+    ).textContent =
+        now.toLocaleTimeString();
+
+}
+
+
+/* =====================================
+   DATA FRESHNESS
+   ===================================== */
+
+function evaluateFreshness(lastUpdated) {
+
+    if (!lastUpdated) {
+
+        return {
+            status: "UNKNOWN",
+            className: "unknown"
+        };
+
+    }
+
+    const updated =
+        new Date(lastUpdated);
+
+    if (isNaN(updated.getTime())) {
+
+        return {
+            status: "UNKNOWN",
+            className: "unknown"
+        };
+
+    }
+
+    const now =
+        new Date();
+
+    const age =
+        now.getTime() -
+        updated.getTime();
+
+    const days =
+        age / (
+            1000 *
+            60 *
+            60 *
+            24
+        );
+
+    if (days > STALE_LIMIT_DAYS) {
+
+        return {
+            status:
+                "STALE — " +
+                Math.floor(days) +
+                " days old",
+            className:
+                "warning"
+        };
+
+    }
+
+    return {
+        status:
+            "CURRENT",
+        className:
+            "success"
+    };
+
+}
+
+
+/* =====================================
+   SYSTEM
+   ===================================== */
+
+async function showSystem() {
+
+    const target =
+        document.getElementById(
+            "systemStatus"
+        );
+
+    try {
+
+        const data =
+            await getData(
+                "status.json"
+            );
+
+        target.innerHTML = `
+
+            <p class="pulse">
+                🟢 ${data.organization || "ONLINE"}
+            </p>
+
+            <p>
+                System:
+                <span class="value">
+                    ${data.system || "UNKNOWN"}
+                </span>
+            </p>
+
+            <p>
+                Platforms:
+                <span class="value">
+                    ${data.platforms ?? 0}
+                </span>
+            </p>
+
+            <p>
+                Missions:
+                <span class="value">
+                    ${data.missions ?? 0}
+                </span>
+            </p>
+
+        `;
+
+    } catch (error) {
+
+        target.innerHTML =
+            `<p class="error">
+                Status data unavailable.
+            </p>`;
+
+    }
+
+}
+
+
+/* =====================================
+   MISSION
+   ===================================== */
+
+async function showMission() {
+
+    const target =
+        document.getElementById(
+            "missionStatus"
+        );
+
+    try {
+
+        const data =
+            await getData(
+                "missions.json"
+            );
+
+        target.innerHTML = `
+
+            <p>
+                <strong>
+                    ${data.id || "Mission"}
+                </strong>
+            </p>
+
+            <p>
+                ${data.title ||
+                    "No mission title"}
+            </p>
+
+            <p>
+                Status:
+                <span class="value">
+                    ${data.status ||
+                        "UNKNOWN"}
+                </span>
+            </p>
+
+            <p>
+                Progress:
+                <span class="value">
+                    ${data.progress ?? 0}%
+                </span>
+            </p>
+
+        `;
+
+    } catch (error) {
+
+        target.innerHTML =
+            `<p class="error">
+                Mission data unavailable.
+            </p>`;
+
+    }
+
+}
+
+
+/* =====================================
+   OPERATIONS
+   ===================================== */
+
+async function showOperations() {
+
+    const target =
+        document.getElementById(
+            "operationsStatus"
+        );
+
+    try {
+
+        const data =
+            await getData(
+                "operations.json"
+            );
+
+        const operations =
+            Array.isArray(
+                data.operations
+            )
+            ? data.operations
+            : [];
+
+        if (
+            operations.length === 0
+        ) {
+
+            target.innerHTML =
+                `<p class="warning">
+                    No operations found.
+                </p>`;
+
+            return;
+
+        }
+
+
+        let html = "";
+
+
+        operations.forEach(
+            function(operation) {
+
+                html += `
+
+                    <div class="operation">
+
+                        <p>
+                            <strong>
+                                ${operation.id ||
+                                    "Operation"}
+                            </strong>
+                        </p>
+
+                        <p>
+                            ${operation.name ||
+                                "Unnamed Operation"}
+                        </p>
+
+                        <p>
+                            Category:
+                            <span class="value">
+                                ${operation.category ||
+                                    "N/A"}
+                            </span>
+                        </p>
+
+                        <p>
+                            Status:
+                            <span class="value">
+                                ${operation.status ||
+                                    "UNKNOWN"}
+                            </span>
+                        </p>
+
+                        <p>
+                            Progress:
+                            <span class="value">
+                                ${operation.progress ??
+                                    0}%
+                            </span>
+                        </p>
+
+                        <p>
+                            Priority:
+                            <span class="value">
+                                ${operation.priority ||
+                                    "N/A"}
+                            </span>
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+
+        target.innerHTML =
+            html;
+
+
+        /* DATA FRESHNESS */
+
+        const freshness =
+            evaluateFreshness(
+                data.lastUpdated
+            );
+
+
+        const freshnessTarget =
+            document.getElementById(
+                "dataFreshness"
+            );
+
+        freshnessTarget.textContent =
+            freshness.status;
+
+        freshnessTarget.className =
+            freshness.className;
+
+
+        /* ALERT */
+
+        const alertTarget =
+            document.getElementById(
+                "alertStatus"
+            );
+
+
+        if (
+            freshness.status
+                .startsWith("STALE")
+        ) {
+
+            alertTarget.textContent =
+                "⚠ DATA STALE";
+
+            alertTarget.className =
+                "warning";
+
+
+            document.getElementById(
+                "recommendedAction"
+            ).innerHTML = `
+
+                ⚠️
+                <strong>
+                    Preventive Alert
+                </strong>
+
+                <p>
+                    Operations data is older
+                    than the defined freshness
+                    threshold.
+                </p>
+
+                <p>
+                    Recommended action:
+                    review and update the
+                    operational checkpoint
+                    before relying on these
+                    values for decisions.
+                </p>
+
+            `;
+
+        } else {
+
+            alertTarget.textContent =
+                "NONE";
+
+            alertTarget.className =
+                "success";
+
+
+            document.getElementById(
+                "recommendedAction"
+            ).innerHTML = `
+
+                <strong>
+                    Flow Normal
+                </strong>
+
+                <p>
+                    No freshness alert is
+                    currently detected.
+                </p>
+
+            `;
+
+        }
+
+
+    } catch (error) {
+
+        target.innerHTML =
+            `<p class="error">
+                Operations data unavailable.
+            </p>`;
+
+        document.getElementById(
+            "dataFreshness"
+        ).textContent =
+            "UNKNOWN";
+
+        document.getElementById(
+            "alertStatus"
+        ).textContent =
+            "⚠ DATA UNAVAILABLE";
+
+        document.getElementById(
+            "alertStatus"
+        ).className =
+            "warning";
+
+        document.getElementById(
+            "recommendedAction"
+        ).innerHTML = `
+
+            ⚠️
+            <strong>
+                Data Availability Alert
+            </strong>
+
+            <p>
+                Operations data could not
+                be verified.
+            </p>
+
+        `;
+
+    }
+
+}
+
+
+/* =====================================
+   INITIAL RESULTS STATE
+   ===================================== */
+
+function initializeResults() {
+
+    document.getElementById(
+        "operationalResult"
+    ).textContent =
+        "UNKNOWN";
+
+    document.getElementById(
+        "revenueStatus"
+    ).textContent =
+        "UNKNOWN";
+
+}
+
+
+/* =====================================
+   START
+   ===================================== */
+
+initializeResults();
+
+updateClock();
+
+setInterval(
+    updateClock,
+    1000
+);
+
+
+showSystem();
+
+showMission();
+
+showOperations();
+
+
+</script>
+
+</body>
+</html>

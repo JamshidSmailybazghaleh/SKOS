@@ -44,6 +44,7 @@ class MockBootstrap {
 
 
 
+
 class MockKernel {
 
     constructor() {
@@ -246,7 +247,6 @@ describe(
         test(
             "Should execute startup sequence",
             () => {
-
                 startup.attachBootstrap(
                     new MockBootstrap()
                 );
@@ -270,11 +270,8 @@ describe(
                 expect(
                     startup.status
                 ).toBe("READY");
-
             }
         );
-
-
 
         test(
             "Should connect SDKC",
@@ -339,7 +336,6 @@ describe(
         test(
             "Should record executed steps",
             () => {
-
                 startup.attachBootstrap(
                     new MockBootstrap()
                 );
@@ -361,11 +357,8 @@ describe(
                 expect(
                     startup.getSteps().length
                 ).toBeGreaterThan(0);
-
             }
         );
-
-
 
         test(
             "Should return runtime status",

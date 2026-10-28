@@ -13,20 +13,27 @@
  */
 
 
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
+
+const RepositoryService =
+    require("../../src/engines/sdkc-engine/repository-service");
+
 const SKOSAlphaRuntime =
     require("../../src/runtime/skos-alpha-runtime");
 
 
 const IntegrationManager =
-    require("../../src/runtime/integration-manager");
+    require("../../src/integration-manager");
 
 
 const IntegrationValidator =
-    require("../../src/runtime/integration-validator");
+    require("../../src/integration-validator");
 
 
 const IntegrationReport =
-    require("../../src/runtime/integration-report");
+    require("../../src/integration-report");
 
 
 
@@ -36,6 +43,8 @@ describe(
 
 
     let runtime;
+    let repository;
+    let rootPath;
     let manager;
     let validator;
     let report;
@@ -43,19 +52,26 @@ describe(
 
 
     beforeEach(() => {
+        rootPath = fs.mkdtempSync(
+            path.join(
+                os.tmpdir(),
+                "skos-runtime-"
+            )
+        );
 
-        runtime =
-            new SKOSAlphaRuntime();
+        repository = new RepositoryService({
+            rootPath
+        });
 
-        manager =
-            new IntegrationManager();
+        repository.connect();
 
-        validator =
-            new IntegrationValidator();
+        runtime = new SKOSAlphaRuntime({
+            repository
+        });
 
-        report =
-            new IntegrationReport();
-
+        manager = new IntegrationManager();
+        validator = new IntegrationValidator();
+        report = new IntegrationReport();
     });
 
 

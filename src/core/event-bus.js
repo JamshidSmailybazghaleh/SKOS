@@ -69,6 +69,20 @@ class EventBus {
         };
 
 
+        this.history = [];
+        this.maxHistory = options.maxHistory || 1000;
+          this.wildcardListeners = [];
+
+          this.queue = [];
+          this.processingQueue = false;
+          this.middlewares = [];
+          this.errorHandlers = [];
+          this.schemas = new Map();
+          this.metrics = {
+            totalEvents: 0,
+            failedEvents: 0,
+            successfulEvents: 0
+          };
     }
 
 /**
@@ -233,7 +247,7 @@ id="eventp201"
 
                 const response =
 
-                    handler(
+                    handler.handler(
 
                         payload
 
@@ -584,17 +598,8 @@ getListeners(
         []
 
     );
+  }
 
-
-}
-
-this.history = [];
-
-this.maxHistory =
-
-    options.maxHistory ||
-
-    1000;
 
   /**
  * ==========================================================
@@ -647,18 +652,6 @@ recordHistory(
 
 
 }
-
-emit()
-
-  return result;
-
-  this.recordHistory(
-
-    event,
-
-    payload
-
-);
 
 /**
  * Get Event History
@@ -759,7 +752,6 @@ replay(
 
 }
 
-this.wildcardListeners = [];
   
  /**
  * Wildcard Subscription
@@ -785,28 +777,6 @@ onAny(
 
 } 
   
-for(
-
-    const handler
-
-    of
-
-    this.wildcardListeners
-
-){
-
-
-    handler({
-
-        event,
-
-        payload
-
-
-    });
-
-
-}
 
 on(
 
@@ -878,44 +848,8 @@ on(
 
 }
 
-for(
-
- const handler of listeners
-
-)
-
-for(
-
-    const listener
-
-    of
-
-    listeners
-
-){
 
 
-    const handler =
-
-        listener.handler;
-
-
-
-    ...
-
-
-}
-
-this.queue = [];
-
-
-this.processingQueue = false;
-
-
-this.middlewares = [];
-
-
-this.errorHandlers = [];
 
 /**
  * ==========================================================
@@ -1314,37 +1248,8 @@ safeEmit(
 
 }
 
-this.schemas =
-
-    new Map();
 
 
-this.metrics = {
-
-
-    totalEvents:
-
-        0,
-
-
-    failedEvents:
-
-        0,
-
-
-    successfulEvents:
-
-        0
-
-
-
-};
-
-SKOS.KNOWLEDGE.CREATED
-
-SKOS.AI.REASONING.STARTED
-
-SKOS.SYSTEM.ERROR
 
 /**
  * ==========================================================
@@ -1353,58 +1258,12 @@ SKOS.SYSTEM.ERROR
  */
 
 
-createNamespace(
-
-    domain,
-
-    action
-
-){
-
-
-    return (
-
-        `SKOS.${domain}.${action}`
-
-    createNamespace(
-
-        domain,
-
-        action
-
-    ){
-
-
-        if(
-
-            !domain ||
-
-            !action
-
-        ){
-
-
-            throw new Error(
-
-                "Event namespace requires domain and action."
-
-            );
-
-
-        }
-
-
-
-        return (
-
-            `SKOS.${domain}.${action}`
-
-                .toUpperCase()
-
-        );
-
-
+  createNamespace(domain, action){
+    if(!domain || !action){
+      throw new Error("Event namespace requires domain and action.");
     }
+    return `SKOS.${domain}.${action}`.toUpperCase();
+  }
 
 /**
  * ==========================================================
@@ -1531,31 +1390,6 @@ registerEvent(
 
 }
 
-const EVENT =
-
-eventBus.createNamespace(
-
-    "KNOWLEDGE",
-
-    "CREATED"
-
-);
-
-SKOS.KNOWLEDGE.CREATED
-
-eventBus.emitValidated(
-
-    "SKOS.KNOWLEDGE.CREATED",
-
-    {
-
-        id:
-
-        "KNOW-00001"
-
-    }
-
-);
 
 /**
  * ==========================================================
@@ -1819,31 +1653,6 @@ shutdown(){
 
 
 }
-
-this.events = new Map();
-
-this.history = [];
-
-this.queue = [];
-
-this.middlewares = [];
-
-this.errorHandlers = [];
-
-this.wildcardListeners = [];
-
-this.schemas = new Map();
-
-this.metrics = {
-
-    totalEvents: 0,
-
-    failedEvents: 0,
-
-    successfulEvents: 0
-
-};
-
 
 }
 

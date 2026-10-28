@@ -7,13 +7,26 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe Live Worker
+      - name: Probe Worker Root
         run: |
           set -e
           curl -4 --http1.1 --silent --show-error \
             --max-time 20 \
-            --dump-header /tmp/headers \
+            --dump-header /tmp/root-headers \
             --output /dev/null \
             'https://smaily-commerce-api.iran-jsbsmaily1.workers.dev/'
-          echo '=== HTTP HEADERS ==='
-          sed -n '1,40p' /tmp/headers
+          echo '=== ROOT HTTP HEADERS ==='
+          sed -n '1,40p' /tmp/root-headers
+
+      - name: Probe Commerce Status
+        run: |
+          set -e
+          curl -4 --http1.1 --silent --show-error \
+            --max-time 20 \
+            --dump-header /tmp/status-headers \
+            --output /tmp/status-body \
+            'https://smaily-commerce-api.iran-jsbsmaily1.workers.dev/commerce/status'
+          echo '=== STATUS HTTP HEADERS ==='
+          sed -n '1,40p' /tmp/status-headers
+          echo '=== STATUS RESPONSE BODY ==='
+          cat /tmp/status-body

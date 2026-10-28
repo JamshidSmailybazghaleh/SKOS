@@ -180,7 +180,6 @@ class SKOSModule {
 
     }
 
-}
     /**
      * ==========================================================
      * Lifecycle Management
@@ -225,44 +224,36 @@ class SKOSModule {
      */
 
     execute(context = {}) {
-
         if (!this.initialized) {
-
             throw new Error(
                 `${this.name} has not been initialized.`
             );
-
         }
 
         if (!this.enabled) {
-
             return false;
-
         }
 
         this.beforeExecute(context);
-
         this.executionCount++;
+        this.lastExecution = new Date();
 
-        this.lastExecution =
-            new Date();
+        this.status = "RUNNING";
 
-        this.status =
-            "RUNNING";
+        try {
+            const result = this.onExecute(context);
 
-        const result =
-            this.onExecute(context);
+            this.afterExecute(context, result);
 
-        this.afterExecute(context, result);
+            this.status = "READY";
+            this.metadata.updatedAt = new Date();
 
-        this.status =
-            "READY";
-
-        this.metadata.updatedAt =
-            new Date();
-
-        return result;
-
+            return result;
+        } catch (error) {
+            this.setError(error);
+            this.metadata.updatedAt = new Date();
+            throw error;
+        }
     }
 
     /**
@@ -357,17 +348,6 @@ class SKOSModule {
         );
 
     }
-this.executionCount =
-    0;
-
-this.lastExecution =
-    null;
-
-this.runtimeContext =
-    {};
-
-this.lastError =
-    null;
 
     /**
      * ==========================================================
@@ -678,37 +658,9 @@ this.lastError =
 
     }
 
-this.configuration =
-
-    {
-
-        ...(options.configuration || {})
-
-    };
 
 
 
-this.environment =
-
-    {
-
-        mode:
-
-            "development"
-
-    };
-
-
-
-this.runtimeContext =
-
-    {
-
-        services:
-
-            {}
-
-    };
 
     /**
  * ==========================================================
@@ -1063,21 +1015,6 @@ getDependencyReport(){
 
 }
 
-capabilities:
-
-[
- "knowledge.graph",
- "semantic.link",
- "query.execution"
-]
-
-
-dependencies:
-
-[
- "semantic-engine",
- "registry-engine"
-]
 
 /**
  * ==========================================================
@@ -1829,17 +1766,6 @@ restore(
 
 }
 
-this.metrics = {};
-
-this.auditLog = [];
-
-this.lastError = null;
-
-this.executionCount = 0;
-
-this.initializeMetrics();
-
-this.initializeAudit();
 
 /**
  * ==========================================================
